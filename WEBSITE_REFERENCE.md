@@ -6,7 +6,7 @@ A single-file, self-contained portfolio site. Use this document as the map for a
 
 ## 1. At a glance
 
-- **Main file:** `Claude Portfolio Interactive.html` (~1,710 lines). Everything — HTML, CSS, and JS — lives in this one file. There is no build step; open the file in a browser to run it.
+- **Main file:** `index.html` (~1,710 lines). Everything — HTML, CSS, and JS lives in this one file. There is no build step; open it in a browser or deploy to Vercel from the repo root.
 - **Structure inside the file:**
   - `<head>` — fonts + libraries (lines ~1-15)
   - `<style>` — all CSS (starts ~line 15)
