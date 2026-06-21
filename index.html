@@ -391,6 +391,7 @@ section{position:relative;z-index:5}
   padding:3px 7px;border-radius:5px;margin-left:9px;vertical-align:2px}
 .ach-item .badge.award{background:rgba(243,212,94,.28);color:#9a7d1e}
 .ach-item .badge.ship{background:#efeee7;color:#8c897f}
+.ach-item .badge.wip{background:#efeee7;color:#a7a399}
 .ach-item .d{font-size:12px;color:#6b6859;margin-top:4px}
 
 /* ----- Testimonials view ----- */
@@ -1331,19 +1332,16 @@ function renderSnapshot() {
    ACHIEVEMENTS view
    ========================================================= */
 const STATS = [
-  { big: '2.4M+', lbl: 'Visits driven' },
-  { big: '150+', lbl: 'Sites launched' },
-  { big: '98', lbl: 'Avg Lighthouse' },
+  { big: '100', lbl: 'Visits driven' },
+  { big: '5', lbl: 'Sites launched' },
+  { big: '0', lbl: 'Avg Lighthouse' },
 ];
 const ACHV = [
-  { yr: '2026', t: 'Awwwards', d: 'Site of the Day for a client launch', badge: 'award' },
-  { yr: '2026', t: 'CSS Design Awards', d: 'UI / UX special kudos', badge: 'award' },
-  { yr: '2026', t: 'Featured on Godly & Land-book', d: 'Curated web-design galleries', badge: 'award' },
-  { yr: '2025', t: 'E-commerce rebuild', d: '+42% conversion, −38% bounce in Q1', badge: 'ship' },
-  { yr: '2025', t: 'SaaS marketing site', d: '318% organic traffic growth in 6 months', badge: 'ship' },
-  { yr: '2025', t: 'Open-source UI kit', d: '12k+ downloads on the Figma community', badge: 'ship' },
-  { yr: '2024', t: 'Focus Now — Chrome extension', d: 'Built with Cursor · shipped to the Web Store', badge: 'ship' },
-  { yr: '2024', t: 'Design system adopted by 3 teams', d: 'Tokens synced from Figma to code', badge: 'ship' },
+  { yr: '2026', t: 'Started the Portfolio', d: 'Designed and built this portfolio site', badge: 'ship' },
+  { yr: '—', t: 'Work in progress', d: '', badge: 'wip' },
+  { yr: '—', t: 'Work in progress', d: '', badge: 'wip' },
+  { yr: '—', t: 'Work in progress', d: '', badge: 'wip' },
+  { yr: '—', t: 'Work in progress', d: '', badge: 'wip' },
 ];
 
 function renderAch() {
@@ -1357,7 +1355,7 @@ function renderAch() {
     </div>
     <div class="ach-h">Awards &amp; shipped work</div>
     <div class="ach-list">
-      ${ACHV.map(a => `<div class="ach-item"><span class="yr">${a.yr}</span><div class="meta"><span class="t">${a.t}</span><span class="badge ${a.badge}">${a.badge === 'award' ? 'award' : 'shipped'}</span><div class="d">${a.d}</div></div></div>`).join('')}
+      ${ACHV.map(a => `<div class="ach-item"><span class="yr">${a.yr}</span><div class="meta"><span class="t">${a.t}</span><span class="badge ${a.badge}">${a.badge === 'award' ? 'award' : a.badge === 'wip' ? 'wip' : 'shipped'}</span>${a.d ? `<div class="d">${a.d}</div>` : ''}</div></div>`).join('')}
     </div>`;
 }
 
