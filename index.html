@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Sam MacKinley — Web Designer</title>
 <meta name="description" content="I think, then I build. Web designer with 8+ years crafting digital experiences." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231B1B18'/%3E%3Ctext x='16' y='23' text-anchor='middle' font-family='system-ui,sans-serif' font-size='18' font-weight='700' fill='%23F1F0EB'%3ES%3C/text%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
@@ -712,7 +713,7 @@ footer .made svg{width:14px;height:14px}
     </div>
 
     <!-- profile device -> linkedin -->
-    <a class="sticker device link-sticker parallax" data-depth="22" data-link="https://www.linkedin.com/in/sammackinley" href="https://www.linkedin.com/in/sammackinley" target="_blank" rel="noopener" style="text-decoration:none">
+    <a class="sticker device link-sticker parallax" data-depth="22" data-link="https://www.linkedin.com/in/sam-mackinley-955166b3" href="https://www.linkedin.com/in/sam-mackinley-955166b3" target="_blank" rel="noopener" style="text-decoration:none">
       <div class="strap">SAM MACKINLEY · DESIGN</div>
       <div class="card">
         <div class="zh">Sam.</div>
@@ -759,8 +760,8 @@ footer .made svg{width:14px;height:14px}
     <!-- pixel clock -->
     <div class="sticker pixel parallax" data-depth="16"><canvas id="pxclock" width="64" height="64"></canvas></div>
 
-    <!-- photo board -> dribbble -->
-    <a class="sticker board link-sticker parallax" data-depth="9" data-link="https://dribbble.com/sammackinley" href="https://dribbble.com/sammackinley" target="_blank" rel="noopener" style="text-decoration:none">
+    <!-- photo board -->
+    <div class="sticker board parallax" data-depth="9">
       <div class="kraft">
         <div class="pile">
           <div class="pho" style="left:8px;top:0;transform:rotate(-8deg)"><i style="background:linear-gradient(135deg,#a8d8ea,#71b7d8)"></i></div>
@@ -770,10 +771,10 @@ footer .made svg{width:14px;height:14px}
         </div>
         <div class="label">capture<br>moments</div>
       </div>
-    </a>
+    </div>
 
-    <!-- vinyl playlist -> playlist -->
-    <a class="sticker vinyl link-sticker parallax" data-depth="13" data-link="https://open.spotify.com/playlist/vibecoding" href="https://open.spotify.com/playlist/vibecoding" target="_blank" rel="noopener" style="text-decoration:none">
+    <!-- vinyl playlist -> spotify -->
+    <a class="sticker vinyl link-sticker parallax" data-depth="13" data-link="https://open.spotify.com/playlist/6WTT2unDySBchtLpJJStud" href="https://open.spotify.com/playlist/6WTT2unDySBchtLpJJStud" target="_blank" rel="noopener" style="text-decoration:none">
       <div class="card">
         <div class="glow"></div>
         <div class="disc">
@@ -838,7 +839,7 @@ footer .made svg{width:14px;height:14px}
 
   <div class="sticky reveal">
     <div class="dots"><i></i><i></i><i></i><i></i></div>
-    I care about craft, how clearly things communicate, handle edge cases, and build trust. Always in "let me try this" mode, curious, building, and exploring.
+    I design and build websites that look sharp and work hard — clear messaging, smooth experiences, and results you can measure. Always shipping, always learning, always finishing what I start.
   </div>
 
   <div class="about-copy">
@@ -893,15 +894,12 @@ footer .made svg{width:14px;height:14px}
 <!-- ===================== FOOTER ===================== -->
 <footer>
   <div class="links">
-    <a href="https://x.com/sammackinley" target="_blank" rel="noopener" data-link="https://x.com/sammackinley">{X}</a>
-    <a href="https://www.linkedin.com/in/sammackinley" target="_blank" rel="noopener" data-link="https://www.linkedin.com/in/sammackinley">{LinkedIn}</a>
-    <a href="https://dribbble.com/sammackinley" target="_blank" rel="noopener" data-link="https://dribbble.com/sammackinley">{Dribbble}</a>
-    <a href="https://github.com/sammackinley" target="_blank" rel="noopener" data-link="https://github.com/sammackinley">{Github}</a>
-    <a href="https://codepen.io/sammackinley" target="_blank" rel="noopener" data-link="https://codepen.io/sammackinley">{CodePen}</a>
+    <a href="https://www.linkedin.com/in/sam-mackinley-955166b3" target="_blank" rel="noopener" data-link="https://www.linkedin.com/in/sam-mackinley-955166b3">{LinkedIn}</a>
+    <a href="https://open.spotify.com/playlist/6WTT2unDySBchtLpJJStud" target="_blank" rel="noopener" data-link="https://open.spotify.com/playlist/6WTT2unDySBchtLpJJStud">{Spotify}</a>
   </div>
   <div class="made">
     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6z"/></svg>
-    Built with Claude Code · Shipped on Vercel
+    Shipped on Vercel
     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6z"/></svg>
   </div>
 </footer>
@@ -1129,27 +1127,27 @@ const FOLDERS = [
     preview: { type: 'image', css: 'linear-gradient(135deg,#7BA7D9,#4f79b0)', cap: 'shipped & live' },
     h: 'Client Work',
     body: '<p>I partner with founders and brands to design and ship <b>high-converting websites</b> end-to-end — from positioning and information architecture through to pixel-level UI and a clean front-end build.</p><p>Recent work spans SaaS marketing sites, e-commerce storefronts, and a design system adopted across three product teams.</p><p class="em">Most launches lift conversion 20–40% in the first quarter.</p>',
-    acts: [{ t: 'View case studies', href: 'https://dribbble.com/sammackinley' }] },
+    acts: [] },
   { key: 'ai', name: 'Designing with AI', color: 'var(--f-tan)', icon: 'sparkle',
     preview: { type: 'play', cap: 'I design, then I build' },
     h: 'Designing with AI',
-    body: '<p>Prototyping and building with AI tools — turning ideas into working interfaces fast and shipping along the way.</p><p>Highlights include a <b>Chrome extension</b> for focused browsing, generative landing-page experiments, and <b>this very portfolio</b>, designed and built with Claude.</p>',
-    acts: [{ t: 'Vibe-coding log', href: 'https://github.com/sammackinley' }] },
+    body: '<p>Prototyping and building with AI tools — turning ideas into working interfaces fast and shipping along the way.</p><p>Highlights include a <b>Chrome extension</b> for focused browsing, generative landing-page experiments, and <b>this very portfolio</b>.</p>',
+    acts: [] },
   { key: 'mkt', name: 'Digital Marketing', color: 'var(--f-green)', icon: 'chart',
     preview: { type: 'grad', css: 'linear-gradient(135deg,#86C896,#4f9e63)', cap: '+318% organic' },
     h: 'Digital Marketing',
     body: '<p>Design that performs. I run <b>SEO, CRO and paid campaigns</b> alongside the build, so the site is measured on results, not just looks.</p><p>Across client accounts I\'ve driven <b>2.4M+ visits</b>, taken pages from a 1.9% to a <b>5.6% conversion rate</b>, and kept Lighthouse scores in the 90s.</p>',
-    acts: [{ t: 'See the numbers', href: 'https://www.linkedin.com/in/sammackinley' }] },
+    acts: [{ t: 'See the numbers', href: 'https://www.linkedin.com/in/sam-mackinley-955166b3' }] },
   { key: 'brand', name: 'Brand & Web Design', color: 'var(--f-red)', icon: 'palette',
     preview: { type: 'image', css: 'radial-gradient(circle at 40% 35%,#f3c98b,#c98b4a 70%,#8a5d30)', cap: 'identity & systems' },
     h: 'Brand & Web Design',
     body: '<p>Visual identity, type, and the design systems that keep a brand consistent across every screen.</p><p>I build <b>token-driven UI kits</b> in Figma and ship them to code, so marketing and product stay perfectly in sync.</p>',
-    acts: [{ t: 'Browse on Dribbble', href: 'https://dribbble.com/sammackinley' }] },
+    acts: [] },
   { key: 'ship', name: 'From Sketch to Ship', color: 'var(--f-purple)', icon: 'pen',
     preview: { type: 'apps' },
     h: 'From Sketch to Ship',
     body: '<p>How an idea travels from a napkin sketch to a deployed site.</p><p><b>Sketch → wireframe → prototype → build → ship.</b> No phase is precious; the craft lives in the loop between them.</p><p class="em">Tools: Figma · Webflow · Cursor · Vercel.</p>',
-    acts: [{ t: 'CodePen', href: 'https://codepen.io/sammackinley' }, { t: 'GitHub', href: 'https://github.com/sammackinley' }] },
+    acts: [] },
 ];
 
 const ICONS = {
@@ -1239,13 +1237,12 @@ const NOTE_PILLS = [
   { t: 'Sweat the details', c: '#9b7fc4', x: '34%', y: '76%', r: 5 },
 ];
 const JOURNEY = [
-  { t: 'Studied design', tag: 'craft' },
-  { t: 'Freelance web designer', tag: 'solo' },
-  { t: 'Designer at a studio', tag: 'agency' },
-  { t: 'Lead web designer', tag: 'product' },
-  { t: 'Growth & digital marketing', tag: 'growth' },
-  { t: 'Building with AI', tag: 'ai' },
-  { t: 'Independent designer', tag: 'now', now: true },
+  { t: 'Pending', tag: 'soon' },
+  { t: 'Pending', tag: 'soon' },
+  { t: 'Pending', tag: 'soon' },
+  { t: 'Pending', tag: 'soon' },
+  { t: 'Pending', tag: 'soon' },
+  { t: 'Pending', tag: 'soon' },
 ];
 const RADAR = [
   { l: 'Coffee', v: 0.95 }, { l: 'Music', v: 0.8 }, { l: 'Code', v: 0.7 },
