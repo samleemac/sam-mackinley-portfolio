@@ -202,12 +202,15 @@ section{position:relative;z-index:5}
   box-shadow:0 6px 14px -6px rgba(0,0,0,.4);cursor:none;transform:rotate(var(--rot));
   touch-action:manipulation;transition:transform .38s cubic-bezier(.2,.7,.2,1),box-shadow .3s,filter .3s}
 .board .pho:not(.expanded):hover{transform:rotate(var(--rot)) translateY(-5px) scale(1.04);box-shadow:0 14px 20px -8px rgba(0,0,0,.4)}
-.board .pho img{display:block;width:100%;height:100%;border-radius:2px;object-fit:cover;
-  transition:opacity .25s ease,transform .35s ease}
-.board .pho img.swapping{opacity:.24;transform:scale(.94)}
+/* two stacked layers per slot so one photo can cross-fade into the next */
+.board .pho .win{position:relative;display:block;width:100%;height:100%;
+  border-radius:2px;overflow:hidden;background:#efece4}
+.board .pho .win img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  opacity:0;transition:opacity .9s ease}
+.board .pho .win img.on{opacity:1}
 .board.photo-open{z-index:100}
 .board .pho.expanded{z-index:15;transform:translate(var(--expand-x,0px),var(--expand-y,0px)) rotate(0deg) scale(4);box-shadow:0 22px 32px -10px rgba(0,0,0,.48)}
-.board .pho.expanded img{transform:scale(1.01)}
+.board .pho.expanded .win img{transform:scale(1.01)}
 /* measuring state: read resting geometry without a transition part-way through */
 .board.settling .kraft{transition:none!important}
 .board.settling .pho{transition:none!important;transform:none!important}
@@ -779,10 +782,10 @@ footer .made svg{width:14px;height:14px}
     <div class="sticker board" data-depth="9">
       <div class="kraft">
         <div class="pile">
-          <button class="pho" type="button" style="--x:8px;--y:0;--rot:-5deg" aria-expanded="false"><img alt="" /></button>
-          <button class="pho" type="button" style="--x:126px;--y:0;--rot:5deg" aria-expanded="false"><img alt="" /></button>
-          <button class="pho" type="button" style="--x:8px;--y:94px;--rot:4deg" aria-expanded="false"><img alt="" /></button>
-          <button class="pho" type="button" style="--x:126px;--y:94px;--rot:-4deg" aria-expanded="false"><img alt="" /></button>
+          <button class="pho" type="button" style="--x:8px;--y:0;--rot:-5deg" aria-expanded="false"><span class="win"><img alt="" /><img alt="" /></span></button>
+          <button class="pho" type="button" style="--x:126px;--y:0;--rot:5deg" aria-expanded="false"><span class="win"><img alt="" /><img alt="" /></span></button>
+          <button class="pho" type="button" style="--x:8px;--y:94px;--rot:4deg" aria-expanded="false"><span class="win"><img alt="" /><img alt="" /></span></button>
+          <button class="pho" type="button" style="--x:126px;--y:94px;--rot:-4deg" aria-expanded="false"><span class="win"><img alt="" /><img alt="" /></span></button>
         </div>
         <div class="label">capture<br>moments</div>
       </div>
@@ -1046,14 +1049,22 @@ document.querySelectorAll('[data-link]').forEach(el => {
   let nextSlot = 0;
   let expanded = null;
 
+  // cross-fade into the slot's spare layer, but only once the new photo has
+  // decoded, otherwise the fade reveals a blank frame
   function showPhoto(slot, photo) {
-    const image = slot.querySelector('img');
-    if (!image) return;
-    image.classList.add('swapping');
-    image.src = photo.src;
-    image.alt = photo.alt;
-    slot.setAttribute('aria-label', `Expand photo from ${photo.alt}`);
-    image.addEventListener('load', () => image.classList.remove('swapping'), { once: true });
+    const layers = [...slot.querySelectorAll('.win img')];
+    if (layers.length !== 2) return;
+    const front = Number(slot.dataset.front || 0);
+    const loader = new Image();
+    loader.onload = loader.onerror = () => {
+      if (slot === expanded) return;
+      layers[1 - front].src = photo.src;
+      layers[1 - front].classList.add('on');
+      layers[front].classList.remove('on');
+      slot.dataset.front = String(1 - front);
+      slot.setAttribute('aria-label', `Expand photo from ${photo.alt}`);
+    };
+    loader.src = photo.src;
   }
 
   function closePhoto() {
