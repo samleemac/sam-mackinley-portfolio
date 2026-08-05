@@ -1052,6 +1052,8 @@ document.querySelectorAll('[data-link]').forEach(el => {
   }
 
   slots.forEach(slot => {
+    // The board itself is draggable; keep a photo tap available for expanding it.
+    slot.addEventListener('pointerdown', event => event.stopPropagation());
     slot.addEventListener('click', event => {
       event.stopPropagation();
       const isOpen = slot === expanded;
