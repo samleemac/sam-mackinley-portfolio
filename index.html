@@ -200,14 +200,17 @@ section{position:relative;z-index:5}
 .board .pho{position:absolute;left:var(--x);top:var(--y);width:96px;height:112px;
   appearance:none;border:0;background:#fff;padding:5px 5px 16px;border-radius:3px;
   box-shadow:0 6px 14px -6px rgba(0,0,0,.4);cursor:none;transform:rotate(var(--rot));
-  transition:transform .38s cubic-bezier(.2,.7,.2,1),box-shadow .3s,filter .3s}
-.board .pho:hover{transform:rotate(var(--rot)) translateY(-5px) scale(1.04);box-shadow:0 14px 20px -8px rgba(0,0,0,.4)}
+  touch-action:manipulation;transition:transform .38s cubic-bezier(.2,.7,.2,1),box-shadow .3s,filter .3s}
+.board .pho:not(.expanded):hover{transform:rotate(var(--rot)) translateY(-5px) scale(1.04);box-shadow:0 14px 20px -8px rgba(0,0,0,.4)}
 .board .pho img{display:block;width:100%;height:100%;border-radius:2px;object-fit:cover;
   transition:opacity .25s ease,transform .35s ease}
 .board .pho img.swapping{opacity:.24;transform:scale(.94)}
 .board.photo-open{z-index:100}
-.board .pho.expanded{z-index:15;transform:rotate(0deg) scale(4);box-shadow:0 22px 32px -10px rgba(0,0,0,.48)}
+.board .pho.expanded{z-index:15;transform:translate(var(--expand-x,0px),var(--expand-y,0px)) rotate(0deg) scale(4);box-shadow:0 22px 32px -10px rgba(0,0,0,.48)}
 .board .pho.expanded img{transform:scale(1.01)}
+/* measuring state: read resting geometry without a transition part-way through */
+.board.settling .kraft{transition:none!important}
+.board.settling .pho{transition:none!important;transform:none!important}
 .board .pho:focus-visible{outline:2px dashed var(--ink);outline-offset:4px}
 
 /* vinyl playlist */
@@ -554,11 +557,11 @@ footer .made svg{width:14px;height:14px}
 
 /* photo board — straighten & fan the photos out */
 .board .kraft{transition:transform .45s cubic-bezier(.2,.7,.2,1),box-shadow .45s}
-.board:hover .kraft{transform:rotate(-3deg) scale(1.03);box-shadow:0 30px 54px -20px rgba(40,38,30,.5)}
+.board:not(.photo-open):hover .kraft{transform:rotate(-3deg) scale(1.03);box-shadow:0 30px 54px -20px rgba(40,38,30,.5)}
 .board .pho{transition:transform .5s cubic-bezier(.2,.7,.2,1)}
-.board:hover .pho:nth-child(1){transform:translate(-16px,-12px) rotate(-15deg)!important}
-.board:hover .pho:nth-child(2){transform:translate(14px,-9px) rotate(12deg)!important}
-.board:hover .pho:nth-child(3){transform:translate(-12px,12px) rotate(10deg)!important}
+.board:not(.photo-open):hover .pho:nth-child(1){transform:translate(-16px,-12px) rotate(-15deg)!important}
+.board:not(.photo-open):hover .pho:nth-child(2){transform:translate(14px,-9px) rotate(12deg)!important}
+.board:not(.photo-open):hover .pho:nth-child(3){transform:translate(-12px,12px) rotate(10deg)!important}
 
 /* profile device — avatar warms up & lifts */
 .device .avatar{position:relative;transition:transform .35s}
@@ -773,7 +776,7 @@ footer .made svg{width:14px;height:14px}
     </div>
 
     <!-- photo board -->
-    <div class="sticker board parallax" data-depth="9">
+    <div class="sticker board" data-depth="9">
       <div class="kraft">
         <div class="pile">
           <button class="pho" type="button" style="--x:8px;--y:0;--rot:-5deg" aria-expanded="false"><img alt="" /></button>
@@ -1053,21 +1056,56 @@ document.querySelectorAll('[data-link]').forEach(el => {
     image.addEventListener('load', () => image.classList.remove('swapping'), { once: true });
   }
 
+  function closePhoto() {
+    if (!expanded) return;
+    expanded.classList.remove('expanded');
+    expanded.setAttribute('aria-expanded', 'false');
+    board.classList.remove('photo-open');
+    expanded = null;
+  }
+
+  // the board is tilted (and scaled on small screens), so a screen-space offset has
+  // to be converted into the photo's own coordinate space before it can be applied
+  function toLocal(slot, dx, dy) {
+    let matrix = new DOMMatrix();
+    for (let node = slot.parentElement; node && node !== document.documentElement; node = node.parentElement) {
+      const value = getComputedStyle(node).transform;
+      if (value && value !== 'none') matrix = new DOMMatrix(value).multiply(matrix);
+    }
+    const inverse = matrix.inverse();
+    const origin = inverse.transformPoint(new DOMPoint(0, 0));
+    const point = inverse.transformPoint(new DOMPoint(dx, dy));
+    return [point.x - origin.x, point.y - origin.y];
+  }
+
+  function openPhoto(slot) {
+    board.classList.add('photo-open', 'settling');
+    const rect = slot.getBoundingClientRect();
+    const [x, y] = toLocal(slot,
+      window.innerWidth / 2 - (rect.left + rect.width / 2),
+      window.innerHeight * 0.48 - (rect.top + rect.height / 2));
+    board.classList.remove('settling');
+    slot.style.setProperty('--expand-x', `${x}px`);
+    slot.style.setProperty('--expand-y', `${y}px`);
+    slot.classList.add('expanded');
+    slot.setAttribute('aria-expanded', 'true');
+    expanded = slot;
+  }
+
   slots.forEach(slot => {
+    slot.addEventListener('pointerdown', event => event.stopPropagation());
     slot.addEventListener('click', event => {
       event.stopPropagation();
-      const isOpen = slot === expanded;
-      if (expanded) {
-        expanded.classList.remove('expanded');
-        expanded.setAttribute('aria-expanded', 'false');
+      if (slot === expanded) closePhoto();
+      else {
+        closePhoto();
+        openPhoto(slot);
       }
-      expanded = isOpen ? null : slot;
-      if (expanded) {
-        expanded.classList.add('expanded');
-        expanded.setAttribute('aria-expanded', 'true');
-      }
-      board.classList.toggle('photo-open', Boolean(expanded));
     });
+  });
+
+  document.addEventListener('pointerdown', event => {
+    if (expanded && !event.target.closest('.board .pho')) closePhoto();
   });
 
   slots.forEach((slot, index) => showPhoto(slot, photos[index]));
