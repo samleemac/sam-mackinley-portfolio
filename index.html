@@ -144,14 +144,6 @@ section{position:relative;z-index:5}
   text-shadow:0 2px 8px rgba(0,0,0,.3)}
 .device:hover .card{filter:brightness(1.18);box-shadow:0 24px 50px -18px rgba(40,38,30,.55)}
 
-/* ripped paper desk note */
-.note{left:18%;top:75%;width:360px;}
-.note .paper{position:relative;filter:drop-shadow(0 14px 26px rgba(40,38,30,.18))}
-.note .plant,.note .coffee,.note .pencil{position:absolute}
-.note .plant{left:0;top:-46px;width:120px}
-.note .coffee{left:118px;top:6px;width:78px}
-.note .pencil{left:196px;top:-34px;width:150px;transform:rotate(8deg)}
-
 /* ticket */
 .ticket{left:47%;top:66%;width:236px;transform:rotate(4deg)}
 .ticket .t{display:flex;background:#fafafa;border-radius:8px;overflow:hidden;
@@ -574,15 +566,6 @@ footer .made svg{width:14px;height:14px}
 .device:hover .avatar{transform:scale(1.08) rotate(-3deg)}
 .device:hover .avatar::after{opacity:1}
 
-/* desk note — plant sways, coffee jiggles, pencil tilts */
-.note .plant{transform-origin:50% 100%}
-.note .coffee,.note .pencil{transition:transform .35s}
-.note:hover .plant{animation:sway 1.7s ease-in-out infinite}
-.note:hover .coffee{animation:jiggle 1.2s ease-in-out infinite}
-.note:hover .pencil{transform:rotate(13deg) translateY(-3px)}
-@keyframes sway{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
-@keyframes jiggle{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-3px) rotate(-3deg)}}
-
 /* flower — bloom grows out of the vase */
 .flower .bloom{transform-origin:50% 92%}
 .flower:hover .bloom{opacity:1;animation:bloomgrow .55s cubic-bezier(.2,.8,.2,1) both}
@@ -633,7 +616,6 @@ footer .made svg{width:14px;height:14px}
     width:120px;height:3px;border-radius:3px;background:#b49a6f;
     box-shadow:0 1px 0 rgba(216,195,154,.7);z-index:0}
   .analog-clock{left:43%;top:11%}
-  .note{left:12%;top:75%}
 }
 @media (max-width:640px){
   header{padding:14px 16px;font-size:12px}
@@ -643,7 +625,6 @@ footer .made svg{width:14px;height:14px}
   header nav{gap:13px}
   #hero{min-height:680px}
   .device{left:auto;right:3%;top:8%;width:150px;transform:scale(.9)}
-  .note{left:-2%;top:75%;width:280px;transform:scale(.7);transform-origin:top left}
   .ticket{left:42%;right:auto;top:62%;transform:scale(.78) rotate(4deg)}
   .board{left:-4%;right:auto;top:7%;transform:scale(.8) rotate(-2deg)}
   .vinyl{left:3%;top:50%;transform:scale(.82)}
@@ -730,41 +711,6 @@ footer .made svg{width:14px;height:14px}
         <div class="avatar"><span>S</span></div>
       </div>
     </a>
-
-    <!-- ripped note + plant + coffee + pencil -->
-    <div class="sticker note parallax" data-depth="14">
-      <div class="paper">
-        <svg viewBox="0 0 360 150" width="360" xmlns="http://www.w3.org/2000/svg">
-          <path d="M6 30 Q4 22 14 20 L70 12 Q90 18 120 12 L200 8 Q250 16 300 10 L350 14 Q360 22 354 40
-                   L356 120 Q352 138 338 134 L260 140 Q210 132 150 140 L60 136 Q12 142 10 124 Z"
-                fill="#f6f4ee" stroke="#e6e3da" stroke-width="1"/>
-        </svg>
-        <!-- plant -->
-        <svg class="plant" viewBox="0 0 120 130" xmlns="http://www.w3.org/2000/svg">
-          <g fill="#5f9e52"><path d="M58 70 C40 50 30 30 36 12 C50 26 56 46 60 66Z"/>
-          <path d="M60 70 C78 48 92 36 108 38 C96 56 78 64 62 70Z"/>
-          <path d="M60 72 C46 60 28 56 18 64 C34 74 50 76 60 74Z"/>
-          <path d="M60 72 C70 52 70 28 60 14 C56 36 56 56 58 72Z" fill="#4f8a44"/></g>
-          <path d="M40 74 L80 74 L74 122 Q60 128 46 122Z" fill="#d8d2c4"/>
-          <rect x="38" y="70" width="44" height="8" rx="3" fill="#c4bdaf"/>
-        </svg>
-        <!-- ice coffee -->
-        <svg class="coffee" viewBox="0 0 78 96" xmlns="http://www.w3.org/2000/svg">
-          <path d="M14 30 L64 30 L58 88 Q39 94 20 88Z" fill="#e9e4da" opacity=".5"/>
-          <path d="M16 52 L62 52 L58 88 Q39 94 20 88Z" fill="#a9763f"/>
-          <rect x="14" y="28" width="50" height="6" rx="3" fill="#d8d2c4"/>
-          <rect x="40" y="6" width="5" height="40" rx="2" fill="#cfc8bb" transform="rotate(8 42 26)"/>
-          <circle cx="30" cy="46" r="5" fill="#fff" opacity=".55"/><circle cx="46" cy="42" r="4" fill="#fff" opacity=".5"/>
-        </svg>
-        <!-- pencil -->
-        <svg class="pencil" viewBox="0 0 150 26" xmlns="http://www.w3.org/2000/svg">
-          <rect x="20" y="9" width="108" height="9" fill="#f4c94e"/>
-          <rect x="20" y="9" width="108" height="3" fill="#e0b53e"/>
-          <path d="M8 13.5 L20 9 L20 18Z" fill="#e8c79a"/><path d="M8 13.5 L14 11 L14 16Z" fill="#3a3a38"/>
-          <rect x="128" y="9" width="10" height="9" fill="#e98aa0"/><rect x="126" y="9" width="3" height="9" fill="#c7c2b8"/>
-        </svg>
-      </div>
-    </div>
 
     <!-- live analogue clock -->
     <div class="sticker analog-clock parallax" data-depth="16" aria-label="Current time">

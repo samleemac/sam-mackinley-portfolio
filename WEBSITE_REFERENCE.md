@@ -67,10 +67,11 @@ All design tokens are CSS custom properties in `:root` (~line 16). Always reuse 
 | Footer | `footer` | ~857 | Links. |
 
 ### Hero
-- "Stickers" are absolutely-positioned elements (`.sticker` variants: `.board`, `.device`, `.note`, `.pixel`, `.vinyl`, `.term`, `.folder`, `.signature`) with `data-depth` for parallax.
+- "Stickers" are absolutely-positioned elements (`.sticker` variants: `.signature`, `.device`, `.analog-clock`, `.board`, `.vinyl`, `.term`) with `data-depth` for parallax.
 - **Parallax:** pointer-move handler offsets each sticker by its depth. Skipped while dragging (`window.__dragging`).
 - **Drag-to-rearrange:** `dragLayout()` IIFE makes non-link stickers draggable; a floating "Reset Layout" button (`.layout-tools`, fixed bottom-right) restores the start positions. Links are not draggable.
-- **Hover micro-interactions:** pixel clock draws a rainbow, terminal types a deploy log, folder opens and spills items, etc.
+- **Hover micro-interactions:** the analogue clock keeps live time, the terminal types a deploy log, the photo board fans its polaroids out, etc.
+- **Photo board:** four slots cross-fade through the `Photos/` set one at a time; clicking a polaroid lifts it to the middle of the viewport at 4x (`.expanded`) and rotation pauses until it is closed.
 - **Idea CTA:** `.hero-cta` form (`#ideaForm`) builds a `mailto:` link. Target address is `IDEA_EMAIL` in the JS — update it to the real inbox.
 
 ---
