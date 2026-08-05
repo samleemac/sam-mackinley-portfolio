@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/portal/assets/:path*",
+      "destination": "/assets/:path*"
+    },
+    {
+      "source": "/portal/favicon.ico",
+      "destination": "/favicon.ico"
+    }
+  ]
+}
