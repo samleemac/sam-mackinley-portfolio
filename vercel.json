@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/portal",
+      "destination": "https://client-portal-pro-rho.vercel.app/portal"
+    },
+    {
+      "source": "/portal/:path*",
+      "destination": "https://client-portal-pro-rho.vercel.app/portal/:path*"
+    }
+  ]
+}

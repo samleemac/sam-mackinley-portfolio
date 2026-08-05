@@ -39,7 +39,7 @@ function Auth() {
     try {
       if (mode === "reset") {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/reset-password`,
+          redirectTo: `${window.location.origin}/portal/auth`,
         });
         if (error) throw error;
         toast.success("Check your email for a reset link");
