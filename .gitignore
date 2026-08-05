@@ -5,3 +5,6 @@ Projects/
 Finder.mov
 verify*.py
 *.mov
+
+# Client portal (portal/.gitignore covers node_modules, dist, etc.)
+portal/.env
