@@ -8,3 +8,5 @@ verify*.py
 
 # Client portal (portal/.gitignore covers node_modules, dist, etc.)
 portal/.env
+.vercel
+.env*
