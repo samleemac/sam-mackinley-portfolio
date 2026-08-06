@@ -124,7 +124,7 @@ function Start() {
               <div className="grid gap-5 sm:grid-cols-2">
                 <div className="grid gap-2">
                   <Label htmlFor="budget_range">Rough budget</Label>
-                  <Input id="budget_range" name="budget_range" placeholder="e.g. £1–3k" maxLength={80} />
+                  <Input id="budget_range" name="budget_range" placeholder="e.g. £500–1.5k / €600–1.8k" maxLength={80} />
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="timeline">Timing</Label>

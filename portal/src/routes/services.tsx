@@ -19,7 +19,7 @@ export const Route = createFileRoute("/services")({
       {
         name: "description",
         content:
-          "Fixed-price website design and build from £950, plus a £95/month care plan with unlimited change requests through the client portal.",
+          "Fixed-price website design and build from £499 / €579, plus a £49 / €57 a month care plan with unlimited change requests through the client portal.",
       },
       { property: "og:title", content: "Services & pricing — Sam Mackinley web design" },
       {
@@ -39,8 +39,9 @@ function Services() {
         <section className="mx-auto max-w-6xl px-5 py-20">
           <h1 className="max-w-2xl text-4xl sm:text-5xl">Services &amp; pricing</h1>
           <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-            Everything is quoted as a fixed price before we start. You'll know the scope, the number
-            of revision rounds and the date it goes live.
+            Everything is quoted as a fixed price before we start — in pounds or euros, roughly
+            matched so UK and Europe pay the same. You'll know the scope, the number of revision
+            rounds and the date it goes live.
           </p>
 
           <div className="mt-14 grid gap-6 lg:grid-cols-3">
@@ -50,7 +51,8 @@ function Services() {
                 className="flex flex-col rounded-lg border border-border bg-card p-7"
               >
                 <h2 className="text-2xl">{s.name}</h2>
-                <p className="mt-2 display text-3xl text-ochre">{s.price}</p>
+                <p className="mt-2 display text-3xl leading-none text-ochre">{s.priceGbp}</p>
+                <p className="mt-2 text-sm font-medium text-muted-foreground">{s.priceEur}</p>
                 <p className="mt-4 leading-relaxed text-muted-foreground">{s.tagline}</p>
                 <p className="mt-4 text-xs uppercase tracking-[0.15em] text-muted-foreground">
                   Best for: {s.bestFor}

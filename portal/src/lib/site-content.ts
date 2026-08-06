@@ -1,15 +1,20 @@
 export type Service = {
   name: string;
-  price: string;
+  /** Lead price (GBP for UK, intentional round EUR pair kept roughly in step). */
+  priceGbp: string;
+  priceEur: string;
   tagline: string;
   includes: string[];
   bestFor: string;
 };
 
+// Dual prices are fixed, rounded figures — not live FX. Kept within ~£1 ≈ €1.17
+// so UK and eurozone clients see essentially the same offer.
 export const SERVICES: Service[] = [
   {
     name: "Starter site",
-    price: "from £950",
+    priceGbp: "from £499",
+    priceEur: "from €579",
     tagline: "A sharp one-page site that explains what you do and gets you enquiries.",
     bestFor: "Sole traders and new businesses",
     includes: [
@@ -23,7 +28,8 @@ export const SERVICES: Service[] = [
   },
   {
     name: "Business site",
-    price: "from £2,400",
+    priceGbp: "from £1,099",
+    priceEur: "from €1,299",
     tagline: "A multi-page site built to be found, read, and acted on.",
     bestFor: "Established businesses with several services",
     includes: [
@@ -38,7 +44,8 @@ export const SERVICES: Service[] = [
   },
   {
     name: "Care plan",
-    price: "£95 / month",
+    priceGbp: "£49 / month",
+    priceEur: "€57 / month",
     tagline: "Ongoing changes handled through the portal, no chasing needed.",
     bestFor: "Anyone who wants their site to keep moving",
     includes: [
