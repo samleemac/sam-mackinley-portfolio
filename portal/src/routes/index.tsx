@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -39,6 +39,14 @@ function Home() {
             Back to Sam’s website
           </a>
         </Button>
+        <p className="mt-5">
+          <Link
+            to="/access"
+            className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+          >
+            Continue with password
+          </Link>
+        </p>
       </section>
     </main>
   );

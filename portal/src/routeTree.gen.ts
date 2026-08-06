@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AccessRouteImport } from './routes/access'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as StartRouteImport } from './routes/start'
@@ -19,6 +20,11 @@ import { Route as WorkSlugRouteImport } from './routes/work/$slug'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccessRoute = AccessRouteImport.update({
+  id: '/access',
+  path: '/access',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -49,6 +55,7 @@ const WorkSlugRoute = WorkSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/access': typeof AccessRoute
   '/auth': typeof AuthRoute
   '/services': typeof ServicesRoute
   '/start': typeof StartRoute
@@ -57,6 +64,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/access': typeof AccessRoute
   '/auth': typeof AuthRoute
   '/services': typeof ServicesRoute
   '/start': typeof StartRoute
@@ -66,6 +74,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/access': typeof AccessRoute
   '/auth': typeof AuthRoute
   '/services': typeof ServicesRoute
   '/start': typeof StartRoute
@@ -74,12 +83,21 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/services' | '/start' | '/work/$slug' | '/work/'
+  fullPaths:
+    | '/'
+    | '/access'
+    | '/auth'
+    | '/services'
+    | '/start'
+    | '/work/$slug'
+    | '/work/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/services' | '/start' | '/work/$slug' | '/work'
+  to:
+    '/' | '/access' | '/auth' | '/services' | '/start' | '/work/$slug' | '/work'
   id:
     | '__root__'
     | '/'
+    | '/access'
     | '/auth'
     | '/services'
     | '/start'
@@ -89,6 +107,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AccessRoute: typeof AccessRoute
   AuthRoute: typeof AuthRoute
   ServicesRoute: typeof ServicesRoute
   StartRoute: typeof StartRoute
@@ -103,6 +122,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/access': {
+      id: '/access'
+      path: '/access'
+      fullPath: '/access'
+      preLoaderRoute: typeof AccessRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -145,6 +171,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AccessRoute: AccessRoute,
   AuthRoute: AuthRoute,
   ServicesRoute: ServicesRoute,
   StartRoute: StartRoute,
@@ -154,3 +181,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
