@@ -1,8 +1,10 @@
 export type Service = {
   name: string;
-  /** Lead price (GBP for UK, intentional round EUR pair kept roughly in step). */
+  /** Intentional round GBP/EUR pair (~£1 ≈ €1.17), not live FX. */
   priceGbp: string;
   priceEur: string;
+  /** Which currency leads on the card — usually the one you anchored the offer on. */
+  lead: "gbp" | "eur";
   tagline: string;
   includes: string[];
   bestFor: string;
@@ -13,29 +15,31 @@ export type Service = {
 export const SERVICES: Service[] = [
   {
     name: "Starter site",
-    priceGbp: "from £499",
-    priceEur: "from €579",
-    tagline: "A sharp one-page site that explains what you do and gets you enquiries.",
-    bestFor: "Sole traders and new businesses",
+    priceGbp: "from £429",
+    priceEur: "from €499",
+    lead: "eur",
+    tagline: "A basic content website built from your design and copy — clean, fast, and ready for enquiries.",
+    bestFor: "Anyone with a design and content ready to go live",
     includes: [
-      "Up to 5 sections on one page",
-      "Copy shaping from your notes",
-      "Mobile-first responsive build",
+      "Basic content website, up to 15 pages",
+      "Built from your design and content",
+      "Mobile-optimised responsive build",
       "Contact form to your inbox",
-      "Basic search setup and analytics",
-      "2 rounds of revisions",
+      "Basic SEO setup",
+      "3 rounds of revisions",
     ],
   },
   {
     name: "Business site",
     priceGbp: "from £1,099",
     priceEur: "from €1,299",
-    tagline: "A multi-page site built to be found, read, and acted on.",
-    bestFor: "Established businesses with several services",
+    lead: "eur",
+    tagline: "I design and build a multi-page site shaped around your services, so it can be found, read, and acted on.",
+    bestFor: "Businesses that want design and build handled together",
     includes: [
-      "Up to 8 pages",
       "Custom design system, not a template",
-      "Services, case study and contact structure",
+      "Multi-page structure around your services",
+      "Copy shaping from your notes",
       "On-page SEO and page-speed pass",
       "Editable content areas",
       "Portal access for change requests",
@@ -43,9 +47,26 @@ export const SERVICES: Service[] = [
     ],
   },
   {
+    name: "Web app",
+    priceGbp: "from £2,499",
+    priceEur: "from €2,899",
+    lead: "eur",
+    tagline: "Sign-ups, logins, dashboards and databases — scoped to what the product actually needs to do.",
+    bestFor: "Client portals, memberships, tools and anything with accounts",
+    includes: [
+      "User sign-up and login",
+      "Protected areas and roles",
+      "Database-backed content or records",
+      "Admin or client-facing dashboards",
+      "Secure hosting and environment setup",
+      "Scoped quote before we start",
+    ],
+  },
+  {
     name: "Care plan",
     priceGbp: "£49 / month",
     priceEur: "€57 / month",
+    lead: "gbp",
     tagline: "Ongoing changes handled through the portal, no chasing needed.",
     bestFor: "Anyone who wants their site to keep moving",
     includes: [
@@ -87,7 +108,11 @@ export const BOOKING_URL = "https://cal.com/sammackinley/intro";
 export const FAQS = [
   {
     q: "How long does a site take?",
-    a: "A starter site is usually two weeks from brief to launch. A business site is four to six weeks, depending on how quickly content comes back.",
+    a: "A starter site is usually one to two weeks once your design and content are ready. A business site is four to six weeks. Web apps are scoped per project.",
+  },
+  {
+    q: "What’s the difference between a site and a web app?",
+    a: "A site is pages of content people read and contact you from. A web app is when people create accounts, log in, save data, or manage things behind a dashboard. That needs a database and proper security, so it’s priced and scoped on its own.",
   },
   {
     q: "Do I own the site?",
@@ -95,7 +120,7 @@ export const FAQS = [
   },
   {
     q: "What do you need from me?",
-    a: "Your existing copy or notes, any brand assets you have, and one decision-maker who can give feedback. I can write and source the rest.",
+    a: "For a starter site: your finished design and the content for each page. For a business site: notes, brand assets and one decision-maker for feedback — I can shape the rest.",
   },
   {
     q: "What happens after launch?",

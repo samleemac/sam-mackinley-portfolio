@@ -19,7 +19,7 @@ export const Route = createFileRoute("/services")({
       {
         name: "description",
         content:
-          "Fixed-price website design and build from £499 / €579, plus a £49 / €57 a month care plan with unlimited change requests through the client portal.",
+          "Fixed-price website design and build from €499 / £429, plus web apps with logins from €2,899, and a £49 / €57 a month care plan.",
       },
       { property: "og:title", content: "Services & pricing — Sam Mackinley web design" },
       {
@@ -39,20 +39,23 @@ function Services() {
         <section className="mx-auto max-w-6xl px-5 py-20">
           <h1 className="max-w-2xl text-4xl sm:text-5xl">Services &amp; pricing</h1>
           <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-            Everything is quoted as a fixed price before we start — in pounds or euros, roughly
-            matched so UK and Europe pay the same. You'll know the scope, the number of revision
-            rounds and the date it goes live.
+            Content sites, designed sites, and web apps with accounts are priced separately — in
+            pounds or euros, roughly matched so UK and Europe pay the same. Everything is quoted
+            fixed before we start.
           </p>
 
-          <div className="mt-14 grid gap-6 lg:grid-cols-3">
-            {SERVICES.map((s) => (
+          <div className="mt-14 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+            {SERVICES.map((s) => {
+              const primary = s.lead === "eur" ? s.priceEur : s.priceGbp;
+              const secondary = s.lead === "eur" ? s.priceGbp : s.priceEur;
+              return (
               <div
                 key={s.name}
                 className="flex flex-col rounded-lg border border-border bg-card p-7"
               >
                 <h2 className="text-2xl">{s.name}</h2>
-                <p className="mt-2 display text-3xl leading-none text-ochre">{s.priceGbp}</p>
-                <p className="mt-2 text-sm font-medium text-muted-foreground">{s.priceEur}</p>
+                <p className="mt-2 display text-3xl leading-none text-ochre">{primary}</p>
+                <p className="mt-2 text-sm font-medium text-muted-foreground">{secondary}</p>
                 <p className="mt-4 leading-relaxed text-muted-foreground">{s.tagline}</p>
                 <p className="mt-4 text-xs uppercase tracking-[0.15em] text-muted-foreground">
                   Best for: {s.bestFor}
@@ -71,7 +74,8 @@ function Services() {
                   </Button>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         </section>
 
