@@ -73,6 +73,7 @@ All design tokens are CSS custom properties in `:root` (~line 16). Always reuse 
 - **Hover micro-interactions:** the analogue clock keeps live time, the terminal types a deploy log, the photo board fans its polaroids out, etc.
 - **Photo board:** four slots cross-fade through the `Photos/` set one at a time; clicking a polaroid lifts it to the middle of the viewport at 4x (`.expanded`) and rotation pauses until it is closed.
 - **Idea CTA:** `.hero-cta` form (`#ideaForm`) builds a `mailto:` link. Target address is `IDEA_EMAIL` in the JS — update it to the real inbox.
+- **Phone hero:** below the `PHONE_HERO` breakpoint (narrow *or* short viewports, so landscape phones too) the stage stacks to just the signature and the idea form; the other stickers are hidden, dragging is off, and the photo board holds its downloads back until it is actually on screen. The JS constant and the media query must be changed together.
 
 ---
 

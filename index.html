@@ -122,6 +122,7 @@ section{position:relative;z-index:5}
   background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;
   transition:transform .25s,background .25s}
 .cta-form button svg{width:18px;height:18px}
+.cta-send{display:none;font-family:var(--font-mono);font-size:13px;letter-spacing:.04em}
 .cta-form button:hover{transform:translateX(3px);background:#000}
 .cta-form button:active{transform:scale(.92)}
 
@@ -623,26 +624,12 @@ footer .made svg{width:14px;height:14px}
   header .brand .b-full{display:none}
   header .brand .b-short{display:inline}
   header nav{gap:13px}
-  #hero{min-height:680px}
-  .device{left:auto;right:3%;top:8%;width:150px;transform:scale(.9)}
-  .ticket{left:42%;right:auto;top:62%;transform:scale(.78) rotate(4deg)}
-  .board{left:-4%;right:auto;top:7%;transform:scale(.8) rotate(-2deg)}
-  .vinyl{left:3%;top:50%;transform:scale(.82)}
-  .term{left:54%;top:64%;transform:scale(.82)}
-  .analog-clock{left:38%;top:11%;transform:scale(.78) rotate(-4deg);transform-origin:top left}
-  .flower{left:64%;top:10%}
-  .signature{top:44%}
   .about-copy{font-size:15px;line-height:2}
   .polaroid{max-width:280px}
   .lb-card{width:92vw}
   .lb-media{max-height:48vh}
   .lb-foot{flex-direction:column;align-items:flex-start;gap:13px;padding:15px 18px}
   .lb-link{align-self:stretch;justify-content:center}
-  .hero-cta{top:57%;width:92vw}
-  .hero-cta .cta-eyebrow{font-size:10px;text-align:center;letter-spacing:.1em}
-  .cta-form{padding:5px 5px 5px 15px}
-  .cta-form input{width:52vw;font-size:13px}
-  .cta-form button{width:36px;height:36px}
   .finder .side{width:128px;padding:14px 8px}
   .finder .side a{font-size:12px;gap:7px;padding:7px 7px}
   .finder .side .h{padding:0 7px 8px}
@@ -652,6 +639,29 @@ footer .made svg{width:14px;height:14px}
   .test-grid{grid-template-columns:1fr}
   .fold .lbl{font-size:11px}
   .ach-stat .big{font-size:22px}
+}
+/* Phone hero — portrait phones, and any viewport too short for the collage
+   (landscape phones). The stickers are unreadable at these sizes, so the hero
+   drops to the name and the idea prompt, stacked and centred. */
+@media (max-width:640px),(max-height:520px) and (max-width:1024px){
+  #hero{height:auto;min-height:100vh;min-height:100svh;display:flex;align-items:center;
+    justify-content:center;padding:clamp(64px,12vh,98px) 22px clamp(72px,13vh,104px)}
+  .hero-stage{position:static;display:flex;flex-direction:column;align-items:center;
+    gap:clamp(22px,5vh,40px);width:100%}
+  .hero-stage .sticker:not(.signature){display:none}
+  .hero-stage .sticker{touch-action:auto}
+  .sticker.draggable::after{display:none}
+  .layout-tools{display:none}
+  .signature{position:static;left:auto;top:auto;transform:none}
+  .signature .name{font-size:clamp(42px,min(16vw,15vh),68px)}
+  .signature .tag{font-size:10px;letter-spacing:.28em;margin-top:14px}
+  .hero-cta{position:static;left:auto;top:auto;transform:none;width:100%;max-width:420px;gap:16px}
+  .hero-cta .cta-eyebrow{font-size:12px;text-align:center;letter-spacing:.1em;line-height:1.7}
+  .cta-form{width:100%;padding:6px 6px 6px 18px}
+  /* 16px keeps iOS from zooming in when the field takes focus */
+  .cta-form input{flex:1 1 auto;width:auto;min-width:0;font-size:16px}
+  .cta-form button{width:auto;height:44px;padding:0 15px;gap:7px;border-radius:22px}
+  .cta-send{display:inline}
 }
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
@@ -698,7 +708,7 @@ footer .made svg{width:14px;height:14px}
       <span class="cta-eyebrow">Got an idea? Tell me — I'll build it.</span>
       <form class="cta-form" id="ideaForm">
         <input type="text" id="ideaInput" placeholder="A site for my bakery, a portfolio, an app…" autocomplete="off" />
-        <button type="submit" aria-label="Send your idea"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        <button type="submit" aria-label="Send your idea"><span class="cta-send">Send</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
       </form>
     </div>
 
@@ -859,6 +869,8 @@ footer .made svg{width:14px;height:14px}
 gsap.registerPlugin(ScrollTrigger);
 
 const isTouch = window.matchMedia('(hover:none)').matches || 'ontouchstart' in window;
+// keep in step with the phone-hero media query in the stylesheet
+const PHONE_HERO = '(max-width:640px),(max-height:520px) and (max-width:1024px)';
 const reduced = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
 if (isTouch) document.body.classList.add('touch');
 
@@ -1065,9 +1077,19 @@ document.querySelectorAll('[data-link]').forEach(el => {
     if (expanded && !event.target.closest('.board .pho')) closePhoto();
   });
 
-  slots.forEach((slot, index) => showPhoto(slot, photos[index]));
+  // the board is hidden on phones, so hold the downloads back until it is on screen
+  const onBoard = () => board.getClientRects().length > 0;
+  let filled = false;
+  function fill() {
+    if (filled || !onBoard()) return;
+    filled = true;
+    slots.forEach((slot, index) => showPhoto(slot, photos[index]));
+  }
+  fill();
+  window.addEventListener('resize', fill);
+
   if (!reduced) setInterval(() => {
-    if (expanded || document.hidden) return;
+    if (expanded || document.hidden || !filled) return;
     showPhoto(slots[nextSlot], photos[nextPhoto]);
     nextSlot = (nextSlot + 1) % slots.length;
     nextPhoto = (nextPhoto + 1) % photos.length;
@@ -1117,6 +1139,15 @@ const ideaForm = document.getElementById('ideaForm');
 if (ideaForm) {
   if (!reduced) gsap.from('.hero-cta', { opacity: 0, y: 16, duration: 0.7, ease: 'power3.out', delay: 0.9 });
   const IDEA_EMAIL = 'hello@sammackinley.com';   // <-- change to your email
+  const ideaInput = document.getElementById('ideaInput');
+  const narrow = window.matchMedia(PHONE_HERO);
+  const setHint = () => {
+    ideaInput.placeholder = narrow.matches
+      ? 'A site, an app, an idea…'
+      : 'A site for my bakery, a portfolio, an app…';
+  };
+  setHint();
+  narrow.addEventListener('change', setHint);
   ideaForm.addEventListener('submit', e => {
     e.preventDefault();
     const idea = document.getElementById('ideaInput').value.trim();
@@ -1663,6 +1694,7 @@ document.querySelectorAll('header nav a, .brand').forEach(a => {
   if (!stage) return;
   // only objects WITHOUT a link can be moved
   const items = [...stage.querySelectorAll('.sticker:not(.link-sticker):not(.board)')];
+  const phone = window.matchMedia(PHONE_HERO);
   let zTop = 60;
 
   items.forEach(el => {
@@ -1676,6 +1708,7 @@ document.querySelectorAll('header nav a, .brand').forEach(a => {
 
   function down(e) {
     if (e.pointerType === 'mouse' && e.button !== 0) return;
+    if (phone.matches) return;   // the phone hero is a plain stack, nothing to rearrange
     const el = e.currentTarget;
     const sRect = stage.getBoundingClientRect();
     const startX = e.clientX, startY = e.clientY;
