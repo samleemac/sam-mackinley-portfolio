@@ -249,6 +249,16 @@ section{position:relative;z-index:5}
   animation:bob 2.4s ease-in-out infinite}
 @keyframes bob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(7px)}}
 
+/* wandering character */
+.walker{position:absolute;left:13%;top:62%;width:74px;height:112px;z-index:7;cursor:none}
+.walker .walker-frame{position:absolute;bottom:0;left:50%;transform:translateX(-50%);
+  height:112px;width:auto;user-select:none;-webkit-user-drag:none;pointer-events:none}
+.walker .walker-wink,.walker .walker-prompt{position:absolute;left:50%;bottom:calc(100% + 4px);
+  transform:translateX(-50%) scale(0);transform-origin:bottom center;opacity:0;pointer-events:none;
+  filter:drop-shadow(0 6px 10px rgba(40,38,30,.25))}
+.walker .walker-wink{width:46px}
+.walker .walker-prompt{width:72px;bottom:calc(100% + 2px)}
+
 /* ===================== ABOUT ===================== */
 #about{padding:140px 24px 130px;position:relative;text-align:center}
 .crosshair{position:absolute;width:14px;height:14px;color:var(--faint);font-size:14px;
@@ -649,6 +659,7 @@ footer .made svg{width:14px;height:14px}
   .hero-stage{position:static;display:flex;flex-direction:column;align-items:center;
     gap:clamp(22px,5vh,40px);width:100%}
   .hero-stage .sticker:not(.signature){display:none}
+  .hero-stage .walker{display:none}
   .hero-stage .sticker{touch-action:auto}
   .sticker.draggable::after{display:none}
   .layout-tools{display:none}
@@ -783,6 +794,13 @@ footer .made svg{width:14px;height:14px}
       </div>
     </div>
 
+    <!-- wandering character -->
+    <div class="walker" id="walker" aria-hidden="true">
+      <img class="walker-prompt" id="walkerPrompt" src="media/walker/click-me.png" alt="" draggable="false" />
+      <img class="walker-wink" id="walkerWink" src="media/walker/wink-head.png" alt="" draggable="false" />
+      <img class="walker-frame" id="walkerFrame" src="media/walker/idle-front.png" alt="" draggable="false" />
+    </div>
+
   </div>
   <div class="cue">Scroll</div>
 </section>
@@ -881,7 +899,7 @@ if (!isTouch) {
   const yTo = gsap.quickTo(cursor, 'y', { duration: 0.18, ease: 'power3' });
   window.addEventListener('pointermove', e => { xTo(e.clientX); yTo(e.clientY); });
   // grow over interactive things
-  const hot = 'a, button, .fold, [data-link]';
+  const hot = 'a, button, .fold, [data-link], .walker';
   const movable = '#hero .sticker:not(.link-sticker)';
   document.addEventListener('pointerover', e => {
     if (e.target.closest(hot)) cursor.classList.add('hot');
@@ -1157,6 +1175,165 @@ if (ideaForm) {
     window.location.href = `mailto:${IDEA_EMAIL}?subject=${subject}&body=${body}`;
   });
 }
+
+/* ---------- hero walker: wanders the collage, jumps & winks on click ---------- */
+(function heroWalker() {
+  const walker = document.getElementById('walker');
+  if (!walker || !window.gsap) return;
+  const stage = document.querySelector('.hero-stage');
+  const frame = document.getElementById('walkerFrame');
+  const winkEl = document.getElementById('walkerWink');
+  const promptEl = document.getElementById('walkerPrompt');
+  const phone = window.matchMedia(PHONE_HERO);
+  const DIR = 'media/walker/';
+  const cycle = d => [1, 2, 3, 4].map(i => `walk-${d}-${i}`);
+  const WALK = { front: cycle('front'), back: cycle('back'), right: cycle('right'), left: cycle('left') };
+  [...Object.values(WALK).flat(), 'idle-front', 'idle-back', 'wave', 'wave-both', 'wink-head', 'click-me']
+    .forEach(n => { const i = new Image(); i.src = `${DIR}${n}.png`; });
+
+  const setFrame = n => { frame.src = `${DIR}${n}.png`; };
+
+  const SPEED = 70;                 // px/s — one 4-frame stride ≈ 0.64s
+  const FRAME_MS = 160;
+  let walkTween = null, frameTimer = null, idleTimers = [], promptTimer = null, busy = false;
+
+  const clearIdle = () => { idleTimers.forEach(clearTimeout); idleTimers = []; };
+  const later = (fn, ms) => idleTimers.push(setTimeout(fn, ms));
+
+  function startWalkFrames(frames) {
+    let i = 0;
+    setFrame(frames[0]);
+    frameTimer = setInterval(() => { i = (i + 1) % frames.length; setFrame(frames[i]); }, FRAME_MS);
+  }
+  function stopWalkFrames() { clearInterval(frameTimer); frameTimer = null; }
+
+  function hidePrompt() {
+    gsap.killTweensOf(promptEl);
+    gsap.to(promptEl, { scale: 0, opacity: 0, duration: 0.18, ease: 'power2.in' });
+  }
+
+  function keepouts() {
+    const sr = stage.getBoundingClientRect();
+    return [...stage.querySelectorAll('.sticker, .hero-cta')]
+      .filter(el => el.offsetParent !== null)
+      .map(el => {
+        const r = el.getBoundingClientRect();
+        return { x1: r.left - sr.left, y1: r.top - sr.top, x2: r.right - sr.left, y2: r.bottom - sr.top };
+      });
+  }
+
+  function pickPoint() {
+    const W = stage.clientWidth, H = stage.clientHeight;
+    const bw = walker.offsetWidth, bh = walker.offsetHeight;
+    const ko = keepouts();
+    const curY = walker.offsetTop;
+    const preferVert = Math.random() < 0.45;
+    for (let i = 0; i < 50; i++) {
+      const x = gsap.utils.random(24, Math.max(25, W - bw - 24));
+      const y = gsap.utils.random(H * 0.16, Math.max(H * 0.17, H - bh - 28));
+      if (preferVert && Math.abs(y - curY) < 90) continue;
+      const box = { x1: x - 6, y1: y - 6, x2: x + bw + 6, y2: y + bh + 6 };
+      if (!ko.some(k => box.x1 < k.x2 && box.x2 > k.x1 && box.y1 < k.y2 && box.y2 > k.y1))
+        return { x, y };
+    }
+    return null;
+  }
+
+  function arriveIdle(dir) {
+    if (dir === 'back') {            // linger facing away, then turn round
+      setFrame('idle-back');
+      later(() => setFrame('idle-front'), 900);
+    } else {
+      setFrame('idle-front');
+    }
+    if (Math.random() < 0.5) {       // sometimes say hello
+      later(() => setFrame(Math.random() < 0.35 ? 'wave-both' : 'wave'), dir === 'back' ? 1000 : 300);
+      later(() => setFrame('idle-front'), dir === 'back' ? 2600 : 1900);
+      later(wander, gsap.utils.random(3200, 5200));
+    } else {
+      later(wander, gsap.utils.random(2200, 4600));
+    }
+  }
+
+  function wander() {
+    clearIdle();
+    hidePrompt();
+    if (busy || reduced || phone.matches || document.hidden) { later(wander, 2000); return; }
+    const target = pickPoint();
+    if (!target) { later(wander, 2500); return; }
+    const dx = target.x - walker.offsetLeft, dy = target.y - walker.offsetTop;
+    const dist = Math.hypot(dx, dy);
+    if (dist < 50) { later(wander, 1200); return; }
+    // pick the cycle that matches the dominant travel direction
+    const dir = Math.abs(dx) >= Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'front' : 'back');
+    startWalkFrames(WALK[dir]);
+    walkTween = gsap.to(walker, {
+      left: target.x, top: target.y, duration: dist / SPEED, ease: 'none',
+      onComplete() { stopWalkFrames(); arriveIdle(dir); }
+    });
+  }
+
+  function showWink(done) {
+    gsap.timeline({ onComplete: done })
+      .to(winkEl, { scale: 1, opacity: 1, duration: 0.28, ease: 'back.out(2)' })
+      .to(winkEl, { scale: 0, opacity: 0, duration: 0.22, ease: 'power2.in' }, '+=0.75');
+  }
+
+  function showClickMe() {
+    if (busy || phone.matches || document.hidden) return;
+    if (!walkTween || !walkTween.isActive()) setFrame('wave-both');
+    gsap.killTweensOf(promptEl);
+    gsap.timeline()
+      .to(promptEl, { scale: 1, opacity: 1, duration: 0.28, ease: 'back.out(2)' })
+      .to(promptEl, { scale: 0, opacity: 0, duration: 0.22, ease: 'power2.in' }, '+=2.2');
+  }
+
+  function schedulePrompt() {
+    clearTimeout(promptTimer);
+    promptTimer = setTimeout(() => {
+      showClickMe();
+      schedulePrompt();
+    }, gsap.utils.random(8000, 15000));
+  }
+
+  walker.addEventListener('click', e => {
+    if (busy) return;
+    busy = true;
+    if (walkTween) walkTween.kill();
+    stopWalkFrames();
+    clearIdle();
+    hidePrompt();
+    if (!reduced) burst(e.clientX, e.clientY);
+    if (reduced) {
+      winkEl.style.opacity = 1;
+      winkEl.style.transform = 'translateX(-50%) scale(1)';
+      setTimeout(() => {
+        winkEl.style.opacity = 0;
+        winkEl.style.transform = 'translateX(-50%) scale(0)';
+        busy = false;
+      }, 900);
+      return;
+    }
+    setFrame('wave-both');           // arms up for the hop
+    gsap.to(walker, {
+      y: -48, duration: 0.3, ease: 'power2.out', yoyo: true, repeat: 1,
+      onComplete() {
+        gsap.set(walker, { y: 0 });
+        setFrame('idle-front');
+        showWink(() => { busy = false; wander(); });
+      }
+    });
+  });
+
+  if (reduced) {
+    setFrame('idle-front');
+    schedulePrompt();
+  } else {
+    gsap.from(walker, { opacity: 0, duration: 0.6, delay: 1.1, ease: 'power2.out' });
+    later(wander, 1800);
+    promptTimer = setTimeout(() => { showClickMe(); schedulePrompt(); }, 4500);
+  }
+})();
 
 /* ---------- about reveal ---------- */
 gsap.from('.sticky', {
