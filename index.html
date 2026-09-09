@@ -355,7 +355,7 @@ section{position:relative;z-index:5}
 .view-snapshot.active{display:flex}
 .snap-row{display:grid;gap:18px}
 .snap-row.r1{grid-template-columns:1fr 1fr 1fr}
-.snap-row.r2{grid-template-columns:1fr 1.35fr}
+.snap-row.r2{grid-template-columns:1.2fr 1fr}
 .card-s{background:#fbfaf8;border:1px solid #ecebe4;border-radius:14px;padding:18px 18px 20px;position:relative}
 .card-s .ch{font-family:var(--font-mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;
   color:#a7a399;margin-bottom:12px}
@@ -379,16 +379,18 @@ section{position:relative;z-index:5}
 .radar-wrap text{font-size:9px;fill:#6b6859;font-family:var(--font-body)}
 /* journey */
 .journey{display:flex;flex-direction:column}
-.journey .row{display:flex;align-items:center;gap:14px;padding:11px 4px;border-bottom:1px solid #f0efe8}
+.journey .row{display:flex;align-items:flex-start;gap:12px;padding:10px 4px;border-bottom:1px solid #f0efe8}
 .journey .row:last-child{border-bottom:none}
-.journey .n{font-family:var(--font-mono);font-size:10px;color:#b8b4a8;width:18px;flex-shrink:0}
-.journey .dot{width:8px;height:8px;border-radius:50%;background:#d4d2c8;flex-shrink:0}
-.journey .lbl{font-size:13px;color:#4a473f;flex:1}
-.journey .tag{font-family:var(--font-mono);font-size:8px;letter-spacing:.08em;color:#a7a399;
-  background:#f0efe8;padding:3px 8px;border-radius:5px;text-transform:uppercase}
-.journey .row.now .lbl{font-weight:700;color:#1b1b18}
+.journey .dot{width:8px;height:8px;border-radius:50%;background:#d4d2c8;flex-shrink:0;margin-top:5px}
+.journey .body{flex:1;min-width:0}
+.journey .lbl{font-size:12px;line-height:1.45;color:#4a473f;display:block}
+.journey .tag{display:inline-block;font-family:var(--font-mono);font-size:8px;letter-spacing:.08em;color:#a7a399;
+  background:#f0efe8;padding:3px 8px;border-radius:5px;text-transform:uppercase;margin-bottom:5px}
+.journey .row.now .lbl{font-weight:600;color:#1b1b18}
 .journey .row.now .dot{background:var(--green);box-shadow:0 0 0 4px rgba(123,194,74,.2)}
 .journey .row.now .tag{background:rgba(123,194,74,.16);color:#5a8c34}
+.journey .cv-link{color:#1b1b18;font:inherit;font-weight:700;background:none;border:none;padding:0;
+  text-decoration:underline;text-underline-offset:2px;cursor:none}
 /* fun facts — flip cards */
 .facts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .fact{background:none;border:none;padding:0;aspect-ratio:4/5;perspective:720px;cursor:none;
@@ -399,6 +401,14 @@ section{position:relative;z-index:5}
   .fact:hover .fact-inner{transform:rotateY(180deg)}
 }
 .fact.flipped .fact-inner{transform:rotateY(180deg)}
+.fact.hint .fact-inner{animation:factHint 5.4s cubic-bezier(.45,.05,.2,1) infinite}
+@keyframes factHint{
+  0%,20%{transform:rotateY(0deg)}
+  36%,64%{transform:rotateY(180deg)}
+  80%,100%{transform:rotateY(0deg)}
+}
+.fact.hint:hover .fact-inner,.fact.hint.flipped .fact-inner{animation:none}
+.facts-ch .ch-hint{text-transform:none;letter-spacing:.04em;opacity:.75;font-weight:500}
 .fact-face{position:absolute;inset:0;border-radius:12px;border:1px solid #ecebe4;background:#fff;
   backface-visibility:hidden;-webkit-backface-visibility:hidden;
   display:flex;align-items:center;justify-content:center;overflow:hidden;
@@ -407,7 +417,10 @@ section{position:relative;z-index:5}
 .fact-front svg{width:42px;height:42px;display:block}
 .fact-back{transform:rotateY(180deg);padding:8px 9px;align-items:center;
   font-size:9.5px;line-height:1.35;color:#3c3a34;text-align:center}
-@media (prefers-reduced-motion:reduce){.fact-inner{transition:none}}
+@media (prefers-reduced-motion:reduce){
+  .fact-inner{transition:none}
+  .fact.hint .fact-inner{animation:none}
+}
 
 /* ----- Achievements view ----- */
 .view-ach{display:none;flex-direction:column;padding:26px 30px;overflow-y:auto}
@@ -451,6 +464,26 @@ section{position:relative;z-index:5}
 .test-card .who .nm{font-size:13px;font-weight:700;color:#1b1b18;display:block}
 .test-card .who .role{font-family:var(--font-mono);font-size:9px;letter-spacing:.06em;text-transform:uppercase;
   color:#a7a399;margin-top:3px;display:block}
+
+/* ----- CV view ----- */
+.view-cv{display:none;flex-direction:column;padding:26px 30px;overflow-y:auto}
+.view-cv.active{display:flex}
+.cv-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:8px}
+.cv-dl{display:inline-flex;align-items:center;gap:8px;font-size:12px;padding:8px 16px;border-radius:8px;
+  background:#1b1b18;color:#fff;border:1px solid #1b1b18;font-family:var(--font-mono);cursor:none;
+  text-decoration:none;white-space:nowrap;flex-shrink:0}
+.cv-dl:hover{background:#332f2a}
+.cv-dl svg{width:13px;height:13px}
+.cv-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;gap:12px;padding:48px 20px;color:#6b6859}
+.cv-empty .sheet{width:72px;height:92px;border-radius:6px;background:#fbfaf8;border:1px solid #ecebe4;
+  box-shadow:0 10px 20px -14px rgba(40,38,30,.45);position:relative}
+.cv-empty .sheet::before,.cv-empty .sheet::after{content:"";position:absolute;left:14px;right:14px;height:2px;
+  background:#ecebe4;border-radius:2px}
+.cv-empty .sheet::before{top:22px}
+.cv-empty .sheet::after{top:32px}
+.cv-empty h3{font-size:18px;color:#1b1b18;font-weight:700}
+.cv-empty p{font-size:14px;line-height:1.65;max-width:36ch}
 
 /* ===================== PLAYGROUND / WORK GALLERY ===================== */
 #play{padding:70px 20px 60px;display:flex;flex-direction:column;align-items:center}
@@ -654,7 +687,7 @@ footer .made svg{width:14px;height:14px}
   .finder .side .h{padding:0 7px 8px}
   .finder .grid{grid-template-columns:repeat(2,1fr);padding:22px 16px;gap:22px 10px}
   .finder.open .grid{grid-template-columns:repeat(2,1fr)}
-  .view-snapshot,.view-ach,.view-test{padding:18px 16px}
+  .view-snapshot,.view-ach,.view-test,.view-cv{padding:18px 16px}
   .facts{grid-template-columns:repeat(2,1fr)}
   .test-grid{grid-template-columns:1fr}
   .fold .lbl{font-size:11px}
@@ -846,6 +879,7 @@ footer .made svg{width:14px;height:14px}
         <a data-view="snapshot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 21h8"/></svg>Snapshot</a>
         <a data-view="achievements"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7 7 .5-5.5 4.5 2 7L12 17l-6.5 4 2-7L2 9.5 9 9z"/></svg>Achievements</a>
         <a data-view="testimonials"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Testimonials</a>
+        <a data-view="cv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h6"/></svg>CV</a>
       </div>
       <div class="content">
         <!-- Projects -->
@@ -861,6 +895,7 @@ footer .made svg{width:14px;height:14px}
         <div class="view view-ach" id="viewAch"></div>
         <!-- Testimonials -->
         <div class="view view-test" id="viewTest"></div>
+        <div class="view view-cv" id="viewCv"></div>
       </div>
     </div>
   </div>
@@ -1474,12 +1509,15 @@ const NOTE_PILLS = [
   { t: 'innovative', c: '#3f9e57', x: '16%', y: '76%', r: -3 },
 ];
 const JOURNEY = [
-  { t: 'Pending', tag: 'soon' },
-  { t: 'Pending', tag: 'soon' },
-  { t: 'Pending', tag: 'soon' },
-  { t: 'Pending', tag: 'soon' },
-  { t: 'Pending', tag: 'soon' },
-  { t: 'Pending', tag: 'soon' },
+  { yr: '2013 – 2017', t: 'Got into technology including design, UX and more at university.' },
+  { yr: '2017', t: 'Started my more technical journey working as a 1st and 2nd line engineer.' },
+  { yr: '2019', t: 'Started doing service delivery in a role which allowed me to design processes and experiences for end users.' },
+  { yr: '2020', t: 'Moved into a more technical 3rd line role, involved in a big company project.' },
+  { yr: '2022', t: 'Moved into a Service Delivery Manager role where I was key in ensuring services ran as smoothly as possible and in improving customer experience and design.' },
+  { yr: '2023', t: 'Whilst in my downtime, I would design books, websites and apps using tools such as Figma, Webflow, Framer and other AI tools to stay innovative.' },
+  { yr: '2025', t: 'Started publishing websites for businesses in the UK and started designing for some European businesses also.' },
+  { yr: '2026', t: 'Left the Service Delivery Manager role for a temporary break from the corporate world and moved to Spain to work on a house which needs some love.' },
+  { yr: 'Present', t: 'Working on my design, SEO, web building skills and general business management. Check out my CV tab for more details.', now: true, cv: true },
 ];
 const RADAR = [
   { l: 'Coffee', v: 1 },
@@ -1576,17 +1614,22 @@ function renderSnapshot() {
       <div class="card-s">
         <div class="ch">My journey</div>
         <div class="journey">
-          ${JOURNEY.map((j, i) => `<div class="row${j.now ? ' now' : ''}"><span class="n">${String(i + 1).padStart(2, '0')}</span><span class="dot"></span><span class="lbl">${j.t}</span><span class="tag">${j.tag}</span></div>`).join('')}
+          ${JOURNEY.map(j => {
+            const copy = j.cv
+              ? j.t.replace('CV tab', '<button type="button" class="cv-link" data-open-cv>CV tab</button>')
+              : j.t;
+            return `<div class="row${j.now ? ' now' : ''}"><span class="dot"></span><div class="body"><span class="tag">${j.yr}</span><span class="lbl">${copy}</span></div></div>`;
+          }).join('')}
         </div>
       </div>
       <div class="card-s">
-        <div class="ch">Fun facts</div>
+        <div class="ch facts-ch">Fun facts <span class="ch-hint">- flip to see more</span></div>
         <div class="facts">
-          ${FACTS.map(f => {
+          ${FACTS.map((f, i) => {
             const front = f.img
               ? `<img src="${f.img}" alt="">`
               : FACT_ICONS[f.icon];
-            return `<button type="button" class="fact" aria-label="${f.label} fun fact. Click to flip.">
+            return `<button type="button" class="fact${i === 0 && !reduced ? ' hint' : ''}" aria-label="${f.label} fun fact. Click to flip.">
               <span class="fact-inner">
                 <span class="fact-face fact-front">${front}</span>
                 <span class="fact-face fact-back">${f.back}</span>
@@ -1597,8 +1640,12 @@ function renderSnapshot() {
       </div>
     </div>`;
   v.querySelectorAll('.fact').forEach(el => {
-    el.addEventListener('click', () => el.classList.toggle('flipped'));
+    el.addEventListener('click', () => {
+      el.classList.remove('hint');
+      el.classList.toggle('flipped');
+    });
   });
+  v.querySelector('[data-open-cv]')?.addEventListener('click', () => switchView('cv'));
 }
 
 /* =========================================================
@@ -1675,16 +1722,58 @@ function renderTest() {
     </div>`;
 }
 
+const CV_FILE = 'media/cv.pdf';
+const CV_NAME = 'Sam-MacKinley-CV.pdf';
+
+async function downloadCV(btn) {
+  const label = btn.innerHTML;
+  try {
+    const res = await fetch(CV_FILE, { cache: 'no-store' });
+    if (!res.ok) throw new Error('missing');
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = CV_NAME;
+    a.click();
+    URL.revokeObjectURL(url);
+  } catch {
+    btn.textContent = 'Coming soon';
+    setTimeout(() => { btn.innerHTML = label; }, 1600);
+  }
+}
+
+function renderCv() {
+  const v = document.getElementById('viewCv');
+  if (v.dataset.built) return;
+  v.dataset.built = '1';
+  v.innerHTML = `
+    <div class="cv-head">
+      <div class="ach-h" style="margin:0">Curriculum vitae</div>
+      <button type="button" class="cv-dl" id="cvDownload">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"/><path d="M7 11l5 5 5-5"/><path d="M5 21h14"/></svg>
+        Download CV
+      </button>
+    </div>
+    <div class="cv-empty">
+      <div class="sheet" aria-hidden="true"></div>
+      <h3>CV coming soon</h3>
+      <p>A downloadable PDF will live here. The button up top is ready — it will save the file once I&rsquo;ve added it.</p>
+    </div>`;
+  v.querySelector('#cvDownload').addEventListener('click', e => downloadCV(e.currentTarget));
+}
+
 /* =========================================================
    FINDER sidebar — view switching
    ========================================================= */
-const VIEW_PATHS = { projects: '~/sam/projects', snapshot: '~/sam/snapshot', achievements: '~/sam/achievements', testimonials: '~/sam/testimonials' };
+const VIEW_PATHS = { projects: '~/sam/projects', snapshot: '~/sam/snapshot', achievements: '~/sam/achievements', testimonials: '~/sam/testimonials', cv: '~/sam/cv' };
 const sideLinks = document.querySelectorAll('.finder .side a');
 const views = {
   projects: document.getElementById('viewProjects'),
   snapshot: document.getElementById('viewSnapshot'),
   achievements: document.getElementById('viewAch'),
   testimonials: document.getElementById('viewTest'),
+  cv: document.getElementById('viewCv'),
 };
 function switchView(name) {
   sideLinks.forEach(a => a.classList.toggle('active', a.dataset.view === name));
@@ -1693,6 +1782,7 @@ function switchView(name) {
   if (name === 'snapshot') renderSnapshot();
   if (name === 'achievements') renderAch();
   if (name === 'testimonials') renderTest();
+  if (name === 'cv') renderCv();
   if (name !== 'projects') closeFolder();
   setTimeout(() => ScrollTrigger.refresh(), 200);
 }
