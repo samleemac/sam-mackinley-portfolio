@@ -392,8 +392,8 @@ section{position:relative;z-index:5}
 .journey .cv-link{color:#1b1b18;font:inherit;font-weight:700;background:none;border:none;padding:0;
   text-decoration:underline;text-underline-offset:2px;cursor:none}
 /* fun facts — flip cards */
-.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.fact{background:none;border:none;padding:0;aspect-ratio:4/5;perspective:720px;cursor:none;
+.facts{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.fact{background:none;border:none;padding:0;aspect-ratio:3/4;perspective:720px;cursor:none;
   font:inherit;color:inherit;text-align:left;-webkit-appearance:none;appearance:none}
 .fact-inner{display:block;position:relative;width:100%;height:100%;transform-style:preserve-3d;
   transition:transform .55s cubic-bezier(.2,.8,.2,1)}
@@ -415,8 +415,9 @@ section{position:relative;z-index:5}
   transform:rotateY(0)}
 .fact-front img{width:86%;height:86%;object-fit:contain}
 .fact-front svg{width:42px;height:42px;display:block}
-.fact-back{transform:rotateY(180deg);padding:8px 9px;align-items:center;
-  font-size:9.5px;line-height:1.35;color:#3c3a34;text-align:center}
+.fact-back{transform:rotateY(180deg);padding:7px 8px;align-items:center;
+  font-size:10px;line-height:1.32;color:#3c3a34;text-align:center;
+  overflow:hidden;hyphens:auto}
 @media (prefers-reduced-motion:reduce){
   .fact-inner{transition:none}
   .fact.hint .fact-inner{animation:none}
@@ -688,7 +689,7 @@ footer .made svg{width:14px;height:14px}
   .finder .grid{grid-template-columns:repeat(2,1fr);padding:22px 16px;gap:22px 10px}
   .finder.open .grid{grid-template-columns:repeat(2,1fr)}
   .view-snapshot,.view-ach,.view-test,.view-cv{padding:18px 16px}
-  .facts{grid-template-columns:repeat(2,1fr)}
+  .facts{grid-template-columns:1fr}
   .test-grid{grid-template-columns:1fr}
   .fold .lbl{font-size:11px}
   .ach-stat .big{font-size:22px}
@@ -1646,6 +1647,29 @@ function renderSnapshot() {
     });
   });
   v.querySelector('[data-open-cv]')?.addEventListener('click', () => switchView('cv'));
+  const fit = () => fitFactBacks(v);
+  requestAnimationFrame(() => requestAnimationFrame(fit));
+  if (!v._factFit) {
+    v._factFit = new ResizeObserver(fit);
+    v._factFit.observe(v.querySelector('.facts'));
+  }
+}
+
+function fitFactBacks(root) {
+  if (!root) return;
+  root.querySelectorAll('.fact-back').forEach(el => {
+    el.style.fontSize = '';
+    el.style.display = 'block';
+    el.style.overflow = 'visible';
+    let size = parseFloat(getComputedStyle(el).fontSize) || 10;
+    let guard = 50;
+    while (el.scrollHeight > el.clientHeight && size > 6.5 && guard--) {
+      size -= 0.2;
+      el.style.fontSize = size + 'px';
+    }
+    el.style.display = '';
+    el.style.overflow = '';
+  });
 }
 
 /* =========================================================
@@ -1779,7 +1803,10 @@ function switchView(name) {
   sideLinks.forEach(a => a.classList.toggle('active', a.dataset.view === name));
   Object.entries(views).forEach(([k, el]) => el.classList.toggle('active', k === name));
   finderPath.textContent = VIEW_PATHS[name] || '~/sam';
-  if (name === 'snapshot') renderSnapshot();
+  if (name === 'snapshot') {
+    renderSnapshot();
+    requestAnimationFrame(() => requestAnimationFrame(() => fitFactBacks(views.snapshot)));
+  }
   if (name === 'achievements') renderAch();
   if (name === 'testimonials') renderTest();
   if (name === 'cv') renderCv();
