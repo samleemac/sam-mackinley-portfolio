@@ -1,0 +1,95 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4rem;
+  max-width: 74rem;
+  margin: 0 auto;
+}
+
+.text {
+  text-align: center;
+  font-family: var(--font-display), sans-serif;
+  font-weight: 750;
+  font-size: 4rem;
+  line-height: 1;
+  letter-spacing: -0.16rem;
+}
+
+.meta {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 1.6rem;
+  text-align: left;
+}
+
+.avatar {
+  flex-shrink: 0;
+  width: 5.6rem;
+  height: 5.6rem;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--color-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display), sans-serif;
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: -0.02rem;
+}
+
+.who {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.name {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 600;
+  font-size: 1.8rem;
+  letter-spacing: -0.036rem;
+}
+
+.role {
+  color: var(--color-secondary);
+  font-size: 1.4rem;
+}
+
+@media screen and (width >= 1025px) {
+  .content {
+    max-width: 74rem;
+    gap: 5rem;
+  }
+
+  .text {
+    font-size: 7.2rem;
+    letter-spacing: -0.288rem;
+  }
+}
+
+@media screen and (width >= 1441px) {
+  .content {
+    max-width: 92rem;
+    gap: 6rem;
+  }
+
+  .text {
+    font-size: 9rem;
+    letter-spacing: -0.36rem;
+  }
+}
+
+@media screen and (width >= 1729px) {
+  .content {
+    max-width: 100rem;
+  }
+
+  .text {
+    font-size: 10rem;
+    letter-spacing: -0.4rem;
+  }
+}

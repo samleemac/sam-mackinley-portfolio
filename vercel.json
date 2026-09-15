@@ -1,16 +1,24 @@
 {
   "rewrites": [
     {
-      "source": "/portal",
-      "destination": "https://client-portal-pro-rho.vercel.app/portal"
+      "source": "/studio",
+      "destination": "https://sam-mackinley-studio.vercel.app/studio"
     },
     {
-      "source": "/portal/",
-      "destination": "https://client-portal-pro-rho.vercel.app/portal/"
+      "source": "/studio/:path*",
+      "destination": "https://sam-mackinley-studio.vercel.app/studio/:path*"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/portal",
+      "destination": "/studio",
+      "permanent": true
     },
     {
       "source": "/portal/:path*",
-      "destination": "https://client-portal-pro-rho.vercel.app/portal/:path*"
+      "destination": "/studio",
+      "permanent": true
     }
   ]
 }

@@ -1,0 +1,15 @@
+node_modules
+.next
+out
+.DS_Store
+*.log
+.env*
+tsconfig.tsbuildinfo
+
+# Local agent/tooling artifacts
+.claude/
+.cursor/
+.playwright/
+.playwright-cli/
+.scratch/
+agent-plugins/

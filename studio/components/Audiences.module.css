@@ -1,0 +1,312 @@
+.heading {
+  max-width: 70rem;
+}
+
+.grid {
+  display: grid;
+  gap: 1.6rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 2.4rem;
+  border-radius: 4rem;
+  overflow: hidden;
+  padding: 3.2rem 2.4rem 2.8rem;
+  min-height: 36rem;
+  container-type: inline-size;
+}
+
+.grey {
+  background: var(--color-neutral);
+}
+
+.lime {
+  background: var(--color-lime-400);
+}
+
+.blue {
+  background: var(--color-blue-050);
+}
+
+.cyan {
+  background: var(--color-cyan-500);
+}
+
+.violetSoft {
+  background: var(--color-violet-050);
+}
+
+.violet {
+  background: var(--color-violet-400);
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.8rem;
+  flex-shrink: 0;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display), sans-serif;
+  font-weight: 800;
+  font-size: 3rem;
+  line-height: 1;
+  letter-spacing: -0.12rem;
+  text-wrap: balance;
+}
+
+.fit {
+  margin: 0;
+  color: var(--color-secondary);
+  font-size: 1.5rem;
+  line-height: 1.35;
+  letter-spacing: -0.02rem;
+  text-wrap: pretty;
+}
+
+.body {
+  margin: 0;
+  color: var(--color-secondary);
+  font-size: 1.6rem;
+  line-height: 1.5;
+  letter-spacing: -0.032rem;
+  max-width: 42rem;
+  text-wrap: pretty;
+}
+
+.lime .fit,
+.lime .body,
+.cyan .fit,
+.cyan .body,
+.violet .fit,
+.violet .body {
+  color: var(--color-ink-800);
+}
+
+.concepts {
+  display: flex;
+  gap: 1.2rem;
+  flex: 1;
+  min-height: 0;
+}
+
+.trades .concepts,
+.finance .concepts {
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  margin-inline: -2.4rem;
+  padding-inline: 2.4rem;
+}
+
+.trades .concepts::-webkit-scrollbar,
+.finance .concepts::-webkit-scrollbar {
+  display: none;
+}
+
+.slot {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.trades .slot,
+.finance .slot {
+  flex: 0 0 74%;
+  scroll-snap-align: start;
+}
+
+.frame {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  width: 100%;
+  border-radius: 0.8rem;
+  overflow: hidden;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-media);
+}
+
+.hair .frame {
+  aspect-ratio: 2 / 1;
+}
+
+.photo {
+  object-fit: cover;
+}
+
+.placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  padding: 1.6rem 1.8rem 2rem;
+  font-family: var(--font-display), sans-serif;
+  font-weight: 800;
+  font-size: clamp(2.4rem, 7cqi, 4.4rem);
+  line-height: 0.9;
+  letter-spacing: -0.08rem;
+  color: var(--color-grey-500);
+  user-select: none;
+  pointer-events: none;
+  text-wrap: balance;
+  overflow: hidden;
+}
+
+.caption {
+  font-size: 1.4rem;
+  line-height: 1.2;
+  letter-spacing: 0;
+  color: var(--color-secondary);
+}
+
+.lime .caption,
+.cyan .caption,
+.violet .caption {
+  color: var(--color-ink-800);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .frame {
+    transition: transform 0.6s var(--ease-overshoot-linear);
+  }
+
+  .slot:hover .frame {
+    transform: scale(1.03);
+  }
+}
+
+@media screen and (width >= 1025px) {
+  .heading {
+    max-width: 80rem;
+  }
+
+  .grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 2rem;
+  }
+
+  .card {
+    padding: 4.4rem 4rem 3.6rem;
+    min-height: 42rem;
+    container-type: inline-size;
+  }
+
+  .title {
+    font-size: 4rem;
+    letter-spacing: -0.16rem;
+  }
+
+  .trades {
+    grid-column: 1 / -1;
+  }
+
+  .creatives {
+    grid-column: 1 / span 3;
+  }
+
+  .finance {
+    grid-column: 4 / span 3;
+  }
+
+  .athletic {
+    grid-column: 1 / span 3;
+  }
+
+  .coffee {
+    grid-column: 4 / span 3;
+  }
+
+  .hair {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: center;
+    gap: 4.8rem;
+    min-height: 32rem;
+    padding: 4.8rem 5rem;
+  }
+
+  .trades .concepts,
+  .finance .concepts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    overflow: visible;
+    margin-inline: 0;
+    padding-inline: 0;
+    scroll-snap-type: none;
+  }
+
+  .trades .slot,
+  .finance .slot {
+    flex: unset;
+  }
+
+  .hair .copy {
+    flex: 0 1 36rem;
+  }
+
+  .hair .concepts {
+    flex: 1;
+  }
+
+  .hair .title {
+    font-size: 4.8rem;
+    letter-spacing: -0.192rem;
+  }
+}
+
+@media screen and (width >= 1441px) {
+  .card {
+    padding: 5.2rem 5rem 4.4rem;
+  }
+
+  .title {
+    font-size: 4.4rem;
+    letter-spacing: -0.176rem;
+  }
+
+  .body {
+    font-size: 1.8rem;
+    letter-spacing: -0.0396rem;
+  }
+
+  .hair {
+    padding: 5.6rem 6rem;
+    gap: 6rem;
+  }
+
+  .hair .title {
+    font-size: 5.6rem;
+    letter-spacing: -0.224rem;
+  }
+
+  .placeholder {
+    font-size: clamp(2.8rem, 6.5cqi, 5.2rem);
+    padding: 2rem 2.2rem 2.4rem;
+  }
+}
+
+@media screen and (width >= 1729px) {
+  .hair .title {
+    font-size: 6.4rem;
+    letter-spacing: -0.256rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .frame {
+    transition: none;
+  }
+
+  .slot:hover .frame {
+    transform: none;
+  }
+}

@@ -1,0 +1,475 @@
+.heading {
+  max-width: 50rem;
+}
+
+.cards {
+  display: grid;
+  gap: 1.6rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  border-radius: 4rem;
+  overflow: hidden;
+  min-height: 48rem;
+  padding-top: 6.5rem;
+  container-type: inline-size;
+}
+
+.grey {
+  background: var(--color-neutral);
+}
+
+.violet {
+  background: var(--color-violet-400);
+}
+
+.blue {
+  background: var(--color-cyan-500);
+}
+
+.media {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  min-height: 24rem;
+  padding: 3.2rem 2.4rem 1.2rem;
+}
+
+.mediaBleed {
+  padding: 0;
+  overflow: hidden;
+  align-items: stretch;
+  justify-content: stretch;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.2rem;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  padding: 1.6rem 3rem 4rem;
+}
+
+.title {
+  margin: 0;
+}
+
+.mark {
+  display: inline;
+  color: var(--color-primary);
+  background-color: var(--color-surface);
+  padding: 0.3rem 0.5rem;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  box-shadow: 0.1rem 0 var(--color-surface), -0.1rem 0 var(--color-surface);
+  font-family: var(--font-display), sans-serif;
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.02rem;
+}
+
+.body {
+  color: var(--color-secondary);
+  font-size: 1.6rem;
+  line-height: 1.5;
+  letter-spacing: -0.032rem;
+  max-width: 36rem;
+  text-wrap: pretty;
+}
+
+.swiss {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.swissFloat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.6rem;
+  transform-origin: center center;
+}
+
+.specimen {
+  position: relative;
+  width: 18rem;
+  height: 20rem;
+  background: var(--color-surface);
+  border-radius: 2rem;
+  overflow: hidden;
+  box-shadow: var(--shadow-media);
+}
+
+.specimen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("/studio/grain.svg");
+  background-repeat: repeat;
+  background-size: 180px 180px;
+  opacity: 0.4;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+.aaGhost,
+.aaBack,
+.aaFront {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 800;
+  line-height: 0.8;
+  letter-spacing: -0.36rem;
+  position: absolute;
+  user-select: none;
+}
+
+.aaGhost {
+  font-size: 16rem;
+  color: var(--color-grey-300);
+  left: -4.2rem;
+  top: -3.2rem;
+  opacity: 0.7;
+}
+
+.aaBack {
+  font-size: 10rem;
+  color: var(--color-violet-400);
+  left: 1.2rem;
+  top: 3.6rem;
+  transform: rotate(-11deg);
+}
+
+.aaFront {
+  font-size: 10rem;
+  color: var(--color-primary);
+  left: 4.4rem;
+  top: 6.8rem;
+  mix-blend-mode: multiply;
+}
+
+.specimenIndex {
+  position: absolute;
+  right: 1.4rem;
+  bottom: 1.2rem;
+  font-family: var(--font-display), sans-serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0.08rem;
+  color: var(--color-secondary);
+  z-index: 1;
+}
+
+.chips {
+  display: flex;
+  gap: 0.8rem;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4rem;
+  padding: 0.55rem 1.4rem 0.45rem;
+  background: var(--color-surface);
+  color: var(--color-primary);
+  font-family: var(--font-display), sans-serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: -0.028rem;
+  line-height: 1.2;
+  transition: transform 0.6s var(--ease-overshoot-linear);
+}
+
+.chipLime {
+  background: var(--color-lime-400);
+}
+
+.orbitStage {
+  position: relative;
+  width: 22rem;
+  height: 22rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.orbitRing {
+  position: absolute;
+  width: 16.8rem;
+  height: 16.8rem;
+  border: 0.1rem solid var(--color-grey-100);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.orbit {
+  position: relative;
+  width: 18.4rem;
+  height: 18.4rem;
+}
+
+.arm {
+  position: absolute;
+  inset: 0;
+}
+
+.armLime {
+  transform: rotate(0deg);
+}
+
+.armViolet {
+  transform: rotate(120deg);
+}
+
+.armCyan {
+  transform: rotate(240deg);
+}
+
+.tileWrap {
+  position: absolute;
+  top: 0;
+  left: 50%;
+}
+
+.armLime .tileWrap {
+  transform: translate(-50%, 0) rotate(0deg);
+}
+
+.armViolet .tileWrap {
+  transform: translate(-50%, 0) rotate(-120deg);
+}
+
+.armCyan .tileWrap {
+  transform: translate(-50%, 0) rotate(-240deg);
+}
+
+.tile {
+  display: block;
+  width: 6.8rem;
+  height: 6.8rem;
+  border-radius: 1.6rem;
+  box-shadow: var(--shadow-media);
+  transition: transform 0.6s var(--ease-overshoot-linear);
+}
+
+.tileLime {
+  background: var(--color-lime-400);
+}
+
+.tileViolet {
+  background: var(--color-violet-400);
+}
+
+.tileCyan {
+  background: var(--color-cyan-500);
+}
+
+.kickerWrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 24rem;
+}
+
+.kicker {
+  position: absolute;
+  left: -8%;
+  top: -6%;
+  margin: 0;
+  color: var(--color-primary);
+  font-family: var(--font-display), sans-serif;
+  font-weight: 800;
+  font-size: clamp(14rem, 56cqi, 18rem);
+  line-height: 0.72;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+  user-select: none;
+  pointer-events: none;
+}
+
+@keyframes swissFloat {
+  0%,
+  100% {
+    transform: translate3d(0, 0.6rem, 0) rotate(-4deg);
+  }
+
+  50% {
+    transform: translate3d(0.5rem, -1.4rem, 0) rotate(3deg);
+  }
+}
+
+@keyframes orbitSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .chip:hover,
+  .tile:hover {
+    transform: scale(1.05);
+  }
+}
+
+@media screen and (width >= 1025px) {
+  .cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2rem;
+  }
+
+  .card {
+    min-height: 52rem;
+    aspect-ratio: 460 / 580;
+  }
+
+  .media {
+    padding: 4.8rem 3.2rem 1.6rem;
+  }
+
+  .content {
+    padding: 2rem 5rem 5rem;
+  }
+
+  .specimen {
+    width: 22rem;
+    height: 24rem;
+  }
+
+  .aaGhost {
+    font-size: 20rem;
+    left: -5.2rem;
+    top: -4rem;
+    letter-spacing: -0.48rem;
+  }
+
+  .aaBack,
+  .aaFront {
+    font-size: 12rem;
+    letter-spacing: -0.42rem;
+  }
+
+  .aaBack {
+    left: 1.6rem;
+    top: 4.4rem;
+  }
+
+  .aaFront {
+    left: 5.2rem;
+    top: 8.2rem;
+  }
+
+  .orbitStage {
+    width: 26rem;
+    height: 26rem;
+  }
+
+  .orbitRing {
+    width: 20rem;
+    height: 20rem;
+  }
+
+  .orbit {
+    width: 22rem;
+    height: 22rem;
+  }
+
+  .tile {
+    width: 8rem;
+    height: 8rem;
+    border-radius: 2rem;
+  }
+
+  .kicker {
+    left: -10%;
+    top: -8%;
+  }
+}
+
+@media screen and (width >= 1441px) {
+  .heading {
+    max-width: 80rem;
+  }
+
+  .card {
+    min-height: 56rem;
+  }
+
+  .content {
+    padding: 2.4rem 5rem 5rem;
+  }
+
+  .specimen {
+    width: 24rem;
+    height: 26rem;
+  }
+
+  .aaGhost {
+    font-size: 22rem;
+  }
+
+  .aaBack,
+  .aaFront {
+    font-size: 13rem;
+  }
+
+  .orbitStage {
+    width: 28rem;
+    height: 28rem;
+  }
+
+  .orbit {
+    width: 24rem;
+    height: 24rem;
+  }
+
+  .tile {
+    width: 8.8rem;
+    height: 8.8rem;
+  }
+
+  .kicker {
+    font-size: 18rem;
+    left: -12%;
+    top: -10%;
+  }
+}
+
+@media screen and (width >= 1729px) {
+  .content {
+    padding: 2.8rem 6rem 5rem;
+  }
+
+  .kicker {
+    left: -12%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .swissFloat {
+    animation: none;
+    transform: rotate(-4deg);
+  }
+
+  .orbit {
+    animation: none;
+    transform: rotate(-18deg);
+  }
+
+  .chip,
+  .tile {
+    transition: none;
+  }
+}

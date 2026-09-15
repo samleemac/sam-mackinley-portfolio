@@ -1,0 +1,126 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3rem;
+}
+
+.heading {
+  text-align: left;
+  max-width: 12ch;
+}
+
+.lead {
+  color: var(--color-primary);
+  max-width: 42rem;
+}
+
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+}
+
+.card {
+  background: var(--color-neutral);
+  border-radius: 4rem;
+  min-height: 22rem;
+  padding: 4rem 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 1.6rem;
+}
+
+.title {
+  margin: 0;
+}
+
+.body {
+  color: var(--color-primary);
+  font-family: var(--font-body), Inter, sans-serif;
+  font-size: 1.8rem;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: -0.0396rem;
+  max-width: 42rem;
+  text-wrap: pretty;
+}
+
+.cta {
+  display: flex;
+  justify-content: center;
+  margin-top: 6rem;
+}
+
+@media screen and (width >= 1025px) {
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+    column-gap: 4rem;
+    align-items: start;
+  }
+
+  .intro {
+    position: sticky;
+    top: 12rem;
+    padding-bottom: 2rem;
+  }
+
+  .heading {
+    max-width: 10ch;
+  }
+
+  .cards {
+    gap: 2rem;
+  }
+
+  .card {
+    min-height: 28rem;
+    padding: 5.5rem 4.5rem 4.5rem;
+  }
+
+  .cta {
+    margin-top: 8rem;
+  }
+}
+
+@media screen and (width >= 1441px) {
+  .layout {
+    column-gap: 6rem;
+  }
+
+  .intro {
+    top: 14rem;
+    gap: 3.5rem;
+  }
+
+  .lead,
+  .body {
+    font-size: 2rem;
+    letter-spacing: -0.04rem;
+    max-width: 48rem;
+  }
+
+  .card {
+    min-height: 32rem;
+    padding: 6.5rem 5rem 5rem;
+  }
+
+  .cta {
+    margin-top: 10rem;
+  }
+}
+
+@media screen and (width >= 1729px) {
+  .card {
+    min-height: 34rem;
+    padding: 7rem 5.5rem 5.5rem;
+  }
+}

@@ -1,0 +1,171 @@
+.hero {
+  margin: 0 0 6rem;
+  padding: 14rem 0 4rem;
+  position: relative;
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3.5rem;
+  text-align: center;
+  padding-bottom: 0;
+}
+
+.pill {
+  flex-wrap: wrap;
+  justify-content: center;
+  column-gap: 0.4em;
+  row-gap: 0.15em;
+  max-width: min(100%, 42rem);
+}
+
+.pillLead {
+  font-weight: 600;
+}
+
+.pillLink {
+  color: var(--color-tertiary);
+  font-weight: 600;
+  display: inline-block;
+  transition: color 0.3s var(--ease-standard);
+}
+
+.pillLink:hover,
+.pillLink:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+.pillLink:focus-visible {
+  outline: 0.2rem solid var(--color-tertiary);
+  outline-offset: 0.3rem;
+  border-radius: 0.4rem;
+}
+
+.title {
+  position: relative;
+  max-width: 32rem;
+  opacity: 0;
+  transform: translateY(0.12em) scale(0.94);
+  transform-origin: 50% 80%;
+  animation: wordIn 0.9s var(--ease-spring) 0.12s forwards;
+}
+
+.title br {
+  display: block;
+  content: "";
+}
+
+.line {
+  display: contents;
+}
+
+.tag {
+  opacity: 0;
+  transform: scale(0.75);
+  transform-origin: center;
+  animation: scaleAndFadeIn 0.8s var(--ease-spring) 0.45s forwards;
+}
+
+.lede {
+  max-width: 52rem;
+  margin: 0 auto;
+  opacity: 0;
+  animation: scaleAndFadeIn 0.8s var(--ease-spring) 0.28s forwards;
+}
+
+.cta {
+  transform: scale(0);
+  transform-origin: center;
+  animation: scaleIn 0.8s var(--ease-spring) 0.2s forwards;
+}
+
+@keyframes wordIn {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes scaleAndFadeIn {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes scaleIn {
+  to {
+    transform: scale(1);
+  }
+}
+
+@media screen and (width <= 1024px) {
+  .title {
+    font-size: 6.4rem !important;
+    line-height: 84% !important;
+    letter-spacing: -0.2rem;
+  }
+}
+
+@media screen and (width >= 1025px) {
+  .hero {
+    margin: 0 0 8rem;
+    padding: 19rem 0 3rem;
+  }
+
+  .inner {
+    gap: 3rem;
+    padding-bottom: 0;
+  }
+
+  .title {
+    max-width: none;
+    white-space: nowrap;
+  }
+
+  .pill {
+    max-width: none;
+    flex-wrap: nowrap;
+  }
+}
+
+@media screen and (width >= 1025px) and (width <= 1440px) {
+  .title {
+    letter-spacing: -0.4rem;
+  }
+}
+
+@media screen and (width >= 1441px) {
+  .hero {
+    padding: 21rem 0 3rem;
+  }
+
+  .inner {
+    padding-bottom: 0;
+  }
+}
+
+@media screen and (width >= 1729px) {
+  .hero {
+    margin: 0 0 10rem;
+  }
+
+  .inner {
+    gap: 4rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .word,
+  .tag,
+  .cta,
+  .lede,
+  .title {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+}

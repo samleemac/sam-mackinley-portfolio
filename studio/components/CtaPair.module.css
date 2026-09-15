@@ -1,0 +1,109 @@
+.pair {
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+}
+
+.card {
+  border-radius: 4rem;
+  min-height: 36rem;
+  padding: 5rem 3.2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-start;
+  gap: 2rem;
+  color: var(--color-primary);
+}
+
+.paper {
+  background: var(--color-neutral);
+}
+
+.wash {
+  background: var(--color-violet-050);
+}
+
+.eyebrow {
+  margin: 0;
+}
+
+.title {
+  margin: 0;
+  max-width: 12ch;
+  font-family: var(--font-display), sans-serif;
+  font-weight: 800;
+  font-size: 4rem;
+  line-height: 1;
+  letter-spacing: -0.16rem;
+  text-wrap: balance;
+}
+
+.body {
+  margin: 0;
+  max-width: 42rem;
+  color: var(--color-primary);
+  font-family: var(--font-body), Inter, sans-serif;
+  font-size: 1.8rem;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: -0.0396rem;
+  text-wrap: pretty;
+}
+
+.action {
+  margin-top: 0.8rem;
+}
+
+@media screen and (width >= 1025px) {
+  .pair {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2rem;
+    align-items: stretch;
+  }
+
+  .card {
+    min-height: 42rem;
+    padding: 5rem 6rem 5rem 5rem;
+    gap: 2rem;
+  }
+
+  .title {
+    max-width: none;
+    font-size: 4.8rem;
+    letter-spacing: -0.192rem;
+  }
+}
+
+@media screen and (width >= 1441px) {
+  .card {
+    min-height: 48rem;
+    padding: 7rem 7rem 6rem;
+    gap: 3rem;
+  }
+
+  .title {
+    font-size: 5.6rem;
+    letter-spacing: -0.224rem;
+  }
+
+  .body {
+    font-size: 2rem;
+    letter-spacing: -0.04rem;
+    max-width: 48rem;
+  }
+}
+
+@media screen and (width >= 1729px) {
+  .card {
+    min-height: 52rem;
+    padding: 8rem 7rem 6rem;
+    gap: 2.4rem;
+  }
+
+  .title {
+    font-size: 6rem;
+    letter-spacing: -0.24rem;
+  }
+}

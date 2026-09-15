@@ -1,0 +1,64 @@
+.heading {
+  max-width: 50rem;
+}
+
+.list {
+  display: grid;
+  row-gap: 7rem;
+}
+
+.row {
+  display: grid;
+  gap: 1.6rem;
+}
+
+.title {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 800;
+  font-size: 4rem;
+  line-height: 1;
+  letter-spacing: -0.16rem;
+}
+
+.body {
+  color: var(--color-secondary);
+  font-size: 1.8rem;
+  line-height: 1.5;
+  letter-spacing: -0.0396rem;
+  max-width: 50.8rem;
+  text-wrap: pretty;
+}
+
+@media screen and (width >= 1025px) {
+  .row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    column-gap: 4rem;
+    align-items: baseline;
+  }
+
+  .title {
+    font-size: 4.8rem;
+    letter-spacing: -0.192rem;
+  }
+}
+
+@media screen and (width >= 1441px) {
+  .heading {
+    max-width: 80rem;
+  }
+
+  .list {
+    row-gap: 8rem;
+  }
+
+  .title {
+    font-size: 5rem;
+    letter-spacing: -0.2rem;
+  }
+
+  .body {
+    font-size: 2rem;
+    letter-spacing: -0.04rem;
+    max-width: 60rem;
+  }
+}

@@ -6,7 +6,7 @@ Finder.mov
 verify*.py
 *.mov
 
-# Client portal (portal/.gitignore covers node_modules, dist, etc.)
-portal/.env
+# Local design scratch (the studio app has its own Templates folder)
+/Templates/
 .vercel
 .env*

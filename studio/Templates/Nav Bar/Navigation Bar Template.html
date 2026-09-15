@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Storefront nav</title>
+
+<!--
+  ────────────────────────────────────────────────────────────────
+  NAV BAR TEMPLATE
+  ────────────────────────────────────────────────────────────────
+  All content is placeholder. Swap the text, links and image blocks.
+  Everything visual is driven by the custom properties in :root.
+
+  TYPEFACE NOTE
+  Inter is loaded below and tightened with negative tracking.
+  To drop in another face, replace the font link and change
+  --font-sans only — nothing else.
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500&display=swap" rel="stylesheet">
+
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   1. TOKENS
+   ═══════════════════════════════════════════════════════════════ */
+:root{
+  /* type */
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  --fs-nav: 0.875rem;      /* 14px — top level links      */
+  --fs-sub: 0.8125rem;     /* 13px — dropdown list items  */
+  --fs-eyebrow: 0.75rem;   /* 12px — announcement bar     */
+  --fs-col-head: 0.875rem; /* 14px — dropdown column head */
+  --tracking-nav: -0.01em;
+  --tracking-tight: -0.02em;
+
+  /* colour */
+  --c-ink: #1c1c1a;
+  --c-ink-soft: #6b6b66;
+  --c-paper: #ffffff;
+  --c-cream: #f4f2ee;        /* mega panel + scrolled header */
+  --c-bar: #1c1c1a;          /* announcement bar            */
+  --c-bar-text: #f4f2ee;
+  --c-rule: rgba(28,28,26,0.12);
+  --c-placeholder: #e6e2db;  /* image block fill            */
+  --c-scrim: rgba(28,28,26,0.32);
+
+  /* metrics */
+  --h-announce: 36px;
+  --h-header: 76px;
+  --pad-x: 32px;             /* page gutter                 */
+  --gap-nav: 28px;           /* between top level links     */
+  --gap-utils: 22px;         /* between utility links       */
+  --radius: 0px;             /* the brand is square-cornered */
+
+  /* motion */
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --dur: 320ms;
+}
+
+@media (max-width: 1024px){
+  :root{ --pad-x: 20px; --h-header: 64px; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   2. RESET
+   ═══════════════════════════════════════════════════════════════ */
+*,*::before,*::after{ box-sizing:border-box; }
+html{ -webkit-text-size-adjust:100%; }
+body{
+  margin:0;
+  font-family:var(--font-sans);
+  font-size:16px;
+  color:var(--c-ink);
+  background:var(--c-paper);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+a{ color:inherit; text-decoration:none; }
+ul{ list-style:none; margin:0; padding:0; }
+button{ font:inherit; color:inherit; background:none; border:0; padding:0; cursor:pointer; }
+:focus-visible{ outline:2px solid var(--c-ink); outline-offset:3px; }
+
+/* ═══════════════════════════════════════════════════════════════
+   3. HEADER SHELL
+   ═══════════════════════════════════════════════════════════════ */
+.header{
+  position:fixed;
+  inset:0 0 auto 0;
+  z-index:100;
+  color:var(--c-paper);                       /* transparent-over-hero state */
+  transition:color var(--dur) var(--ease), background-color var(--dur) var(--ease);
+}
+.header::before{                              /* the fill, animated separately */
+  content:"";
+  position:absolute; inset:0;
+  background:var(--c-cream);
+  opacity:0;
+  transition:opacity var(--dur) var(--ease);
+  pointer-events:none;
+}
+/* solid state — applied on scroll, on hover of a mega menu, or when drawer is open */
+.header.is-solid,
+.header.is-open{ color:var(--c-ink); }
+.header.is-solid::before,
+.header.is-open::before{ opacity:1; }
+
+/* ── announcement bar ───────────────────────────────────────── */
+.announce{
+  position:relative;
+  z-index:2;
+  height:var(--h-announce);
+  background:var(--c-bar);
+  color:var(--c-bar-text);
+  overflow:hidden;
+}
+.announce__inner{
+  height:100%;
+  padding:0 var(--pad-x);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+}
+.announce__rotator{
+  position:relative;
+  flex:1;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.announce__slide{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  font-size:var(--fs-eyebrow);
+  letter-spacing:var(--tracking-nav);
+  white-space:nowrap;
+  opacity:0;
+  transition:opacity 500ms var(--ease);
+  pointer-events:none;
+}
+.announce__slide.is-active{ opacity:1; pointer-events:auto; }
+.announce__slide a{ text-decoration:underline; text-underline-offset:3px; }
+
+.announce__locale{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:var(--fs-eyebrow);
+  letter-spacing:var(--tracking-nav);
+  white-space:nowrap;
+}
+.announce__flag{
+  width:16px; height:11px;
+  background:var(--c-placeholder);
+  display:inline-block;
+}
+@media (max-width: 860px){
+  .announce__locale{ display:none; }
+}
+
+/* ── main bar ───────────────────────────────────────────────── */
+.bar{
+  position:relative;
+  z-index:2;
+  height:var(--h-header);
+  padding:0 var(--pad-x);
+  display:flex;
+  align-items:center;
+  gap:40px;
+}
+
+.logo{
+  font-size:1.0625rem;
+  font-weight:500;
+  letter-spacing:var(--tracking-tight);
+  flex:0 0 auto;
+}
+
+/* primary nav — sits directly beside the wordmark */
+.nav{ flex:1 1 auto; }
+.nav__list{ display:flex; align-items:center; gap:var(--gap-nav); }
+.nav__link{
+  position:relative;
+  display:block;
+  padding:6px 0;
+  font-size:var(--fs-nav);
+  font-weight:450;
+  letter-spacing:var(--tracking-nav);
+}
+.nav__link::after{                            /* hairline reveal on hover */
+  content:"";
+  position:absolute;
+  left:0; right:0; bottom:0;
+  height:1px;
+  background:currentColor;
+  transform:scaleX(0);
+  transform-origin:left;
+  transition:transform 260ms var(--ease);
+}
+.nav__item:hover .nav__link::after,
+.nav__item.is-active .nav__link::after{ transform:scaleX(1); }
+
+/* utilities */
+.utils{ flex:0 0 auto; display:flex; align-items:center; gap:var(--gap-utils); }
+.utils__link{
+  font-size:var(--fs-nav);
+  font-weight:450;
+  letter-spacing:var(--tracking-nav);
+}
+.utils__link:hover{ opacity:0.6; }
+.cart__count{ font-variant-numeric:tabular-nums; }
+
+.burger{ display:none; }
+
+@media (max-width: 1024px){
+  .nav, .utils__link--desktop{ display:none; }
+  .bar{ gap:0; justify-content:space-between; }
+  .burger{
+    display:block;
+    font-size:var(--fs-nav);
+    letter-spacing:var(--tracking-nav);
+    order:3;
+  }
+  .logo{ order:2; }
+  .utils{ order:1; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   4. MEGA MENU
+   ═══════════════════════════════════════════════════════════════ */
+.mega{
+  position:absolute;
+  left:0; right:0;
+  top:100%;
+  background:var(--c-cream);
+  color:var(--c-ink);
+  border-top:1px solid var(--c-rule);
+  opacity:0;
+  visibility:hidden;
+  transform:translateY(-6px);
+  transition:opacity 240ms var(--ease), transform 240ms var(--ease), visibility 0s linear 240ms;
+}
+.mega.is-open{
+  opacity:1;
+  visibility:visible;
+  transform:translateY(0);
+  transition-delay:0s;
+}
+.mega__inner{
+  padding:44px var(--pad-x) 52px;
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0,1fr)) 1.25fr;
+  gap:48px;
+}
+/* panels with fewer link columns keep the feature rail flush right */
+.mega__inner--two{ grid-template-columns:repeat(2, minmax(0,1fr)) 1fr 1.25fr; }
+
+.mega__head{
+  margin:0 0 18px;
+  font-size:var(--fs-col-head);
+  font-weight:500;
+  letter-spacing:var(--tracking-nav);
+}
+.mega__list li + li{ margin-top:11px; }
+.mega__list a{
+  font-size:var(--fs-sub);
+  color:var(--c-ink-soft);
+  letter-spacing:var(--tracking-nav);
+  transition:color 180ms var(--ease);
+}
+.mega__list a:hover{ color:var(--c-ink); }
+
+/* stacked promo links — the "collection" strip */
+.promo{ display:flex; flex-direction:column; gap:18px; }
+.promo__item{ display:block; }
+.promo__title{
+  display:block;
+  font-size:var(--fs-col-head);
+  font-weight:500;
+  letter-spacing:var(--tracking-nav);
+}
+.promo__sub{
+  display:block;
+  margin-top:3px;
+  font-size:var(--fs-sub);
+  color:var(--c-ink-soft);
+}
+.promo__item:hover .promo__title{ text-decoration:underline; text-underline-offset:3px; }
+
+/* feature cards — image over caption */
+.features{ display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+.feature__media{
+  aspect-ratio:4 / 5;
+  background:var(--c-placeholder);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:0.6875rem;
+  color:var(--c-ink-soft);
+  letter-spacing:var(--tracking-nav);
+  overflow:hidden;
+}
+.feature__media img{ width:100%; height:100%; object-fit:cover; display:block; }
+.feature__title{
+  margin:12px 0 0;
+  font-size:var(--fs-col-head);
+  font-weight:500;
+  letter-spacing:var(--tracking-nav);
+}
+.feature__text{
+  margin:3px 0 0;
+  font-size:var(--fs-sub);
+  line-height:1.45;
+  color:var(--c-ink-soft);
+  max-width:34ch;
+}
+
+@media (max-width: 1180px){
+  .mega__inner,
+  .mega__inner--two{ grid-template-columns:repeat(3, minmax(0,1fr)); }
+  .features{ display:none; }
+}
+@media (max-width: 1024px){
+  .mega{ display:none; }
+}
+
+/* scrim behind the open panel */
+.scrim{
+  position:fixed;
+  inset:0;
+  z-index:90;
+  background:var(--c-scrim);
+  opacity:0;
+  visibility:hidden;
+  transition:opacity var(--dur) var(--ease), visibility 0s linear var(--dur);
+}
+.scrim.is-visible{ opacity:1; visibility:visible; transition-delay:0s; }
+
+/* ═══════════════════════════════════════════════════════════════
+   5. MOBILE DRAWER
+   ═══════════════════════════════════════════════════════════════ */
+.drawer{
+  position:fixed;
+  inset:0;
+  z-index:110;
+  background:var(--c-cream);
+  color:var(--c-ink);
+  transform:translateY(-100%);
+  transition:transform 420ms var(--ease);
+  display:flex;
+  flex-direction:column;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+}
+.drawer.is-open{ transform:translateY(0); }
+
+.drawer__top{
+  height:calc(var(--h-announce) + var(--h-header));
+  padding:0 var(--pad-x);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex:0 0 auto;
+}
+.drawer__body{ padding:8px var(--pad-x) 48px; }
+
+.acc__head{
+  width:100%;
+  padding:18px 0;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  border-bottom:1px solid var(--c-rule);
+  font-size:1.0625rem;
+  font-weight:450;
+  letter-spacing:var(--tracking-tight);
+  text-align:left;
+}
+.acc__sign{ transition:transform 260ms var(--ease); }
+.acc.is-open .acc__sign{ transform:rotate(45deg); }
+
+.acc__panel{
+  display:grid;
+  grid-template-rows:0fr;
+  transition:grid-template-rows 320ms var(--ease);
+}
+.acc.is-open .acc__panel{ grid-template-rows:1fr; }
+.acc__inner{ overflow:hidden; }
+.acc__group{ padding:16px 0 4px; }
+.acc__group h3{
+  margin:0 0 10px;
+  font-size:var(--fs-sub);
+  font-weight:500;
+  color:var(--c-ink-soft);
+  letter-spacing:var(--tracking-nav);
+}
+.acc__group li + li{ margin-top:10px; }
+.acc__group a{ font-size:0.9375rem; letter-spacing:var(--tracking-nav); }
+
+.drawer__foot{
+  margin-top:32px;
+  padding-top:24px;
+  border-top:1px solid var(--c-rule);
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  font-size:0.9375rem;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   6. DEMO PAGE — delete everything below when you lift the nav
+   ═══════════════════════════════════════════════════════════════ */
+.hero{
+  min-height:100vh;
+  background:#3a3a35;
+  color:var(--c-paper);
+  display:flex;
+  align-items:flex-end;
+  padding:0 var(--pad-x) 72px;
+}
+.hero__text{
+  font-size:clamp(1.5rem, 3vw, 2.25rem);
+  font-weight:400;
+  letter-spacing:var(--tracking-tight);
+  line-height:1.25;
+  max-width:22ch;
+  margin:0;
+}
+.filler{ padding:120px var(--pad-x); max-width:60ch; }
+.filler p{ line-height:1.6; color:var(--c-ink-soft); }
+
+@media (prefers-reduced-motion: reduce){
+  *{ transition-duration:0.01ms !important; animation-duration:0.01ms !important; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ══════════════════════════════ HEADER ══════════════════════════════ -->
+<header class="header" data-header>
+
+  <!-- announcement bar ------------------------------------------------ -->
+  <div class="announce">
+    <div class="announce__inner">
+      <div class="announce__rotator" data-rotator>
+        <p class="announce__slide is-active"><a href="#">Placeholder promotional message one.</a></p>
+        <p class="announce__slide">Placeholder promotional message two.</p>
+        <p class="announce__slide">Placeholder promotional message three.</p>
+      </div>
+      <button class="announce__locale" type="button">
+        <span>£ GBP</span>
+        <span aria-hidden="true">|</span>
+        <span>United Kingdom</span>
+        <span class="announce__flag" aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- main bar --------------------------------------------------------- -->
+  <div class="bar">
+    <a class="logo" href="#">Brand.</a>
+
+    <nav class="nav" aria-label="Primary">
+      <ul class="nav__list">
+        <li class="nav__item"><a class="nav__link" href="#">Subscribe.</a></li>
+
+        <li class="nav__item" data-menu="shop">
+          <a class="nav__link" href="#" aria-expanded="false" aria-controls="mega-shop">Shop.</a>
+        </li>
+
+        <li class="nav__item" data-menu="visit">
+          <a class="nav__link" href="#" aria-expanded="false" aria-controls="mega-visit">Visit us.</a>
+        </li>
+
+        <li class="nav__item" data-menu="about">
+          <a class="nav__link" href="#" aria-expanded="false" aria-controls="mega-about">About.</a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="utils">
+      <a class="utils__link" href="#">Search.</a>
+      <a class="utils__link utils__link--desktop" href="#">Login.</a>
+      <a class="utils__link utils__link--desktop" href="#">Wishlist.</a>
+      <a class="utils__link" href="#">Cart <span class="cart__count">[0]</span></a>
+    </div>
+
+    <button class="burger" type="button" data-drawer-open aria-expanded="false">Menu.</button>
+  </div>
+
+  <!-- ── mega panel: SHOP ─────────────────────────────────────────────── -->
+  <div class="mega" id="mega-shop" data-panel="shop">
+    <div class="mega__inner">
+      <div>
+        <h2 class="mega__head"><a href="#">Category one.</a></h2>
+        <ul class="mega__list">
+          <li><a href="#">Sub item one</a></li>
+          <li><a href="#">Sub item two</a></li>
+          <li><a href="#">Sub item three</a></li>
+          <li><a href="#">Sub item four</a></li>
+          <li><a href="#">Sub item five</a></li>
+          <li><a href="#">Shop all</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="mega__head"><a href="#">Category two.</a></h2>
+        <ul class="mega__list">
+          <li><a href="#">Sub item one</a></li>
+          <li><a href="#">Sub item two</a></li>
+          <li><a href="#">Sub item three</a></li>
+          <li><a href="#">Sub item four</a></li>
+          <li><a href="#">Shop all</a></li>
+        </ul>
+      </div>
+
+      <div class="promo">
+        <a class="promo__item" href="#">
+          <span class="promo__title">Collection one.</span>
+          <span class="promo__sub">Short descriptive line.</span>
+        </a>
+        <a class="promo__item" href="#">
+          <span class="promo__title">Collection two.</span>
+          <span class="promo__sub">Short descriptive line.</span>
+        </a>
+        <a class="promo__item" href="#">
+          <span class="promo__title">Collection three.</span>
+          <span class="promo__sub">Short descriptive line.</span>
+        </a>
+      </div>
+
+      <div class="features">
+        <a class="feature" href="#">
+          <div class="feature__media">Image 4:5</div>
+          <p class="feature__title">Feature one.</p>
+          <p class="feature__text">Two short lines of supporting copy sit beneath the image.</p>
+        </a>
+        <a class="feature" href="#">
+          <div class="feature__media">Image 4:5</div>
+          <p class="feature__title">Feature two.</p>
+          <p class="feature__text">Two short lines of supporting copy sit beneath the image.</p>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── mega panel: VISIT ────────────────────────────────────────────── -->
+  <div class="mega" id="mega-visit" data-panel="visit">
+    <div class="mega__inner mega__inner--two">
+      <div>
+        <h2 class="mega__head"><a href="#">Group one.</a></h2>
+        <ul class="mega__list">
+          <li><a href="#">Location one</a></li>
+          <li><a href="#">Location two</a></li>
+          <li><a href="#">Location three</a></li>
+          <li><a href="#">Location four</a></li>
+          <li><a href="#">Location five</a></li>
+          <li><a href="#">View all</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="mega__head"><a href="#">Group two.</a></h2>
+        <ul class="mega__list">
+          <li><a href="#">Location one</a></li>
+          <li><a href="#">Location two</a></li>
+          <li><a href="#">Location three</a></li>
+          <li><a href="#">Location four</a></li>
+          <li><a href="#">Location five</a></li>
+          <li><a href="#">View all</a></li>
+        </ul>
+      </div>
+
+      <div class="promo">
+        <a class="promo__item" href="#">
+          <span class="promo__title">Link one.</span>
+          <span class="promo__sub">Short descriptive line.</span>
+        </a>
+        <a class="promo__item" href="#">
+          <span class="promo__title">Link two.</span>
+          <span class="promo__sub">Short descriptive line.</span>
+        </a>
+        <a class="promo__item" href="#">
+          <span class="promo__title">Link three.</span>
+          <span class="promo__sub">Short descriptive line.</span>
+        </a>
+      </div>
+
+      <div class="features">
+        <a class="feature" href="#">
+          <div class="feature__media">Image 4:5</div>
+          <p class="feature__title">Feature one.</p>
+          <p class="feature__text">Two short lines of supporting copy sit beneath the image.</p>
+        </a>
+        <a class="feature" href="#">
+          <div class="feature__media">Image 4:5</div>
+          <p class="feature__title">Feature two.</p>
+          <p class="feature__text">Two short lines of supporting copy sit beneath the image.</p>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── mega panel: ABOUT ────────────────────────────────────────────── -->
+  <div class="mega" id="mega-about" data-panel="about">
+    <div class="mega__inner mega__inner--two">
+      <div>
+        <h2 class="mega__head"><a href="#">Section one.</a></h2>
+        <ul class="mega__list">
+          <li><a href="#">Page one</a></li>
+          <li><a href="#">Page two</a></li>
+          <li><a href="#">Page three</a></li>
+          <li><a href="#">Page four</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="mega__head"><a href="#">Section two.</a></h2>
+        <ul class="mega__list">
+          <li><a href="#">Page one</a></li>
+          <li><a href="#">Page two</a></li>
+          <li><a href="#">Page three</a></li>
+          <li><a href="#">Page four</a></li>
+          <li><a href="#">Page five</a></li>
+        </ul>
+      </div>
+
+      <div></div>
+
+      <div class="features">
+        <a class="feature" href="#">
+          <div class="feature__media">Image 4:5</div>
+          <p class="feature__title">Feature one.</p>
+          <p class="feature__text">Two short lines of supporting copy sit beneath the image.</p>
+        </a>
+        <a class="feature" href="#">
+          <div class="feature__media">Image 4:5</div>
+          <p class="feature__title">Feature two.</p>
+          <p class="feature__text">Two short lines of supporting copy sit beneath the image.</p>
+        </a>
+      </div>
+    </div>
+  </div>
+
+</header>
+
+<div class="scrim" data-scrim></div>
+
+<!-- ══════════════════════════════ MOBILE DRAWER ══════════════════════════════ -->
+<div class="drawer" data-drawer aria-hidden="true">
+  <div class="drawer__top">
+    <a class="logo" href="#">Brand.</a>
+    <button class="burger" type="button" data-drawer-close style="display:block">Close.</button>
+  </div>
+
+  <div class="drawer__body">
+    <div class="acc"><a class="acc__head" href="#">Subscribe.</a></div>
+
+    <div class="acc" data-acc>
+      <button class="acc__head" type="button" aria-expanded="false">
+        Shop. <span class="acc__sign" aria-hidden="true">+</span>
+      </button>
+      <div class="acc__panel"><div class="acc__inner">
+        <div class="acc__group">
+          <h3>Category one.</h3>
+          <ul>
+            <li><a href="#">Sub item one</a></li>
+            <li><a href="#">Sub item two</a></li>
+            <li><a href="#">Sub item three</a></li>
+            <li><a href="#">Shop all</a></li>
+          </ul>
+        </div>
+        <div class="acc__group">
+          <h3>Category two.</h3>
+          <ul>
+            <li><a href="#">Sub item one</a></li>
+            <li><a href="#">Sub item two</a></li>
+            <li><a href="#">Shop all</a></li>
+          </ul>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="acc" data-acc>
+      <button class="acc__head" type="button" aria-expanded="false">
+        Visit us. <span class="acc__sign" aria-hidden="true">+</span>
+      </button>
+      <div class="acc__panel"><div class="acc__inner">
+        <div class="acc__group">
+          <h3>Group one.</h3>
+          <ul>
+            <li><a href="#">Location one</a></li>
+            <li><a href="#">Location two</a></li>
+            <li><a href="#">View all</a></li>
+          </ul>
+        </div>
+        <div class="acc__group">
+          <h3>Group two.</h3>
+          <ul>
+            <li><a href="#">Location one</a></li>
+            <li><a href="#">Location two</a></li>
+            <li><a href="#">View all</a></li>
+          </ul>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="acc" data-acc>
+      <button class="acc__head" type="button" aria-expanded="false">
+        About. <span class="acc__sign" aria-hidden="true">+</span>
+      </button>
+      <div class="acc__panel"><div class="acc__inner">
+        <div class="acc__group">
+          <h3>Section one.</h3>
+          <ul>
+            <li><a href="#">Page one</a></li>
+            <li><a href="#">Page two</a></li>
+            <li><a href="#">Page three</a></li>
+          </ul>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="drawer__foot">
+      <a href="#">Login.</a>
+      <a href="#">Wishlist.</a>
+      <a href="#">£ GBP · United Kingdom</a>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ DEMO CONTENT ══════════════════════════════ -->
+<section class="hero">
+  <p class="hero__text">Hero placeholder. The header sits transparent over this block and turns solid on scroll.</p>
+</section>
+
+<section class="filler">
+  <p>Scroll placeholder. Replace this section with real page content — the nav above is self-contained and carries no dependencies beyond the font link.</p>
+</section>
+
+<script>
+(function () {
+  var header  = document.querySelector('[data-header]');
+  var scrim   = document.querySelector('[data-scrim]');
+  var items   = document.querySelectorAll('.nav__item[data-menu]');
+  var panels  = document.querySelectorAll('.mega[data-panel]');
+  var drawer  = document.querySelector('[data-drawer]');
+  var openBtn = document.querySelector('[data-drawer-open]');
+  var closeBtn= document.querySelector('[data-drawer-close]');
+  var closeTimer;
+
+  /* ── header solidifies past the announcement bar ─────────────── */
+  function onScroll(){
+    header.classList.toggle('is-solid', window.scrollY > 8);
+  }
+  window.addEventListener('scroll', onScroll, { passive:true });
+  onScroll();
+
+  /* ── mega menus: hover with a short close delay ──────────────── */
+  function openPanel(key){
+    clearTimeout(closeTimer);
+    panels.forEach(function (p) {
+      p.classList.toggle('is-open', p.dataset.panel === key);
+    });
+    items.forEach(function (i) {
+      var on = i.dataset.menu === key;
+      i.classList.toggle('is-active', on);
+      i.querySelector('.nav__link').setAttribute('aria-expanded', on ? 'true' : 'false');
+    });
+    header.classList.add('is-open');
+    scrim.classList.add('is-visible');
+  }
+
+  function closePanels(){
+    panels.forEach(function (p) { p.classList.remove('is-open'); });
+    items.forEach(function (i) {
+      i.classList.remove('is-active');
+      i.querySelector('.nav__link').setAttribute('aria-expanded', 'false');
+    });
+    header.classList.remove('is-open');
+    scrim.classList.remove('is-visible');
+  }
+
+  function scheduleClose(){
+    closeTimer = setTimeout(closePanels, 140);
+  }
+
+  items.forEach(function (item) {
+    var key = item.dataset.menu;
+    item.addEventListener('mouseenter', function () { openPanel(key); });
+    item.addEventListener('mouseleave', scheduleClose);
+    item.querySelector('.nav__link').addEventListener('focus', function () { openPanel(key); });
+  });
+
+  panels.forEach(function (panel) {
+    panel.addEventListener('mouseenter', function () { clearTimeout(closeTimer); });
+    panel.addEventListener('mouseleave', scheduleClose);
+  });
+
+  scrim.addEventListener('mouseenter', closePanels);
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { closePanels(); closeDrawer(); }
+  });
+
+  /* ── mobile drawer ───────────────────────────────────────────── */
+  function openDrawer(){
+    drawer.classList.add('is-open');
+    drawer.setAttribute('aria-hidden', 'false');
+    openBtn.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeDrawer(){
+    drawer.classList.remove('is-open');
+    drawer.setAttribute('aria-hidden', 'true');
+    openBtn.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+  }
+  openBtn.addEventListener('click', openDrawer);
+  closeBtn.addEventListener('click', closeDrawer);
+
+  /* ── drawer accordions ───────────────────────────────────────── */
+  document.querySelectorAll('[data-acc]').forEach(function (acc) {
+    var head = acc.querySelector('.acc__head');
+    head.addEventListener('click', function () {
+      var open = acc.classList.toggle('is-open');
+      head.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  });
+
+  /* ── announcement rotator ────────────────────────────────────── */
+  var slides = document.querySelectorAll('.announce__slide');
+  if (slides.length > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    var idx = 0;
+    setInterval(function () {
+      slides[idx].classList.remove('is-active');
+      idx = (idx + 1) % slides.length;
+      slides[idx].classList.add('is-active');
+    }, 4500);
+  }
+})();
+</script>
+</body>
+</html>

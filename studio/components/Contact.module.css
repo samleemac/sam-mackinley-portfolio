@@ -1,0 +1,138 @@
+.section {
+  padding: 14rem 0 8rem;
+}
+
+.grid {
+  display: grid;
+  gap: 4.8rem;
+}
+
+.title {
+  max-width: 12ch;
+  margin-bottom: 2rem;
+}
+
+.lead {
+  max-width: 42rem;
+  margin-bottom: 2.4rem;
+}
+
+.aside {
+  max-width: 36rem;
+  margin: 0 0 2.4rem;
+  color: var(--color-secondary);
+  font-size: 1.6rem;
+  line-height: 1.5;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  background: var(--color-neutral);
+  padding: 3.2rem 2.4rem;
+  border-radius: 2.4rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.field label {
+  font: 600 1.4rem / 1 var(--font-display), sans-serif;
+  letter-spacing: -0.02rem;
+  color: var(--color-primary);
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  border: 0.1rem solid var(--color-grey-300);
+  background: var(--color-surface);
+  color: var(--color-primary);
+  border-radius: 1.2rem;
+  padding: 1.4rem 1.6rem;
+  font: 400 1.6rem / 1.4 var(--font-body), sans-serif;
+  box-shadow: none;
+  resize: vertical;
+}
+
+.field input::placeholder,
+.field textarea::placeholder {
+  color: var(--color-grey-500);
+}
+
+.field input:focus,
+.field textarea:focus {
+  outline: 0.2rem solid var(--color-primary);
+  outline-offset: 0.2rem;
+  border-color: var(--color-primary);
+}
+
+.field input:user-invalid:not(:focus),
+.field textarea:user-invalid:not(:focus) {
+  border-color: var(--color-error);
+}
+
+.submit {
+  appearance: none;
+  border: 0;
+  cursor: pointer;
+  align-self: flex-start;
+  min-height: 6rem;
+  padding: 0.8rem 3.2rem;
+  border-radius: 5rem;
+  background: var(--color-primary);
+  color: var(--color-surface);
+  font: 600 1.8rem / 1 var(--font-display), sans-serif;
+  letter-spacing: -0.03rem;
+  white-space: nowrap;
+}
+
+.submit:focus-visible {
+  outline: 0.2rem solid var(--color-primary);
+  outline-offset: 0.3rem;
+}
+
+.submit:active {
+  transform: scale(0.98);
+}
+
+.status {
+  margin: 0;
+  font-size: 1.5rem;
+  line-height: 1.4;
+  color: var(--color-primary);
+}
+
+@media screen and (width >= 1025px) {
+  .section {
+    padding: 18rem 0 12rem;
+  }
+
+  .grid {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 8rem;
+    align-items: start;
+  }
+
+  .form {
+    padding: 4.8rem 4rem;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .submit:hover {
+    transform: scale(1.03);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .submit,
+  .submit:hover,
+  .submit:active {
+    transform: none;
+  }
+}

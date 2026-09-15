@@ -1,0 +1,174 @@
+.section {
+  padding-top: 8rem;
+}
+
+.heading {
+  max-width: 12ch;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.8rem;
+  margin-bottom: 3.2rem;
+}
+
+.filter,
+.pick,
+.try {
+  appearance: none;
+  border: 0;
+  margin: 0;
+  cursor: pointer;
+  border-radius: 4rem;
+  background: var(--color-neutral);
+  color: var(--color-primary);
+  font: 600 1.6rem / 1.2 var(--font-display), sans-serif;
+  letter-spacing: -0.032rem;
+  transition:
+    transform 0.3s var(--ease-overshoot-linear),
+    background-color 0.3s var(--ease-standard);
+}
+
+.filter {
+  padding: 0.8rem 2rem;
+}
+
+.filterOn,
+.pickOn {
+  background: var(--color-violet-400);
+}
+
+.filter:active,
+.pick:active,
+.try:active {
+  transform: scale(0.96);
+}
+
+.filter:focus-visible,
+.pick:focus-visible,
+.try:focus-visible {
+  outline: 0.2rem solid var(--color-primary);
+  outline-offset: 0.3rem;
+}
+
+.stage {
+  display: flex;
+  flex-direction: column;
+  gap: 2.4rem;
+}
+
+.picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+.pick {
+  padding: 0.8rem 2rem;
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2.4rem;
+}
+
+.category {
+  margin: 0 0 0.8rem;
+  color: var(--color-secondary);
+  font-size: 1.5rem;
+  letter-spacing: -0.03rem;
+}
+
+.title {
+  margin: 0 0 1.2rem;
+  font-family: var(--font-display), sans-serif;
+  font-weight: 800;
+  font-size: 3.2rem;
+  line-height: 1.05;
+  letter-spacing: -0.12rem;
+}
+
+.summary {
+  margin: 0;
+  max-width: 48rem;
+  color: var(--color-secondary);
+  font-size: 1.6rem;
+  line-height: 1.5;
+  letter-spacing: -0.032rem;
+  text-wrap: pretty;
+}
+
+.try {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 6rem;
+  padding: 0.8rem 5rem;
+  background: var(--color-violet-400);
+  text-decoration: none;
+}
+
+.empty {
+  color: var(--color-secondary);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .filter:hover,
+  .pick:hover,
+  .try:hover {
+    transform: scale(1.04);
+  }
+
+  .filter:active,
+  .pick:active,
+  .try:active {
+    transform: scale(0.96);
+  }
+}
+
+@media screen and (width >= 1025px) {
+  .section {
+    padding-top: 10rem;
+  }
+
+  .filters {
+    margin-bottom: 4.8rem;
+  }
+
+  .stage {
+    gap: 3.2rem;
+  }
+
+  .meta {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 4rem;
+  }
+
+  .title {
+    font-size: 4rem;
+    letter-spacing: -0.16rem;
+  }
+
+  .summary {
+    font-size: 1.8rem;
+    max-width: 56rem;
+  }
+}
+
+@media screen and (width >= 1441px) {
+  .title {
+    font-size: 4.8rem;
+    letter-spacing: -0.192rem;
+  }
+
+  .summary {
+    font-size: 2rem;
+    letter-spacing: -0.04rem;
+  }
+}

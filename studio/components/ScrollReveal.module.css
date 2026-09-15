@@ -1,0 +1,57 @@
+.section {
+  margin: 14rem 0 6rem;
+}
+
+.grid {
+  padding: 0;
+}
+
+.text {
+  color: var(--color-grey-300);
+  letter-spacing: -0.15rem;
+  text-wrap: pretty;
+  font-family: var(--font-display);
+  font-size: 3.6rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.text span {
+  display: inline;
+}
+
+@media screen and (width >= 1025px) {
+  .section {
+    margin: 18rem 0;
+  }
+
+  .text {
+    grid-column: 2 / span 8;
+    font-size: 4rem;
+  }
+}
+
+@media screen and (width >= 1441px) {
+  .section {
+    margin-bottom: 16rem;
+  }
+
+  .text {
+    letter-spacing: -0.22rem;
+    grid-column: 2 / span 18;
+    max-width: 84.7rem;
+    font-size: 5.4rem;
+  }
+}
+
+@media screen and (width >= 1729px) {
+  .section {
+    margin: 22rem 0 20rem;
+  }
+
+  .text {
+    letter-spacing: -0.24rem;
+    max-width: 93.7rem;
+    font-size: 6rem;
+  }
+}

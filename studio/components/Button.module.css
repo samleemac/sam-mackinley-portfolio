@@ -1,0 +1,159 @@
+.button {
+  -webkit-user-select: none;
+  user-select: none;
+  white-space: nowrap;
+  appearance: none;
+  background: none;
+  border: none;
+  text-decoration: none;
+  position: relative;
+  display: inline-flex;
+  cursor: pointer;
+  color: var(--color-primary);
+}
+
+.inner {
+  pointer-events: none;
+  width: 100%;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: center;
+  display: inline-flex;
+  transition:
+    transform 0.3s var(--ease-overshoot-linear),
+    color 0.3s var(--ease-standard),
+    background-color 0.3s var(--ease-standard),
+    border-color 0.3s var(--ease-standard);
+}
+
+.md {
+  letter-spacing: -0.04rem;
+  font: 600 2rem / 138% var(--font-display), sans-serif;
+}
+
+.md .inner {
+  border-radius: 5rem;
+  height: 6rem;
+  padding: 0.8rem 5rem;
+}
+
+.compact.md .inner {
+  padding: 0.8rem 3.2rem;
+}
+
+.lg {
+  letter-spacing: -0.04rem;
+  font: 600 2rem / 100% var(--font-display), sans-serif;
+}
+
+.lg .inner {
+  border-radius: 24.6rem;
+  height: 6rem;
+  padding: 0.8rem 5rem;
+}
+
+.icon {
+  width: 5.2rem;
+  max-width: none;
+  padding: 0;
+}
+
+.icon .inner {
+  width: 5.2rem;
+  height: 5.2rem;
+  padding: 0;
+  border-radius: 5rem;
+}
+
+.violet .inner {
+  background-color: var(--color-violet-400);
+}
+
+.black {
+  color: var(--color-surface);
+}
+
+.black .inner {
+  background-color: var(--color-primary);
+}
+
+.white .inner {
+  background-color: var(--color-surface);
+}
+
+.grey .inner {
+  background-color: var(--color-neutral);
+}
+
+.lime .inner {
+  background-color: var(--color-lime-400);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .button:hover .inner {
+    will-change: transform;
+    transition:
+      transform 0.6s var(--ease-overshoot-linear),
+      color 0.3s var(--ease-standard),
+      background-color 0.3s var(--ease-standard);
+    transform: scale(1.05);
+  }
+}
+
+@media (pointer: coarse) {
+  .button:hover .inner {
+    transform: none;
+  }
+}
+
+.button:focus-visible {
+  outline: 0.2rem solid var(--color-primary);
+  outline-offset: 0.4rem;
+  border-radius: 5rem;
+}
+
+.button:active .inner {
+  will-change: transform;
+  transition:
+    transform 0.1s linear,
+    color 0.3s var(--ease-standard),
+    background-color 0.3s var(--ease-standard);
+  transform: scale(0.9) !important;
+}
+
+@media screen and (width >= 1025px) {
+  .lg {
+    font-size: 2.2rem;
+  }
+
+  .lg .inner {
+    border-radius: 37.5rem;
+    height: 6rem;
+    min-width: 24rem;
+    padding: 0 5rem;
+  }
+}
+
+@media screen and (width >= 1441px) {
+  .lg {
+    letter-spacing: -0.044rem;
+    font-size: 2.2rem;
+  }
+
+  .lg .inner {
+    height: 6rem;
+    padding: 0 5.2rem;
+  }
+}
+
+@media screen and (width >= 1729px) {
+  .lg {
+    letter-spacing: -0.044rem;
+    font-size: 2.4rem;
+  }
+
+  .lg .inner {
+    height: 6.4rem;
+    padding: 0 5.6rem;
+  }
+}

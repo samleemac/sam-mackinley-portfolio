@@ -1,0 +1,164 @@
+.section {
+  margin: 0 0 8rem;
+  overflow: hidden;
+}
+
+.caption {
+  position: relative;
+  width: fit-content;
+  max-width: min(52rem, calc(100% - 4rem));
+  margin: 0 auto 3.2rem;
+  text-align: center;
+  text-wrap: pretty;
+  color: var(--color-primary);
+  font-family: var(--font-body), Inter, sans-serif;
+  font-size: 1.8rem;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: -0.03rem;
+  opacity: 0;
+  animation: fadeIn 0.4s var(--ease-standard) 0.3s forwards;
+}
+
+.caption::before,
+.caption::after {
+  content: "";
+  display: block;
+  background-color: var(--color-grey-100);
+  width: 50vw;
+  height: 1px;
+  position: absolute;
+  top: 50%;
+}
+
+.caption::before {
+  right: calc(100% + 3rem);
+}
+
+.caption::after {
+  left: calc(100% + 3rem);
+}
+
+.list {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 4rem;
+  height: 3.5rem;
+}
+
+.item {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.6rem;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--color-secondary);
+}
+
+.desktop {
+  display: none;
+}
+
+.marquee {
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 8%,
+    #000 92%,
+    transparent
+  );
+}
+
+.track {
+  display: flex;
+  width: max-content;
+  animation: marquee 90s linear infinite;
+}
+
+.track .list {
+  padding-right: 4rem;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media screen and (width >= 1025px) {
+  .section {
+    margin: 0 0 10rem;
+  }
+
+  .caption {
+    max-width: none;
+    margin-bottom: 4rem;
+    white-space: nowrap;
+  }
+
+  .caption::before,
+  .caption::after {
+    display: block;
+  }
+
+  .desktop {
+    display: block;
+  }
+
+  .marquee {
+    display: none;
+  }
+
+  .desktop .list {
+    justify-content: center;
+    width: 100%;
+    gap: 4rem;
+    height: 3.5rem;
+  }
+
+  .item {
+    font-size: 1.8rem;
+    letter-spacing: -0.03em;
+    font-weight: 600;
+  }
+}
+
+@media screen and (width >= 1441px) {
+  .desktop .list {
+    height: 3.5rem;
+  }
+
+  .item {
+    font-size: 1.8rem;
+  }
+}
+
+@media screen and (width >= 1729px) {
+  .item {
+    font-size: 1.8rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .caption {
+    opacity: 1;
+    animation: none;
+  }
+
+  .track {
+    animation: none;
+  }
+}
