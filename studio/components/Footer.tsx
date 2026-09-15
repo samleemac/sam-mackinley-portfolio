@@ -31,7 +31,9 @@ export function Footer() {
             </div>
             <div>
               <p className={styles.columnTitle}>On the site</p>
-              {nav.map((item) =>
+              {nav
+                .filter((item) => item.href !== site.portfolioUrl)
+                .map((item) =>
                 item.href.startsWith("http") ? (
                   <a
                     key={item.href}

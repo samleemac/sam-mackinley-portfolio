@@ -253,6 +253,14 @@
   transition-delay: 0.28s;
 }
 
+.open .list li:nth-child(5) .link {
+  transition-delay: 0.34s;
+}
+
+.open .list li:nth-child(6) .link {
+  transition-delay: 0.4s;
+}
+
 .link::before {
   content: "";
   position: absolute;

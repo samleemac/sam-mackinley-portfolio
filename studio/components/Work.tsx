@@ -265,6 +265,7 @@ export function Work() {
 
   return (
     <section
+      id="work"
       ref={sectionRef}
       className={cx("global-section", styles.section)}
       aria-label="Work"

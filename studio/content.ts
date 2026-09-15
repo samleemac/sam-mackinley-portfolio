@@ -281,11 +281,12 @@ export const faqs = [
 ];
 
 export const nav = [
-  { label: "Work", href: "https://sammackinley.com" },
+  { label: "Work", href: "#work" },
   { label: "Templates", href: "/templates" },
   { label: "Services", href: "#services" },
   { label: "Plans", href: "#plans" },
   { label: "Process", href: "#process" },
+  { label: "Portfolio", href: site.portfolioUrl },
 ];
 
 export const templateKinds = [

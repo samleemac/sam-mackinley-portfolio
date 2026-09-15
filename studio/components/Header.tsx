@@ -145,19 +145,21 @@ export function Header() {
               <ul className={styles.list}>
                 {nav.map((item) => {
                   const href = itemHref(item.href);
-                  const external = href.startsWith("http");
+                  const offSite =
+                    href.startsWith("http") &&
+                    !href.startsWith(site.portfolioUrl);
                   const className = styles.link;
                   const props = {
                     className,
                     onClick: close,
                     tabIndex: open ? 0 : -1,
-                    ...(external
-                      ? { target: "_blank", rel: "noreferrer noopener" }
+                    ...(offSite
+                      ? { target: "_blank" as const, rel: "noreferrer noopener" }
                       : {}),
-                  } as const;
+                  };
                   return (
                     <li key={item.href}>
-                      {external ? (
+                      {href.startsWith("http") ? (
                         <a href={href} {...props}>
                           {item.label}
                         </a>
