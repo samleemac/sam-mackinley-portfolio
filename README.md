@@ -31,7 +31,7 @@ npm run dev
 
 Both apps deploy from this repo on every push to `main`:
 
-- **Portfolio project** — root directory empty, framework "Other". `vercel.json` rewrites `/studio/*` to the studio project and permanently redirects the old `/portal` URLs to `/studio`. `.vercelignore` keeps `studio/` out of the static upload.
+- **Portfolio project** — root directory empty, framework "Other". `vercel.json` rewrites `/studio/*` to the studio project and permanently redirects the old `/portal` URLs to `/studio`. (Don't add a root `.vercelignore` excluding `studio/` — Vercel applies it to the studio project's build too and breaks it.)
 - **Studio project** (`sam-mackinley-studio`) — root directory `studio`, framework Next.js. `basePath: "/studio"` in `studio/next.config.ts` keeps all routes and assets under the slug.
 
 The domain `sammackinley.com` stays attached to the portfolio project only.
