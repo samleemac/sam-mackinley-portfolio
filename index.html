@@ -123,6 +123,7 @@ section{position:relative;z-index:5}
   transition:transform .25s,background .25s}
 .cta-form button svg{width:18px;height:18px}
 .cta-send{display:none;font-family:var(--font-mono);font-size:13px;letter-spacing:.04em}
+.cta-send-in{display:none;font-family:var(--font-mono);font-size:13px;letter-spacing:.04em}
 .cta-form button:hover{transform:translateX(3px);background:#000}
 .cta-form button:active{transform:scale(.92)}
 .mail-pick{display:none}
@@ -727,16 +728,18 @@ footer .made svg{width:14px;height:14px}
   .signature .tag{font-size:10px;letter-spacing:.28em;margin-top:14px}
   .hero-cta{position:static;left:auto;top:auto;transform:none;width:100%;max-width:420px;gap:16px}
   .hero-cta .cta-eyebrow{font-size:12px;text-align:center;letter-spacing:.1em;line-height:1.7}
-  .cta-form{width:100%;padding:6px 6px 6px 18px}
-  /* 16px keeps iOS from zooming in when the field takes focus */
-  .cta-form input{flex:1 1 auto;width:auto;min-width:0;font-size:16px}
-  .cta-form button{width:auto;height:44px;padding:0 15px;gap:7px;border-radius:22px}
-  .cta-send{display:inline}
-  .mail-pick.open{display:flex;flex-direction:column;align-items:center;gap:8px;width:100%}
-  .mail-pick p{font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .cta-form{width:100%;flex-direction:column;align-items:stretch;gap:10px;
+    background:none;border:none;box-shadow:none;padding:0;border-radius:0}
+  .cta-form:hover{transform:none}
+  .cta-form input{width:100%;height:52px;padding:0 18px;border:1px solid #e1ded4;border-radius:30px;
+    background:#fbfaf7;box-shadow:0 18px 34px -18px rgba(40,38,30,.45);font-size:16px}
+  .cta-form button{width:100%;height:48px;padding:0 18px;gap:8px;border-radius:24px}
+  .cta-send{display:none}
+  .cta-send-in{display:inline}
+  .mail-pick.open{display:flex;width:100%}
   .mail-pick .opts{display:flex;gap:8px;width:100%}
-  .mail-pick button{flex:1;height:44px;border-radius:22px;border:1px solid #e1ded4;background:#fbfaf7;
-    font-family:var(--font-body);font-size:14px;font-weight:600;color:var(--ink);cursor:pointer}
+  .mail-pick button{flex:1;height:48px;border:none;border-radius:24px;background:var(--ink);color:#fff;
+    font-family:var(--font-mono);font-size:13px;letter-spacing:.04em;font-weight:500;cursor:pointer}
 }
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
@@ -783,10 +786,9 @@ footer .made svg{width:14px;height:14px}
       <span class="cta-eyebrow">Got an idea? Tell me — I'll build it.</span>
       <form class="cta-form" id="ideaForm">
         <input type="text" id="ideaInput" placeholder="A site for my bakery, a portfolio, an app…" autocomplete="off" />
-        <button type="submit" aria-label="Send your idea"><span class="cta-send">Send</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        <button type="submit" aria-label="Send in"><span class="cta-send">Send</span><span class="cta-send-in">Send in</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
       </form>
       <div class="mail-pick" id="mailPick" hidden>
-        <p>Open in</p>
         <div class="opts">
           <button type="button" data-mail="native">Mail</button>
           <button type="button" data-mail="gmail">Gmail</button>
