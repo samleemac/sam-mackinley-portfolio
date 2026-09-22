@@ -1277,11 +1277,52 @@ if (ideaForm) {
     mailPick.dataset.subject = subject;
     mailPick.dataset.body = body;
   });
+  // Android Chrome hands the website address to the system, which opens it only
+  // when the app is missing. Everywhere else, try the app link and load the
+  // website only if this page is still here afterwards.
+  let appAttempt = null;
+  const openInstalledApp = (scheme, web) => {
+    if (appAttempt) appAttempt();
+    let left = false;
+    let timer = 0;
+    const cleanup = () => {
+      clearTimeout(timer);
+      document.removeEventListener('visibilitychange', onVis);
+      window.removeEventListener('pagehide', onHide);
+      window.removeEventListener('blur', onBlur);
+      window.removeEventListener('focus', onFocus);
+      if (appAttempt === cleanup) appAttempt = null;
+    };
+    const onHide = () => { left = true; cleanup(); };
+    const onVis = () => { if (document.hidden) onHide(); };
+    const decide = () => {
+      if (left || document.hidden) { cleanup(); return; }
+      // Blur means a system prompt or the mail app has the screen. Stay put
+      // until this page is focused again, which is the missing-app path.
+      if (!document.hasFocus()) { clearTimeout(timer); return; }
+      cleanup();
+      window.location.href = web;
+    };
+    const onBlur = () => { if (!left) { clearTimeout(timer); timer = setTimeout(decide, 2500); } };
+    const onFocus = () => {
+      if (left || document.hidden) { onHide(); return; }
+      clearTimeout(timer);
+      timer = setTimeout(decide, 1200);
+    };
+    document.addEventListener('visibilitychange', onVis);
+    window.addEventListener('pagehide', onHide);
+    window.addEventListener('blur', onBlur);
+    window.addEventListener('focus', onFocus);
+    appAttempt = cleanup;
+    try { window.location.href = scheme; }
+    catch (e) { if (!left) window.location.href = web; }
+    timer = setTimeout(decide, 2000);
+  };
   mailPick.addEventListener('click', e => {
     const choice = e.target.closest('[data-mail]');
     if (!choice) return;
     const { mailto, subject, body } = mailPick.dataset;
-    const to = IDEA_EMAIL;
+    const to = encodeURIComponent(IDEA_EMAIL);
     const kind = choice.dataset.mail;
     if (kind === 'native') {
       window.location.href = mailto;
@@ -1292,7 +1333,15 @@ if (ideaForm) {
       : kind === 'outlook'
         ? `https://outlook.office.com/mail/deeplink/compose?to=${to}&subject=${subject}&body=${body}`
         : `https://outlook.live.com/mail/0/deeplink/compose?to=${to}&subject=${subject}&body=${body}`;
-    window.location.href = web;
+    const android = /Android/i.test(navigator.userAgent) && !/Firefox/i.test(navigator.userAgent);
+    const scheme = kind === 'gmail'
+      ? (android
+        ? `intent://co?to=${to}&subject=${subject}&body=${body}#Intent;scheme=googlegmail;package=com.google.android.gm;S.browser_fallback_url=${encodeURIComponent(web)};end`
+        : `googlegmail://co?to=${to}&subject=${subject}&body=${body}`)
+      : (android
+        ? `intent://compose?to=${to}&subject=${subject}&body=${body}#Intent;scheme=ms-outlook;package=com.microsoft.office.outlook;S.browser_fallback_url=${encodeURIComponent(web)};end`
+        : `ms-outlook://compose?to=${to}&subject=${subject}&body=${body}`);
+    openInstalledApp(scheme, web);
   });
 }
 
