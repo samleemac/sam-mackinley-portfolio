@@ -5,7 +5,7 @@ export const site = {
   description:
     "Websites for owner-operators and independent businesses that have outgrown a template. Designed and built by one person, from first sketch to launch.",
   portfolioUrl: "https://sammackinley.com",
-  contactEmail: "hello@sammackinley.com",
+  contactEmail: "samleemac@outlook.com",
 };
 
 export const hero = {
@@ -268,7 +268,7 @@ export const faqs = [
   },
   {
     q: "How do we start?",
-    a: "Email hello@sammackinley.com with a short brief. If it looks like a fit, we book a call, agree the package, and I send a simple proposal.",
+    a: "Email samleemac@outlook.com with a short brief. If it looks like a fit, we book a call, agree the package, and I send a simple proposal.",
   },
   {
     q: "Who owns the site when we finish?",
