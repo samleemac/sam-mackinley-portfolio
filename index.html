@@ -736,10 +736,17 @@ footer .made svg{width:14px;height:14px}
   .cta-form button{width:100%;height:48px;padding:0 18px;gap:8px;border-radius:24px}
   .cta-send{display:none}
   .cta-send-in{display:inline}
-  .mail-pick.open{display:flex;width:100%}
+}
+/* Phones and tablets get a mail choice. Wider laptops send straight to the system mail app. */
+@media (max-width:1024px){
+  .mail-pick.open{display:flex;flex-direction:column;align-items:stretch;gap:8px;width:100%}
   .mail-pick .opts{display:flex;gap:8px;width:100%}
-  .mail-pick button{flex:1;height:48px;border:none;border-radius:24px;background:var(--ink);color:#fff;
-    font-family:var(--font-mono);font-size:13px;letter-spacing:.04em;font-weight:500;cursor:pointer}
+  .mail-pick .opts button{flex:1;min-width:0;height:48px;padding:0 8px;border:none;border-radius:24px;
+    background:var(--ink);color:#fff;font-family:var(--font-mono);font-size:12px;letter-spacing:.02em;
+    font-weight:500;cursor:pointer;white-space:nowrap}
+  .mail-pick .personal{align-self:center;border:none;background:none;padding:4px 6px;
+    font-family:var(--font-mono);font-size:11px;letter-spacing:.04em;color:var(--muted);
+    text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 }
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
@@ -785,15 +792,16 @@ footer .made svg{width:14px;height:14px}
     <div class="hero-cta">
       <span class="cta-eyebrow">Got an idea? Tell me — I'll build it.</span>
       <form class="cta-form" id="ideaForm">
-        <input type="text" id="ideaInput" placeholder="A site for my bakery, a portfolio, an app…" autocomplete="off" />
-        <button type="submit" aria-label="Send in"><span class="cta-send">Send</span><span class="cta-send-in">Send in</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        <input type="text" id="ideaInput" maxlength="500" placeholder="A site for my bakery, a portfolio, an app…" autocomplete="off" />
+        <button type="submit" aria-label="Send"><span class="cta-send">Send</span><span class="cta-send-in">Send in</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
       </form>
       <div class="mail-pick" id="mailPick" hidden>
         <div class="opts">
-          <button type="button" data-mail="native">Mail</button>
+          <button type="button" data-mail="native">Mail app</button>
           <button type="button" data-mail="gmail">Gmail</button>
           <button type="button" data-mail="outlook">Outlook</button>
         </div>
+        <button type="button" class="personal" data-mail="outlook-personal">Personal Outlook</button>
       </div>
     </div>
 
@@ -1234,56 +1242,57 @@ if (ideaForm) {
   if (!reduced) gsap.from('.hero-cta', { opacity: 0, y: 16, duration: 0.7, ease: 'power3.out', delay: 0.9 });
   const IDEA_EMAIL = 'samleemac@outlook.com';
   const ideaInput = document.getElementById('ideaInput');
+  const mailPick = document.getElementById('mailPick');
+  const sendBtn = ideaForm.querySelector('button[type="submit"]');
   const narrow = window.matchMedia(PHONE_HERO);
+  const chooser = window.matchMedia('(max-width:1024px)');
   const setHint = () => {
-    ideaInput.placeholder = narrow.matches
+    const phone = narrow.matches;
+    ideaInput.placeholder = phone
       ? 'A site, an app, an idea…'
       : 'A site for my bakery, a portfolio, an app…';
+    if (sendBtn) sendBtn.setAttribute('aria-label', phone ? 'Send in' : 'Send');
   };
   setHint();
   narrow.addEventListener('change', setHint);
+  chooser.addEventListener('change', () => {
+    if (chooser.matches) return;
+    mailPick.hidden = true;
+    mailPick.classList.remove('open');
+  });
   ideaForm.addEventListener('submit', e => {
     e.preventDefault();
-    const idea = document.getElementById('ideaInput').value.trim();
+    const idea = ideaInput.value.trim().slice(0, 500);
     const subject = encodeURIComponent('I have an idea for you to build');
     const body = encodeURIComponent('Hi Sam,\n\n' +
       (idea ? "Here's what I'd love you to build:\n" + idea : "I have an idea I'd love you to build:\n") + '\n\n');
     const mailto = `mailto:${IDEA_EMAIL}?subject=${subject}&body=${body}`;
-    if (!narrow.matches) {
+    if (!chooser.matches) {
       window.location.href = mailto;
       return;
     }
-    const pick = document.getElementById('mailPick');
-    pick.hidden = false;
-    pick.classList.add('open');
-    pick.dataset.mailto = mailto;
-    pick.dataset.subject = subject;
-    pick.dataset.body = body;
+    mailPick.hidden = false;
+    mailPick.classList.add('open');
+    mailPick.dataset.mailto = mailto;
+    mailPick.dataset.subject = subject;
+    mailPick.dataset.body = body;
   });
-  const mailPick = document.getElementById('mailPick');
   mailPick.addEventListener('click', e => {
     const choice = e.target.closest('[data-mail]');
     if (!choice) return;
     const { mailto, subject, body } = mailPick.dataset;
     const to = IDEA_EMAIL;
-    if (choice.dataset.mail === 'native') {
+    const kind = choice.dataset.mail;
+    if (kind === 'native') {
       window.location.href = mailto;
       return;
     }
-    const web = choice.dataset.mail === 'gmail'
+    const web = kind === 'gmail'
       ? `https://mail.google.com/mail/?view=cm&fs=1&to=${to}&su=${subject}&body=${body}`
-      : `https://outlook.live.com/mail/0/deeplink/compose?to=${to}&subject=${subject}&body=${body}`;
-    const scheme = choice.dataset.mail === 'gmail'
-      ? `googlegmail://co?to=${to}&subject=${subject}&body=${body}`
-      : `ms-outlook://compose?to=${to}&subject=${subject}&body=${body}`;
-    let left = false;
-    const mark = () => { if (document.hidden) left = true; };
-    document.addEventListener('visibilitychange', mark);
-    window.location.href = scheme;
-    setTimeout(() => {
-      document.removeEventListener('visibilitychange', mark);
-      if (!left) window.location.href = web;
-    }, 900);
+      : kind === 'outlook'
+        ? `https://outlook.office.com/mail/deeplink/compose?to=${to}&subject=${subject}&body=${body}`
+        : `https://outlook.live.com/mail/0/deeplink/compose?to=${to}&subject=${subject}&body=${body}`;
+    window.location.href = web;
   });
 }
 
