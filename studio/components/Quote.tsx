@@ -3,7 +3,7 @@
 import { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { quote } from "@/content";
+import { quote, testimonial } from "@/content";
 import styles from "./Quote.module.css";
 
 if (typeof window !== "undefined") {
@@ -60,6 +60,26 @@ export function Quote() {
               </span>
             </p>
           </div>
+        </div>
+      </section>
+      <section className="global-section" aria-label="Testimonial from Paula Dawson">
+        <div className="container">
+          <figure className={`${styles.content} ${styles.letter}`}>
+            <blockquote className={styles.letterText}>
+              {testimonial.paragraphs.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
+            </blockquote>
+            <figcaption className={styles.meta}>
+              <span className={styles.avatar} aria-hidden="true">
+                {testimonial.name.charAt(0)}
+              </span>
+              <span className={styles.who}>
+                <span className={styles.name}>{testimonial.name}</span>
+                <span className={styles.role}>{testimonial.role}</span>
+              </span>
+            </figcaption>
+          </figure>
         </div>
       </section>
       <section className="global-section">

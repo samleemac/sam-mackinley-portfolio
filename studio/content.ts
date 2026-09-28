@@ -148,6 +148,16 @@ export const quote = {
   role: "Running Coach · Gijs Running",
 };
 
+export const testimonial = {
+  name: "Paula Dawson",
+  role: "Routes 2 Change CIC",
+  paragraphs: [
+    "We absolutely loved working with Sam to create our website. He understood our brand so quickly, even though we only had a few ideas to start with. I showed him two websites that we liked the style of, and from those minimal ideas he was able to create a template that was pretty much spot on straight away.",
+    "Sam was brilliant throughout the whole process. He was really responsive to our ideas and changes, and nothing ever seemed too much trouble. He was also able to give us helpful advice about current website practices, which was particularly useful as we didn’t always know what we should be asking for.",
+    "What we appreciated most was Sam’s calm and patient approach. He made the whole process feel easy and never made us feel like we needed to know more than we did. I would happily recommend Sam to anyone looking for a website, especially if you’re someone who needs a bit of extra guidance and reassurance along the way. He really took the time to understand what we wanted and brought our ideas to life better than we could have done ourselves.",
+  ],
+};
+
 // Drop concept images in /public/concepts and set `image: "/concepts/plumber.jpg"`.
 export const audiences: {
   id: "trades" | "creatives" | "finance" | "athletic" | "coffee" | "hair";
