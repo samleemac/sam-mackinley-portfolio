@@ -461,6 +461,9 @@ section{position:relative;z-index:5}
 .test-card .stars{display:flex;gap:3px;margin-top:-4px}
 .test-card .stars svg{width:14px;height:14px;fill:var(--yellow);stroke:none}
 .test-card .quote{font-size:13.5px;line-height:1.65;color:#3c3a34;flex:1}
+.test-card .quote p{margin:0}
+.test-card .quote p + p{margin-top:.85em}
+.test-card.wide{grid-column:1 / -1}
 .test-card .who{display:flex;align-items:center;gap:12px;margin-top:2px}
 .test-card .avatar{width:38px;height:38px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;
   justify-content:center;font-weight:700;font-size:14px;color:#fff;letter-spacing:.02em}
@@ -1847,6 +1850,10 @@ const TESTIMONIALS = [
     quote: 'Professional from the first call to launch. Sam delivered a clean, trustworthy website that finally matches the quality of the work we do out in the field.',
     nm: 'James', role: 'Owner · James Agro BV', initials: 'J', color: 'var(--f-tan)', stars: 5,
   },
+  {
+    quote: 'We absolutely loved working with Sam to create our website. He understood our brand so quickly, even though we only had a few ideas to start with. I showed him two websites that we liked the style of, and from those minimal ideas he was able to create a template that was pretty much spot on straight away.\n\nSam was brilliant throughout the whole process. He was really responsive to our ideas and changes, and nothing ever seemed too much trouble. He was also able to give us helpful advice about current website practices, which was particularly useful as we didn’t always know what we should be asking for.\n\nWhat we appreciated most was Sam’s calm and patient approach. He made the whole process feel easy and never made us feel like we needed to know more than we did. I would happily recommend Sam to anyone looking for a website, especially if you’re someone who needs a bit of extra guidance and reassurance along the way. He really took the time to understand what we wanted and brought our ideas to life better than we could have done ourselves.',
+    nm: 'Paula Dawson', role: 'Routes 2 Change CIC', initials: 'P', color: 'var(--f-blue)', stars: 5, wide: true,
+  },
 ];
 
 function renderTest() {
@@ -1858,10 +1865,10 @@ function renderTest() {
     <div class="ach-h" style="margin-top:0">What clients say</div>
     <div class="test-grid">
       ${TESTIMONIALS.map(t => `
-        <div class="test-card">
+        <div class="test-card${t.wide ? ' wide' : ''}">
           <div class="quote-mark">&ldquo;</div>
           <div class="stars">${star.repeat(t.stars)}</div>
-          <p class="quote">${t.quote}</p>
+          <div class="quote">${t.quote.split(/\n\n+/).map(p => `<p>${p}</p>`).join('')}</div>
           <div class="who">
             <div class="avatar" style="background:${t.color}">${t.initials}</div>
             <div><span class="nm">${t.nm}</span><span class="role">${t.role}</span></div>
