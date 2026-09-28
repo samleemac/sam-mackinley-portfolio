@@ -251,10 +251,13 @@ section{position:relative;z-index:5}
   animation:bob 2.4s ease-in-out infinite}
 @keyframes bob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(7px)}}
 
-/* wandering character */
-.walker{position:absolute;left:13%;top:62%;width:74px;height:112px;z-index:7;cursor:none}
-.walker .walker-frame{position:absolute;bottom:0;left:50%;transform:translateX(-50%);
+/* wandering character — JS moves it with a transform; left/top are only the no-JS spot */
+.walker{position:absolute;left:27%;top:60%;width:74px;height:112px;z-index:9;cursor:none}
+.walker .walker-body{position:absolute;inset:0;transform-origin:50% 100%}
+.walker .walker-frame{position:absolute;bottom:0;left:50%;transform:translateX(calc(-50% + var(--fx,0px)));
   height:112px;width:auto;user-select:none;-webkit-user-drag:none;pointer-events:none}
+.walker .walker-shadow{position:absolute;left:50%;bottom:-5px;width:50px;height:11px;margin-left:-25px;
+  border-radius:50%;pointer-events:none;background:radial-gradient(closest-side,rgba(40,38,30,.26),rgba(40,38,30,0))}
 .walker .walker-wink,.walker .walker-prompt{position:absolute;left:50%;bottom:calc(100% + 4px);
   transform:translateX(-50%) scale(0);transform-origin:bottom center;opacity:0;pointer-events:none;
   filter:drop-shadow(0 6px 10px rgba(40,38,30,.25))}
@@ -883,7 +886,10 @@ footer .made svg{width:14px;height:14px}
     <div class="walker" id="walker" aria-hidden="true">
       <img class="walker-prompt" id="walkerPrompt" src="media/walker/click-me.png" alt="" draggable="false" />
       <img class="walker-wink" id="walkerWink" src="media/walker/wink-head.png" alt="" draggable="false" />
-      <img class="walker-frame" id="walkerFrame" src="media/walker/idle-front.png" alt="" draggable="false" />
+      <span class="walker-shadow" id="walkerShadow"></span>
+      <div class="walker-body" id="walkerBody">
+        <img class="walker-frame" id="walkerFrame" src="media/walker/idle-front.png" alt="" draggable="false" />
+      </div>
     </div>
 
   </div>
@@ -1348,134 +1354,462 @@ if (ideaForm) {
   });
 }
 
-/* ---------- hero walker: wanders the collage, jumps & winks on click ---------- */
+/* ---------- hero walker: strolls the graph paper, visits the collage, hops & winks on click ----------
+   He walks only along the grid (the four walk cycles match the four directions), routes around
+   every sticker instead of through them, and his stride matches his speed: the walk cycle advances
+   with distance covered, not on a clock. Each stop is a small scene — watching the clock, looking over the photos,
+   dancing by the playlist, waving next to the idea box. */
 (function heroWalker() {
   const walker = document.getElementById('walker');
   if (!walker || !window.gsap) return;
   const stage = document.querySelector('.hero-stage');
+  const hero = document.getElementById('hero');
+  const bodyEl = document.getElementById('walkerBody');
+  const shadow = document.getElementById('walkerShadow');
   const frame = document.getElementById('walkerFrame');
   const winkEl = document.getElementById('walkerWink');
   const promptEl = document.getElementById('walkerPrompt');
+  const ideaInput = document.getElementById('ideaInput');
+  const ideaForm = document.getElementById('ideaForm');
   const phone = window.matchMedia(PHONE_HERO);
   const DIR = 'media/walker/';
   const cycle = d => [1, 2, 3, 4].map(i => `walk-${d}-${i}`);
-  const WALK = { front: cycle('front'), back: cycle('back'), right: cycle('right'), left: cycle('left') };
+  const WALK = { right: cycle('right'), left: cycle('left'), front: cycle('front'), back: cycle('back') };
   [...Object.values(WALK).flat(), 'idle-front', 'idle-back', 'wave', 'wave-both', 'wink-head', 'click-me']
     .forEach(n => { const i = new Image(); i.src = `${DIR}${n}.png`; });
 
-  const setFrame = n => { frame.src = `${DIR}${n}.png`; };
+  // the one-hand wave is drawn ~15px right of centre in its 210px source; pull it back under his feet
+  const FRAME_X = { wave: -5 };
+  let shown = '';
+  const setFrame = n => {
+    if (n === shown) return;
+    shown = n;
+    frame.src = `${DIR}${n}.png`;
+    frame.style.setProperty('--fx', (FRAME_X[n] || 0) + 'px');
+  };
 
-  const SPEED = 70;                 // px/s — one 4-frame stride ≈ 0.64s
-  const FRAME_MS = 160;
-  let walkTween = null, frameTimer = null, idleTimers = [], promptTimer = null, busy = false;
+  const CELL = 23;                  // half the 46px graph-paper square, so his feet land on its lines
+  const HALF = 25;                  // half his body width, for collisions
+  const PAD = 14;                   // breathing room around stickers (covers their parallax drift)
+  const EDGE = 16, TOP = 70, BOTTOM = 30;
+  const SIDE_SPEED = 100, DEPTH_SPEED = 66;  // px/s; walking toward/away from you reads slower
+  // px travelled per animation frame: the side cycle is two ~37px steps over four frames
+  const SIDE_STRIDE = 18, DEPTH_STRIDE = 12;
+  const RAMP = 26;                  // px to get up to speed / slow down
+  const DIRS = [['right', 1, 0], ['left', -1, 0], ['front', 0, 1], ['back', 0, -1]];
+  const CANCEL = Symbol('cancel');
 
-  const clearIdle = () => { idleTimers.forEach(clearTimeout); idleTimers = []; };
-  const later = (fn, ms) => idleTimers.push(setTimeout(fn, ms));
+  let BW = walker.offsetWidth || 74, BH = walker.offsetHeight || 112;
+  const pos = { x: 0, y: 0 };       // his feet, in stage coordinates
+  let run = 0, busy = false, walking = false, dancing = false, heroVisible = true;
+  let lastSpot = '', noticeAt = 0, promptTimer = null;
 
-  function startWalkFrames(frames) {
-    let i = 0;
-    setFrame(frames[0]);
-    frameTimer = setInterval(() => { i = (i + 1) % frames.length; setFrame(frames[i]); }, FRAME_MS);
+  walker.style.left = walker.style.top = '0px';
+  const place = () => gsap.set(walker, { x: pos.x - BW / 2, y: pos.y - BH });
+  const breathe = gsap.to(bodyEl, { scaleY: 1.014, duration: 1.7, ease: 'sine.inOut', yoyo: true, repeat: -1, paused: true });
+
+  const wait = (ms, id) => new Promise((res, rej) =>
+    setTimeout(() => (id === run ? res() : rej(CANCEL)), ms));
+  const rnd = (a, b) => gsap.utils.random(a, b);
+  const active = () => heroVisible && !phone.matches && !document.hidden && !busy;
+
+  /* ---- the floor plan ---- */
+  function rel(el, pad = 0) {
+    const s = stage.getBoundingClientRect(), r = el.getBoundingClientRect();
+    return { x1: r.left - s.left - pad, y1: r.top - s.top - pad, x2: r.right - s.left + pad, y2: r.bottom - s.top + pad,
+      cx: (r.left + r.right) / 2 - s.left };
   }
-  function stopWalkFrames() { clearInterval(frameTimer); frameTimer = null; }
-
-  function hidePrompt() {
-    gsap.killTweensOf(promptEl);
-    gsap.to(promptEl, { scale: 0, opacity: 0, duration: 0.18, ease: 'power2.in' });
+  function obstacles() {
+    const els = [...stage.querySelectorAll('.sticker, .hero-cta')].filter(el => el.offsetParent !== null);
+    const cue = hero.querySelector('.cue');
+    if (cue) els.push(cue);
+    const tools = document.getElementById('layoutTools');
+    if (tools && tools.classList.contains('show')) els.push(tools);
+    return els.map(el => rel(el, PAD));
   }
-
-  function keepouts() {
-    const sr = stage.getBoundingClientRect();
-    return [...stage.querySelectorAll('.sticker, .hero-cta')]
-      .filter(el => el.offsetParent !== null)
-      .map(el => {
-        const r = el.getBoundingClientRect();
-        return { x1: r.left - sr.left, y1: r.top - sr.top, x2: r.right - sr.left, y2: r.bottom - sr.top };
-      });
-  }
-
-  function pickPoint() {
+  function buildGrid() {
     const W = stage.clientWidth, H = stage.clientHeight;
-    const bw = walker.offsetWidth, bh = walker.offsetHeight;
-    const ko = keepouts();
-    const curY = walker.offsetTop;
-    const preferVert = Math.random() < 0.45;
-    for (let i = 0; i < 50; i++) {
-      const x = gsap.utils.random(24, Math.max(25, W - bw - 24));
-      const y = gsap.utils.random(H * 0.16, Math.max(H * 0.17, H - bh - 28));
-      if (preferVert && Math.abs(y - curY) < 90) continue;
-      const box = { x1: x - 6, y1: y - 6, x2: x + bw + 6, y2: y + bh + 6 };
-      if (!ko.some(k => box.x1 < k.x2 && box.x2 > k.x1 && box.y1 < k.y2 && box.y2 > k.y1))
-        return { x, y };
+    const cols = Math.floor(W / CELL) + 1, rows = Math.floor(H / CELL) + 1;
+    const obs = obstacles();
+    const free = new Uint8Array(cols * rows);
+    const fits = (x, y) => {
+      if (x - HALF < EDGE || x + HALF > W - EDGE || y - BH < TOP || y > H - BOTTOM) return false;
+      const x1 = x - HALF, y1 = y - BH + 6, x2 = x + HALF, y2 = y + 2;
+      return !obs.some(o => x1 < o.x2 && x2 > o.x1 && y1 < o.y2 && y2 > o.y1);
+    };
+    for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) free[j * cols + i] = fits(i * CELL, j * CELL) ? 1 : 0;
+    return { cols, rows, free, fits };
+  }
+  const pt = (g, n) => ({ x: (n % g.cols) * CELL, y: Math.floor(n / g.cols) * CELL });
+  function nearestFree(g, x, y, maxR = Infinity, count = 1) {
+    const near = [];
+    for (let n = 0; n < g.free.length; n++) {
+      if (!g.free[n]) continue;
+      const p = pt(g, n), d = (p.x - x) ** 2 + (p.y - y) ** 2;
+      if (d <= maxR * maxR) near.push([d, n]);
+    }
+    near.sort((a, b) => a[0] - b[0]);
+    return count === 1 ? (near.length ? near[0][1] : -1) : near.slice(0, count).map(a => a[1]);
+  }
+
+  // A* over (cell, heading) so straight runs win over zig-zags
+  function route(g, from, to) {
+    const { cols, rows, free } = g, N = cols * rows, TURN = 4;
+    const cost = new Float32Array(N * 4).fill(Infinity), prev = new Int32Array(N * 4).fill(-1);
+    const heap = [];
+    const push = (f, s) => {
+      heap.push([f, s]);
+      for (let i = heap.length - 1; i > 0;) {
+        const p = (i - 1) >> 1;
+        if (heap[p][0] <= heap[i][0]) break;
+        [heap[p], heap[i]] = [heap[i], heap[p]]; i = p;
+      }
+    };
+    const pop = () => {
+      const top = heap[0], last = heap.pop();
+      if (heap.length) {
+        heap[0] = last;
+        for (let i = 0; ;) {
+          const l = 2 * i + 1, r = l + 1; let m = i;
+          if (l < heap.length && heap[l][0] < heap[m][0]) m = l;
+          if (r < heap.length && heap[r][0] < heap[m][0]) m = r;
+          if (m === i) break;
+          [heap[m], heap[i]] = [heap[i], heap[m]]; i = m;
+        }
+      }
+      return top;
+    };
+    const tx = to % cols, ty = Math.floor(to / cols);
+    const h = n => Math.abs(n % cols - tx) + Math.abs(Math.floor(n / cols) - ty);
+    for (let d = 0; d < 4; d++) { cost[from * 4 + d] = 0; push(h(from), from * 4 + d); }
+    let end = -1;
+    while (heap.length) {
+      const [f, s] = pop();
+      const n = s >> 2, d = s & 3;
+      if (f - h(n) > cost[s]) continue;
+      if (n === to) { end = s; break; }
+      const x = n % cols, y = Math.floor(n / cols);
+      for (let nd = 0; nd < 4; nd++) {
+        const nx = x + DIRS[nd][1], ny = y + DIRS[nd][2];
+        if (nx < 0 || ny < 0 || nx >= cols || ny >= rows) continue;
+        const m = ny * cols + nx;
+        if (!free[m]) continue;
+        const c = cost[s] + 1 + (nd === d ? 0 : TURN), ns = m * 4 + nd;
+        if (c < cost[ns]) { cost[ns] = c; prev[ns] = s; push(c + h(m), ns); }
+      }
+    }
+    if (end < 0) return null;
+    const cells = [];
+    for (let s = end; s >= 0; s = prev[s]) cells.push(s >> 2);
+    cells.reverse();
+    // keep only the corners
+    const pts = [pt(g, cells[0])];
+    for (let i = 1; i < cells.length - 1; i++) {
+      const a = pt(g, cells[i - 1]), b = pt(g, cells[i]), c = pt(g, cells[i + 1]);
+      if ((b.x - a.x) !== (c.x - b.x) || (b.y - a.y) !== (c.y - b.y)) pts.push(b);
+    }
+    if (cells.length > 1) pts.push(pt(g, cells[cells.length - 1]));
+    return pts;
+  }
+
+  // from wherever he is (even off the grid or inside a sticker someone dropped on him) to cell `to`
+  function plan(g, to) {
+    const here = Math.round(pos.y / CELL) * g.cols + Math.round(pos.x / CELL);
+    const onGrid = pos.x % CELL === 0 && pos.y % CELL === 0;
+    // off the grid or buried: step out to a nearby open cell — the nearest may be a sealed pocket
+    // (straight out along a row or column beats an L-shaped shuffle past other stickers)
+    const aligned = n => { const p = pt(g, n); return Math.abs(p.x - pos.x) < 1 || Math.abs(p.y - pos.y) < 1; };
+    const starts = onGrid && g.free[here] ? [here]
+      : nearestFree(g, pos.x, pos.y, 8 * CELL, 40)
+        .map((n, rank) => [rank + (aligned(n) ? 0 : 6), n]).sort((a, b) => a[0] - b[0]).slice(0, 12).map(a => a[1]);
+    for (const from of starts) {
+      const legs = route(g, from, to);
+      if (!legs) continue;
+      const s = pt(g, from);
+      return [{ ...pos }, { x: s.x, y: pos.y }, ...legs];
     }
     return null;
   }
 
-  function arriveIdle(dir) {
-    if (dir === 'back') {            // linger facing away, then turn round
-      setFrame('idle-back');
-      later(() => setFrame('idle-front'), 900);
-    } else {
-      setFrame('idle-front');
+  /* ---- walking ---- */
+  function walkPath(pts, id) {
+    const segs = [];
+    let L = 0;
+    for (let k = 0; k < pts.length - 1; k++) {
+      const a = pts[k], b = pts[k + 1], dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy);
+      if (len < 0.5) continue;
+      const dir = Math.abs(dx) >= Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'front' : 'back');
+      segs.push({ a, b, len, dir, at: L });
+      L += len;
     }
-    if (Math.random() < 0.5) {       // sometimes say hello
-      later(() => setFrame(Math.random() < 0.35 ? 'wave-both' : 'wave'), dir === 'back' ? 1000 : 300);
-      later(() => setFrame('idle-front'), dir === 'back' ? 2600 : 1900);
-      later(wander, gsap.utils.random(3200, 5200));
-    } else {
-      later(wander, gsap.utils.random(2200, 4600));
-    }
-  }
-
-  function wander() {
-    clearIdle();
-    hidePrompt();
-    if (busy || reduced || phone.matches || document.hidden) { later(wander, 2000); return; }
-    const target = pickPoint();
-    if (!target) { later(wander, 2500); return; }
-    const dx = target.x - walker.offsetLeft, dy = target.y - walker.offsetTop;
-    const dist = Math.hypot(dx, dy);
-    if (dist < 50) { later(wander, 1200); return; }
-    // pick the cycle that matches the dominant travel direction
-    const dir = Math.abs(dx) >= Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'front' : 'back');
-    startWalkFrames(WALK[dir]);
-    walkTween = gsap.to(walker, {
-      left: target.x, top: target.y, duration: dist / SPEED, ease: 'none',
-      onComplete() { stopWalkFrames(); arriveIdle(dir); }
+    if (!segs.length) return Promise.resolve(null);
+    return new Promise((res, rej) => {
+      let s = 0, seg = 0, phase = 0, acc = 0, dir = null, last = performance.now();
+      walking = id;
+      breathe.pause(0);
+      const tick = now => {
+        if (id !== run) { if (walking === id) walking = false; return rej(CANCEL); }
+        const dt = Math.min(0.05, (now - last) / 1000);
+        last = now;
+        const side = segs[seg].dir === 'left' || segs[seg].dir === 'right';
+        const ramp = Math.max(0.28, Math.min(1, (s + 8) / RAMP, (L - s + 4) / RAMP));
+        const ds = Math.min(L - s, (side ? SIDE_SPEED : DEPTH_SPEED) * ramp * dt);
+        s += ds;
+        while (seg < segs.length - 1 && s >= segs[seg].at + segs[seg].len) seg++;
+        const cur = segs[seg], u = Math.min(1, (s - cur.at) / cur.len);
+        pos.x = cur.a.x + (cur.b.x - cur.a.x) * u;
+        pos.y = cur.a.y + (cur.b.y - cur.a.y) * u;
+        if (cur.dir !== dir) {           // turning a corner: new cycle, same point in the stride
+          dir = cur.dir;
+          setFrame(WALK[dir][phase]);
+        }
+        acc += ds;
+        const stride = dir === 'left' || dir === 'right' ? SIDE_STRIDE : DEPTH_STRIDE;
+        while (acc >= stride) { acc -= stride; phase = (phase + 1) % 4; setFrame(WALK[dir][phase]); }
+        place();
+        if (s >= L - 0.01) {
+          pos.x = cur.b.x; pos.y = cur.b.y; place();
+          walking = false;
+          return res(dir);
+        }
+        requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
     });
   }
 
+  async function walkTo(g, to, id) {
+    const pts = plan(g, to);
+    if (!pts) return false;
+    const dir = await walkPath(pts, id);
+    setFrame(dir === 'back' ? 'idle-back' : 'idle-front');
+    breathe.play();
+    return true;
+  }
+
+  /* ---- little scenes ---- */
+  async function lookAt(id, ms) {        // back to us, gazing at the thing above him
+    setFrame('idle-back');
+    await wait(ms, id);
+    setFrame('idle-front');
+    await wait(350, id);
+  }
+  async function wave(id, both) {
+    setFrame(both ? 'wave-both' : 'wave');
+    await wait(both ? 1500 : 1300, id);
+    setFrame('idle-front');
+  }
+  let groove = [];
+  function stopDance(ease) {
+    groove.forEach(t => t.kill());
+    groove = [];
+    if (ease) gsap.to(bodyEl, { rotation: 0, y: 0, duration: 0.2 });
+    else gsap.set(bodyEl, { rotation: 0, y: 0 });
+    dancing = false;
+  }
+  async function dance(id) {             // bop along to the playlist
+    dancing = true;
+    breathe.pause(0);
+    groove = [
+      gsap.fromTo(bodyEl, { rotation: -4 }, { rotation: 4, duration: 0.38, ease: 'sine.inOut', yoyo: true, repeat: -1 }),
+      gsap.to(bodyEl, { y: -5, duration: 0.19, ease: 'sine.out', yoyo: true, repeat: -1 })
+    ];
+    for (let beat = 0; beat < 10; beat++) {
+      setFrame(beat % 4 === 3 ? 'wave-both' : beat % 2 ? 'wave' : 'idle-front');
+      await wait(380, id);             // a cancel leaves the clean-up to whoever cancelled
+    }
+    stopDance(true);
+    breathe.play();
+    setFrame('idle-front');
+  }
+
+  // places worth visiting: where to stand relative to each sticker (best first), and what to do there
+  const below = r => ({ x: r.cx, y: r.y2 + BH });
+  const leftOf = r => ({ x: r.x1 - HALF - 8, y: r.y2 - 8 });
+  const rightOf = r => ({ x: r.x2 + HALF + 8, y: r.y2 - 8 });
+  const SPOTS = [
+    { name: 'clock', sel: '.analog-clock', at: [below, leftOf, rightOf],
+      act: async id => { await lookAt(id, rnd(1800, 2800)); if (Math.random() < 0.4) await wave(id); } },
+    { name: 'photos', sel: '.board', at: [r => ({ x: r.cx + rnd(-40, 40), y: r.y2 + BH }), rightOf],
+      act: id => lookAt(id, rnd(2200, 3400)) },
+    { name: 'card', sel: '.device', at: [below, leftOf],
+      act: async id => { await lookAt(id, rnd(1400, 2200)); await wave(id); } },
+    { name: 'vinyl', sel: '.vinyl', at: [rightOf, below], act: dance },
+    { name: 'terminal', sel: '.term', at: [leftOf, r => ({ x: r.cx, y: r.y1 - 6 })],
+      act: id => wave(id) },
+    { name: 'idea', sel: '.hero-cta', act: id => wave(id, true),
+      at: [r => ({ x: pos.x < r.cx ? r.x1 - HALF - 8 : r.x2 + HALF + 8, y: r.y2 + 2 }),
+           r => ({ x: pos.x < r.cx ? r.x2 + HALF + 8 : r.x1 - HALF - 8, y: r.y2 + 2 })] },
+  ];
+  function spotCell(g, sp, maxR = 70) {
+    const el = stage.querySelector(sp.sel);
+    if (!el || el.offsetParent === null) return -1;
+    const r = rel(el);
+    for (const at of sp.at) {
+      const want = at(r), n = nearestFree(g, want.x, want.y, maxR);
+      if (n >= 0) return n;
+    }
+    return -1;
+  }
+
+  function chooseSpot(g) {
+    const options = [];
+    SPOTS.forEach(sp => {
+      if (sp.name === lastSpot) return;
+      const n = spotCell(g, sp);
+      if (n < 0) return;
+      const p = pt(g, n);
+      if (Math.hypot(p.x - pos.x, p.y - pos.y) < 60) return;
+      options.push({ ...sp, n });
+    });
+    // an aimless stroll now and then — out on open paper, not wedged in a corner
+    const W = stage.clientWidth, H = stage.clientHeight;
+    const open = n => { for (let dj = -2; dj <= 2; dj++) for (let di = -2; di <= 2; di++) if (!g.free[n + dj * g.cols + di]) return false; return true; };
+    for (let tries = 0; tries < 60 && lastSpot !== 'stroll'; tries++) {
+      const n = Math.floor(Math.random() * g.free.length);
+      const p = pt(g, n);
+      if (p.x < W * 0.12 || p.x > W * 0.88 || p.y < H * 0.3) continue;
+      if (g.free[n] && open(n) && Math.hypot(p.x - pos.x, p.y - pos.y) > 160) {
+        options.push({ name: 'stroll', n, act: id => wait(rnd(900, 1800), id) });
+        break;
+      }
+    }
+    return options.length ? options[Math.floor(Math.random() * options.length)] : null;
+  }
+
+  async function life(id) {
+    for (let stuck = 0; ;) {
+      while (!active()) await wait(600, id);
+      const g = buildGrid();
+      const spot = chooseSpot(g);
+      if (!spot || !(await walkTo(g, spot.n, id))) {
+        if (++stuck < 4) { await wait(1500, id); continue; }
+        // walled in with no way out: slip away and stroll back in through a gap
+        gsap.to(walker, { autoAlpha: 0, duration: 0.35 });
+        await wait(400, id);
+        return enter();
+      }
+      stuck = 0;
+      lastSpot = spot.name;
+      await spot.act(id);
+      await wait(rnd(700, 2200), id);
+    }
+  }
+
+  // someone clicked into the idea box: come over and keep them company while they type
+  async function keepCompany(id) {
+    const g = buildGrid();
+    const n = spotCell(g, SPOTS.find(s => s.name === 'idea'), 90);
+    if (n >= 0 && Math.hypot(pt(g, n).x - pos.x, pt(g, n).y - pos.y) > 4) await walkTo(g, n, id);
+    lastSpot = 'idea';
+    setFrame('idle-front');
+    await wait(250, id);
+    await wave(id);
+    while (document.activeElement === ideaInput) await wait(500, id);
+    await wait(rnd(900, 1600), id);
+    return life(id);
+  }
+
+  function start(activity) {
+    const id = ++run;
+    if (dancing) { stopDance(true); breathe.play(); }
+    activity(id).catch(e => { if (e !== CANCEL) throw e; });
+  }
+
+  /* ---- entrance: stroll in through a gap at the side of the page, heading for the idea box ---- */
+  function enter() {
+    const g = buildGrid();
+    const W = stage.clientWidth, H = stage.clientHeight;
+    const goal = spotCell(g, SPOTS.find(s => s.name === 'idea'), 90);
+    const gp = goal >= 0 ? pt(g, goal) : { x: W / 2, y: H * 0.7 };
+    // doorways: open cells on the outermost columns he fits in, or failing that the bottom row
+    const doors = [];
+    const firstCol = Math.ceil((EDGE + HALF) / CELL), lastCol = Math.floor((W - EDGE - HALF) / CELL);
+    const lastRow = Math.floor((H - BOTTOM) / CELL);
+    const door = (n, from, extra) => {
+      if (!g.free[n]) return;
+      const p = pt(g, n);
+      doors.push({ n, from, p, score: Math.hypot(p.x - gp.x, p.y - gp.y) + extra });
+    };
+    for (let j = 0; j < g.rows; j++) { door(j * g.cols + firstCol, 'left', 0); door(j * g.cols + lastCol, 'right', 0); }
+    for (let i = 0; i < g.cols; i++) door(lastRow * g.cols + i, 'bottom', 500);
+    doors.sort((a, b) => a.score - b.score);
+    let way = null, from = null;
+    for (const d of doors.slice(0, 12)) {
+      way = goal >= 0 ? route(g, d.n, goal) : [d.p];
+      if (way) { from = d; break; }
+    }
+    if (!from) {                      // boxed in everywhere: just appear on open paper
+      const n = goal >= 0 ? goal : nearestFree(g, gp.x, gp.y);
+      if (n >= 0) Object.assign(pos, pt(g, n));
+      place();
+      setFrame('idle-front');
+      gsap.to(walker, { autoAlpha: 1, duration: 0.5 });
+      start(life);
+      return;
+    }
+    pos.x = from.from === 'left' ? -BW : from.from === 'right' ? W + BW : from.p.x;
+    pos.y = from.from === 'bottom' ? H + BH : from.p.y;
+    place();
+    gsap.set(walker, { autoAlpha: 1 });
+    start(async id => {
+      const dir = await walkPath([{ ...pos }, ...way], id);
+      setFrame(dir === 'back' ? 'idle-back' : 'idle-front');
+      breathe.play();
+      if (goal >= 0) {
+        lastSpot = 'idea';
+        await wait(300, id);
+        await wave(id, true);
+        await wait(rnd(900, 1500), id);
+      }
+      return life(id);
+    });
+  }
+
+  /* ---- speech bubbles ---- */
+  function hidePrompt() {
+    gsap.killTweensOf(promptEl);
+    gsap.to(promptEl, { scale: 0, opacity: 0, duration: 0.18, ease: 'power2.in' });
+  }
   function showWink(done) {
     gsap.timeline({ onComplete: done })
       .to(winkEl, { scale: 1, opacity: 1, duration: 0.28, ease: 'back.out(2)' })
       .to(winkEl, { scale: 0, opacity: 0, duration: 0.22, ease: 'power2.in' }, '+=0.75');
   }
-
   function showClickMe() {
-    if (busy || phone.matches || document.hidden) return;
-    if (!walkTween || !walkTween.isActive()) setFrame('wave-both');
+    if (!active() || gsap.getProperty(walker, 'autoAlpha') === 0) return;
+    if (walking || dancing) { clearTimeout(promptTimer); promptTimer = setTimeout(() => { showClickMe(); schedulePrompt(); }, 1500); return; }
+    setFrame('wave-both');
     gsap.killTweensOf(promptEl);
     gsap.timeline()
       .to(promptEl, { scale: 1, opacity: 1, duration: 0.28, ease: 'back.out(2)' })
-      .to(promptEl, { scale: 0, opacity: 0, duration: 0.22, ease: 'power2.in' }, '+=2.2');
+      .add(() => { if (!walking && !dancing && !busy && shown === 'wave-both') setFrame('idle-front'); }, '+=1.4')
+      .to(promptEl, { scale: 0, opacity: 0, duration: 0.22, ease: 'power2.in' }, '+=0.8');
   }
-
   function schedulePrompt() {
     clearTimeout(promptTimer);
-    promptTimer = setTimeout(() => {
-      showClickMe();
-      schedulePrompt();
-    }, gsap.utils.random(8000, 15000));
+    promptTimer = setTimeout(() => { showClickMe(); schedulePrompt(); }, rnd(9000, 16000));
+  }
+
+  /* ---- hop: on click, and a little cheer when an idea is sent ---- */
+  function hop(done) {
+    breathe.pause(0);
+    setFrame('wave-both');           // arms up for the hop
+    gsap.timeline({ onComplete() { breathe.play(); done && done(); } })
+      .to(bodyEl, { y: -48, duration: 0.3, ease: 'power2.out' })
+      .to(shadow, { scale: 0.55, opacity: 0.45, duration: 0.3, ease: 'power2.out' }, 0)
+      .to(bodyEl, { y: 0, duration: 0.3, ease: 'power2.in' })
+      .to(shadow, { scale: 1, opacity: 1, duration: 0.3, ease: 'power2.in' }, '<')
+      .to(bodyEl, { scaleY: 0.94, duration: 0.08, ease: 'power1.out', yoyo: true, repeat: 1 })  // land
+      .add(() => setFrame('idle-front'));
   }
 
   walker.addEventListener('click', e => {
     if (busy) return;
     busy = true;
-    if (walkTween) walkTween.kill();
-    stopWalkFrames();
-    clearIdle();
+    run++;                           // stop whatever he was doing
+    walking = false;
     hidePrompt();
-    if (!reduced) burst(e.clientX, e.clientY);
     if (reduced) {
       winkEl.style.opacity = 1;
       winkEl.style.transform = 'translateX(-50%) scale(1)';
@@ -1486,24 +1820,71 @@ if (ideaForm) {
       }, 900);
       return;
     }
-    setFrame('wave-both');           // arms up for the hop
-    gsap.to(walker, {
-      y: -48, duration: 0.3, ease: 'power2.out', yoyo: true, repeat: 1,
-      onComplete() {
-        gsap.set(walker, { y: 0 });
-        setFrame('idle-front');
-        showWink(() => { busy = false; wander(); });
-      }
-    });
+    burst(e.clientX, e.clientY);
+    stopDance();
+    hop(() => showWink(() => { busy = false; start(life); }));
   });
 
-  if (reduced) {
+  if (ideaInput) ideaInput.addEventListener('focus', () => {
+    if (!reduced && active()) start(keepCompany);
+  });
+  if (ideaForm) ideaForm.addEventListener('submit', () => {
+    if (!reduced && active() && !walking) { run++; stopDance(); busy = true; hop(() => { busy = false; start(life); }); }
+  });
+
+  // turn and wave when the cursor comes close while he's standing about
+  if (!isTouch) window.addEventListener('pointermove', e => {
+    if (reduced || walking || dancing || busy || !active() || gsap.getProperty(walker, 'autoAlpha') === 0) return;
+    const now = performance.now();
+    if (now < noticeAt) return;
+    const s = stage.getBoundingClientRect();
+    if (Math.hypot(e.clientX - s.left - pos.x, e.clientY - s.top - (pos.y - BH / 2)) > 150) return;
+    noticeAt = now + 9000;
+    const id = run;
+    setFrame('idle-front');
+    setTimeout(() => { if (id === run && !walking && !dancing && !busy) setFrame('wave'); }, 220);
+    setTimeout(() => { if (id === run && !walking && !dancing && !busy && shown === 'wave') setFrame('idle-front'); }, 1500);
+  }, { passive: true });
+
+  // a sticker dragged onto him or across his path, or a resize: find a new way
+  let dragSeen = false;
+  window.addEventListener('pointermove', () => { if (window.__dragging) dragSeen = true; }, { passive: true });
+  function recheck() {
+    if (reduced || busy || phone.matches || gsap.getProperty(walker, 'autoAlpha') === 0) return;
+    BW = walker.offsetWidth || BW; BH = walker.offsetHeight || BH;
+    const g = buildGrid();
+    const n = Math.round(pos.y / CELL) * g.cols + Math.round(pos.x / CELL);
+    if (walking || !g.free[n] || pos.x > stage.clientWidth || pos.y > stage.clientHeight) start(life);
+  }
+  window.addEventListener('pointerup', () => { if (dragSeen) { dragSeen = false; setTimeout(recheck, 50); } });
+  let resizeTimer = 0;
+  window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(recheck, 250); });
+  document.getElementById('resetLayout')?.addEventListener('click', () => setTimeout(recheck, 600));
+
+  new IntersectionObserver(es => es.forEach(en => { heroVisible = en.isIntersecting; }), { threshold: 0.2 }).observe(hero);
+
+  if (reduced) {                     // no strolling: just stand beside the idea box
+    const g = buildGrid();
+    const cta = SPOTS.find(s => s.name === 'idea');
+    pos.x = -1e4;                    // i.e. the left-hand side of the box
+    const n = spotCell(g, cta, Infinity);
+    if (n >= 0) { Object.assign(pos, pt(g, n)); place(); }
+    else walker.style.left = walker.style.top = '';  // fall back to the CSS spot
     setFrame('idle-front');
     schedulePrompt();
   } else {
-    gsap.from(walker, { opacity: 0, duration: 0.6, delay: 1.1, ease: 'power2.out' });
-    later(wander, 1800);
-    promptTimer = setTimeout(() => { showClickMe(); schedulePrompt(); }, 4500);
+    gsap.set(walker, { autoAlpha: 0 });
+    // on a phone he's hidden; make his entrance whenever the collage first appears
+    const begin = () => {
+      if (!phone.matches) return enter();
+      phone.addEventListener('change', function wide() {
+        if (phone.matches) return;
+        phone.removeEventListener('change', wide);
+        enter();
+      });
+    };
+    setTimeout(begin, 1300);
+    promptTimer = setTimeout(() => { showClickMe(); schedulePrompt(); }, 9000);
   }
 })();
 
