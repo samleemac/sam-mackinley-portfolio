@@ -126,7 +126,21 @@ section{position:relative;z-index:5}
 .cta-send-in{display:none;font-family:var(--font-mono);font-size:13px;letter-spacing:.04em}
 .cta-form button:hover{transform:translateX(3px);background:#000}
 .cta-form button:active{transform:scale(.92)}
-.mail-pick{display:none}
+.cta-form input[hidden],.cta-done[hidden]{display:none}
+.cta-form .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+.cta-form.shake{animation:ctaShake .4s}
+@keyframes ctaShake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.cta-form[data-step="sending"] button{opacity:.55;pointer-events:none}
+.cta-form[data-step="sent"] button{display:none}
+.cta-done{font-family:var(--font-body);font-size:14px;color:var(--ink);width:268px;
+  display:flex;align-items:center;gap:8px;height:40px;padding-right:12px}
+.cta-done::before{content:"";width:8px;height:8px;border-radius:50%;background:#7BC24A;flex-shrink:0}
+.cta-back{border:none;background:none;padding:2px 6px;cursor:none;font-family:var(--font-mono);font-size:11px;
+  letter-spacing:.04em;color:var(--muted);text-decoration:underline;text-underline-offset:3px}
+.cta-back[hidden]{display:none}
+.cta-eyebrow a{color:inherit}
+.visually-hidden{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;
+  clip:rect(0 0 0 0);white-space:nowrap;border:0}
 
 /* profile device */
 .device{left:74%;top:17%;width:182px;}
@@ -135,17 +149,25 @@ section{position:relative;z-index:5}
   writing-mode:vertical-rl;color:#5a5852;font-size:8px;letter-spacing:.25em;
   text-align:center;padding-top:14px;font-family:var(--font-mono);}
 .device .card{background:linear-gradient(165deg,#262420,#171612);border-radius:18px;
-  padding:20px 18px 22px;box-shadow:var(--shadow);position:relative;overflow:hidden;
-  transition:filter .3s,box-shadow .3s;}
-.device .zh{color:#ECEAE3;font-size:26px;font-weight:700;letter-spacing:.04em}
-.device .desc{color:#86837b;font-size:10.5px;line-height:1.5;margin-top:8px}
-.device .avatar{width:108px;height:108px;border-radius:50%;margin:16px auto 0;
-  background:radial-gradient(circle at 35% 30%,#b9a7d6,#6d5b91 60%,#3b3357);
-  display:flex;align-items:center;justify-content:center;overflow:hidden;
-  box-shadow:inset 0 0 0 4px rgba(255,255,255,.06);}
-.device .avatar span{font-family:var(--font-script);font-size:54px;color:#fff;font-weight:700;
-  text-shadow:0 2px 8px rgba(0,0,0,.3)}
-.device:hover .card{filter:brightness(1.18);box-shadow:0 24px 50px -18px rgba(40,38,30,.55)}
+  padding:26px 16px 18px;box-shadow:var(--shadow);position:relative;overflow:hidden;text-align:center;
+  transition:box-shadow .3s;}
+/* the slot the lanyard threads through */
+.device .card::before{content:"";position:absolute;top:10px;left:50%;width:34px;height:6px;margin-left:-17px;
+  border-radius:3px;background:#0d0c0a;box-shadow:inset 0 1px 2px rgba(0,0,0,.7),0 1px 0 rgba(255,255,255,.06)}
+.device .pass-top{display:flex;align-items:center;justify-content:space-between;margin-top:4px}
+.device .pass-kind{font-family:var(--font-mono);font-size:8px;letter-spacing:.28em;text-transform:uppercase;
+  color:#86837b}
+.device .in{width:16px;height:16px;border-radius:4px;background:#0A66C2;color:#fff;font-weight:700;
+  font-size:10px;line-height:16px;letter-spacing:-.02em}
+.device .avatar{display:block;width:96px;height:96px;border-radius:50%;margin:12px auto 0;object-fit:cover;
+  box-shadow:0 0 0 3px #171612,0 0 0 4px rgba(236,234,227,.18);transition:transform .35s}
+.device .nm{color:#ECEAE3;font-size:17px;font-weight:700;letter-spacing:.01em;margin-top:14px}
+.device .role{color:#86837b;font-size:10.5px;margin-top:3px}
+.device .connect{display:inline-block;margin-top:14px;padding:6px 12px;border-radius:20px;
+  background:rgba(236,234,227,.1);color:#ECEAE3;font-family:var(--font-mono);font-size:9.5px;
+  letter-spacing:.02em;transition:background .25s,color .25s}
+.device:hover .card{box-shadow:0 24px 50px -18px rgba(40,38,30,.55)}
+.device:hover .connect,.device:focus-visible .connect{background:#ECEAE3;color:var(--ink)}
 
 /* ticket */
 .ticket{left:47%;top:66%;width:236px;transform:rotate(4deg)}
@@ -219,15 +241,44 @@ section{position:relative;z-index:5}
   background:radial-gradient(120% 90% at 50% 40%,var(--green-glow),transparent 70%)}
 .vinyl:hover .glow{opacity:.9}
 .vinyl:hover .card{box-shadow:0 24px 48px -16px rgba(123,194,74,.5)}
-.vinyl .disc{width:118px;height:118px;margin:0 auto;position:relative;z-index:2}
-.vinyl .disc svg{width:100%;display:block;transition:transform .6s linear}
-.vinyl:hover .disc svg{animation:spin 2.6s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
+.vinyl .deck{position:relative;height:118px;z-index:2}
+.vinyl .disc{position:absolute;left:50%;top:0;width:118px;height:118px;margin-left:-59px;
+  border-radius:50%;touch-action:none;user-select:none;-webkit-user-select:none}
+.vinyl .disc svg{width:100%;display:block;will-change:transform}
+/* the sheen stays still while the grooves turn under it */
+.vinyl .disc::after{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;
+  background:conic-gradient(from 20deg,transparent 0 9%,rgba(255,255,255,.13) 13%,transparent 18% 59%,
+    rgba(255,255,255,.08) 63%,transparent 68%)}
+.vinyl .vl-text{font-family:var(--font-mono);font-size:5.2px;font-weight:600;fill:#15140f}
+.vinyl .arm{position:absolute;right:-9px;top:-6px;width:20px;height:96px;pointer-events:none;
+  transform-origin:10px 14px;transform:rotate(-4deg);transition:transform .7s cubic-bezier(.3,1.35,.5,1);
+  filter:drop-shadow(0 3px 3px rgba(20,19,15,.28))}
+.vinyl:hover .arm,.vinyl:focus-visible .arm,.vinyl.scratching .arm{transform:rotate(20deg)}
 .vinyl .pl{font-family:var(--font-mono);font-size:8px;letter-spacing:.28em;color:var(--muted);
   margin-top:12px;position:relative;z-index:2}
-.vinyl .ttl{font-weight:700;font-size:15px;margin-top:3px;position:relative;z-index:2}
-.vinyl .sub{font-size:10px;color:var(--muted);margin-top:3px;position:relative;z-index:2}
-.vinyl .sub2{font-size:10px;color:var(--faint);margin-top:1px;position:relative;z-index:2}
+.vinyl .ttl{font-weight:700;font-size:15px;line-height:1.2;margin-top:4px;position:relative;z-index:2;
+  text-wrap:balance}
+.vinyl .play{display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:5px 10px 5px 9px;
+  border-radius:20px;background:#efeee7;color:var(--ink);font-family:var(--font-mono);font-size:9.5px;
+  letter-spacing:.02em;position:relative;z-index:2;transition:background .25s,color .25s}
+.vinyl:hover .play,.vinyl:focus-visible .play{background:var(--ink);color:#fff}
+.vinyl .eq{display:inline-flex;align-items:flex-end;gap:1.5px;height:9px}
+.vinyl .eq i{width:2px;height:100%;border-radius:1px;background:#7BC24A;transform-origin:bottom;
+  transform:scaleY(.45)}
+.vinyl .eq i:nth-child(2){transform:scaleY(.85)}
+.vinyl .eq i:nth-child(3){transform:scaleY(.6)}
+.vinyl:hover .eq i,.vinyl.scratching .eq i{animation:eq .8s ease-in-out infinite alternate}
+.vinyl:hover .eq i:nth-child(2),.vinyl.scratching .eq i:nth-child(2){animation-duration:.55s;animation-delay:-.2s}
+.vinyl:hover .eq i:nth-child(3),.vinyl.scratching .eq i:nth-child(3){animation-duration:.7s;animation-delay:-.45s}
+@keyframes eq{from{transform:scaleY(.25)}to{transform:scaleY(1)}}
+/* same tag as the draggable stickers, so the record reads as something to grab */
+.vinyl::after{content:"⟲ spin it";position:absolute;top:-13px;left:50%;
+  transform:translateX(-50%) translateY(5px);font-family:var(--font-mono);font-size:8.5px;
+  letter-spacing:.06em;color:#7c7973;background:rgba(247,245,239,.96);border:1px solid #dcd8ce;
+  padding:2px 8px;border-radius:11px;white-space:nowrap;opacity:0;pointer-events:none;z-index:60;
+  box-shadow:0 5px 12px -5px rgba(40,38,30,.35);transition:opacity .2s ease,transform .2s ease}
+.vinyl:hover::after{opacity:1;transform:translateX(-50%) translateY(0)}
+.vinyl.scratching::after{opacity:0}
 
 /* terminal */
 .term{left:71%;top:68%;width:248px}
@@ -618,12 +669,7 @@ footer .made svg{width:14px;height:14px}
 .board:not(.photo-open):hover .pho:nth-child(3){transform:translate(-12px,12px) rotate(10deg)!important}
 
 /* profile device — avatar warms up & lifts */
-.device .avatar{position:relative;transition:transform .35s}
-.device .avatar::after{content:"";position:absolute;inset:0;border-radius:50%;opacity:0;transition:opacity .4s;
-  background:radial-gradient(circle at 38% 30%,#ffd98a,#f5839f 52%,#7b50d4)}
-.device .avatar span{position:relative;z-index:2}
-.device:hover .avatar{transform:scale(1.08) rotate(-3deg)}
-.device:hover .avatar::after{opacity:1}
+.device:hover .avatar{transform:scale(1.06) rotate(-2deg)}
 
 /* flower — bloom grows out of the vase */
 .flower .bloom{transform-origin:50% 92%}
@@ -739,17 +785,8 @@ footer .made svg{width:14px;height:14px}
   .cta-form button{width:100%;height:48px;padding:0 18px;gap:8px;border-radius:24px}
   .cta-send{display:none}
   .cta-send-in{display:inline}
-}
-/* Phones and tablets get a mail choice. Wider laptops send straight to the system mail app. */
-@media (max-width:1024px){
-  .mail-pick.open{display:flex;flex-direction:column;align-items:stretch;gap:8px;width:100%}
-  .mail-pick .opts{display:flex;gap:8px;width:100%}
-  .mail-pick .opts button{flex:1;min-width:0;height:48px;padding:0 8px;border:none;border-radius:24px;
-    background:var(--ink);color:#fff;font-family:var(--font-mono);font-size:12px;letter-spacing:.02em;
-    font-weight:500;cursor:pointer;white-space:nowrap}
-  .mail-pick .personal{align-self:center;border:none;background:none;padding:4px 6px;
-    font-family:var(--font-mono);font-size:11px;letter-spacing:.04em;color:var(--muted);
-    text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+  .cta-done{width:100%;height:auto;justify-content:center;padding:14px 0;font-size:16px}
+  .cta-back{cursor:pointer;font-size:12px}
 }
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
@@ -793,28 +830,28 @@ footer .made svg{width:14px;height:14px}
 
     <!-- call to action -->
     <div class="hero-cta">
-      <span class="cta-eyebrow">Got an idea? Tell me — I'll build it.</span>
-      <form class="cta-form" id="ideaForm">
-        <input type="text" id="ideaInput" maxlength="500" placeholder="A site for my bakery, a portfolio, an app…" autocomplete="off" />
+      <span class="cta-eyebrow" id="ideaEyebrow" aria-live="polite">Got an idea? Tell me — I'll build it.</span>
+      <form class="cta-form" id="ideaForm" data-step="idea" novalidate>
+        <label class="visually-hidden" for="ideaInput">Your idea</label>
+        <input type="text" id="ideaInput" name="idea" maxlength="1000" placeholder="A site for my bakery, a portfolio, an app…" autocomplete="off" />
+        <label class="visually-hidden" for="ideaEmail">Your email</label>
+        <input type="email" id="ideaEmail" name="email" maxlength="200" placeholder="Your email, so I can reply" autocomplete="email" hidden />
+        <input type="text" name="company" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
+        <span class="cta-done" hidden>Got it — I'll reply within a day.</span>
         <button type="submit" aria-label="Send"><span class="cta-send">Send</span><span class="cta-send-in">Send in</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
       </form>
-      <div class="mail-pick" id="mailPick" hidden>
-        <div class="opts">
-          <button type="button" data-mail="native">Mail app</button>
-          <button type="button" data-mail="gmail">Gmail</button>
-          <button type="button" data-mail="outlook">Outlook</button>
-        </div>
-        <button type="button" class="personal" data-mail="outlook-personal">Personal Outlook</button>
-      </div>
+      <button type="button" class="cta-back" id="ideaBack" hidden>← Edit my idea</button>
     </div>
 
     <!-- profile device -> linkedin -->
     <a class="sticker device link-sticker parallax" data-depth="22" data-link="https://www.linkedin.com/in/sam-mackinley-955166b3" href="https://www.linkedin.com/in/sam-mackinley-955166b3" target="_blank" rel="noopener" style="text-decoration:none">
       <div class="strap">SAM MACKINLEY · DESIGN</div>
       <div class="card">
-        <div class="zh">Sam.</div>
-        <div class="desc">Love exploring,<br>prototyping,<br>storytelling, and visual craft</div>
-        <div class="avatar"><span>S</span></div>
+        <div class="pass-top" aria-hidden="true"><span class="pass-kind">Pass</span><span class="in">in</span></div>
+        <img class="avatar" src="media/sam-portrait.jpg" alt="" width="96" height="96" draggable="false" />
+        <div class="nm">Sam MacKinley</div>
+        <div class="role">Web designer · 8+ years</div>
+        <span class="connect">Connect on LinkedIn ↗</span>
       </div>
     </a>
 
@@ -844,23 +881,36 @@ footer .made svg{width:14px;height:14px}
     </div>
 
     <!-- vinyl playlist -> spotify -->
-    <a class="sticker vinyl link-sticker parallax" data-depth="13" data-link="https://open.spotify.com/playlist/6WTT2unDySBchtLpJJStud" href="https://open.spotify.com/playlist/6WTT2unDySBchtLpJJStud" target="_blank" rel="noopener" style="text-decoration:none">
+    <a class="sticker vinyl link-sticker parallax" data-depth="13" data-link="https://open.spotify.com/playlist/6WTT2unDySBchtLpJJStud" href="https://open.spotify.com/playlist/6WTT2unDySBchtLpJJStud" target="_blank" rel="noopener" draggable="false" style="text-decoration:none">
       <div class="card">
         <div class="glow"></div>
-        <div class="disc">
-          <svg viewBox="0 0 118 118" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="59" cy="59" r="58" fill="#15140f"/>
-            <circle cx="59" cy="59" r="50" fill="none" stroke="#2a2820" stroke-width="1"/>
-            <circle cx="59" cy="59" r="42" fill="none" stroke="#2a2820" stroke-width="1"/>
-            <circle cx="59" cy="59" r="34" fill="none" stroke="#2a2820" stroke-width="1"/>
-            <circle cx="59" cy="59" r="22" fill="#7BC24A"/>
-            <circle cx="59" cy="59" r="5" fill="#15140f"/>
+        <div class="deck">
+          <div class="disc">
+            <svg viewBox="0 0 118 118" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <defs><path id="vinylLabelPath" d="M59 43a16 16 0 1 1-.01 0"/></defs>
+              <circle cx="59" cy="59" r="58" fill="#15140f"/>
+              <circle cx="59" cy="59" r="55" fill="none" stroke="#2c2a22" stroke-width=".8"/>
+              <circle cx="59" cy="59" r="50" fill="none" stroke="#26241d" stroke-width="1"/>
+              <circle cx="59" cy="59" r="45" fill="none" stroke="#26241d" stroke-width=".8"/>
+              <circle cx="59" cy="59" r="40" fill="none" stroke="#2a2820" stroke-width="1"/>
+              <circle cx="59" cy="59" r="34" fill="none" stroke="#26241d" stroke-width=".8"/>
+              <circle cx="59" cy="59" r="28" fill="none" stroke="#2a2820" stroke-width="1"/>
+              <circle cx="59" cy="59" r="22" fill="#7BC24A"/>
+              <text class="vl-text"><textPath href="#vinylLabelPath" textLength="99" lengthAdjust="spacing">SIDE A · SAM MACKINLEY ·</textPath></text>
+              <circle cx="59" cy="59" r="3.2" fill="#15140f"/>
+            </svg>
+          </div>
+          <svg class="arm" viewBox="-10 -14 20 96" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="-3.5" y="-13" width="7" height="8" rx="1.5" fill="#3a382f"/>
+            <path d="M0 -4V60l-2.5 6" fill="none" stroke="#c9c5b9" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="-6.5" y="64" width="7" height="11" rx="1.5" fill="#dcd9cf" stroke="#8c887e" stroke-width=".8" transform="rotate(14 -3 69)"/>
+            <circle r="5.5" fill="#e3e0d6" stroke="#b8b4a8" stroke-width=".8"/>
+            <circle r="2" fill="#8c887e"/>
           </svg>
         </div>
         <div class="pl">PLAYLIST</div>
-        <div class="ttl">Vibe Coding</div>
-        <div class="sub">20+ projects and counting</div>
-        <div class="sub2">Learning by building</div>
+        <div class="ttl">Soundtrack to my builds</div>
+        <span class="play"><span class="eq" aria-hidden="true"><i></i><i></i><i></i></span>Play on Spotify ↗</span>
       </div>
     </a>
 
@@ -987,7 +1037,7 @@ if (!isTouch) {
   window.addEventListener('pointermove', e => { xTo(e.clientX); yTo(e.clientY); });
   // grow over interactive things
   const hot = 'a, button, .fold, [data-link], .walker, .fact';
-  const movable = '#hero .sticker:not(.link-sticker)';
+  const movable = '#hero .sticker:not(.link-sticker), #hero .vinyl .disc';
   document.addEventListener('pointerover', e => {
     if (e.target.closest(hot)) cursor.classList.add('hot');
     if (e.target.closest(movable)) cursor.classList.add('grab');
@@ -1065,6 +1115,100 @@ document.querySelectorAll('[data-link]').forEach(el => {
   });
   el.addEventListener('pointerleave', () => linkprev.classList.remove('on'));
 });
+
+/* ---------- vinyl: slow spin, faster on hover, grab to scratch ---------- */
+(function vinyl() {
+  const deck = document.querySelector('#hero .vinyl');
+  if (!deck) return;
+  const disc = deck.querySelector('.disc');
+  const rec = disc.querySelector('svg');
+  const REST = 30, PLAY = 200, FLING = 1440;   // degrees per second
+  let angle = 0, vel = reduced ? 0 : REST, hover = false, held = null, raf = 0, last = 0, onScreen = true;
+
+  const paint = () => { rec.style.transform = `rotate(${angle % 360}deg)`; };
+  const target = () => (reduced ? 0 : hover ? PLAY : REST);
+
+  function tick(t) {
+    const dt = Math.min((t - last) / 1000, 0.05);
+    last = t;
+    if (!held) {
+      // a flung record coasts down slowly; speeding up to play is quicker
+      const k = Math.abs(vel) > PLAY ? 1.2 : 3;
+      vel += (target() - vel) * (1 - Math.exp(-dt * k));
+      angle += vel * dt;
+      paint();
+    }
+    raf = requestAnimationFrame(tick);
+  }
+  function start() {
+    if (raf || reduced || !onScreen) return;
+    last = performance.now();
+    raf = requestAnimationFrame(tick);
+  }
+  function stop() { cancelAnimationFrame(raf); raf = 0; }
+
+  new IntersectionObserver(es => {
+    onScreen = es[0].isIntersecting;
+    onScreen ? start() : stop();
+  }).observe(deck);
+
+  const setHover = on => { hover = on; };
+  deck.addEventListener('pointerenter', () => setHover(true));
+  deck.addEventListener('pointerleave', () => setHover(false));
+  deck.addEventListener('focus', () => setHover(true));
+  deck.addEventListener('blur', () => setHover(false));
+
+  function pointerAngle(e) {
+    const r = disc.getBoundingClientRect();
+    const dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
+    return { a: Math.atan2(dy, dx) * 180 / Math.PI, near: Math.hypot(dx, dy) < 10 };
+  }
+
+  disc.addEventListener('pointerdown', e => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    e.preventDefault();                       // no native link drag or text selection
+    disc.setPointerCapture(e.pointerId);
+    held = { id: e.pointerId, a: pointerAngle(e).a, t: performance.now(), v: 0, turned: 0 };
+    vel = 0;
+    deck.classList.add('scratching');
+    cursor && cursor.classList.add('grabbing');
+  });
+  disc.addEventListener('pointermove', e => {
+    if (!held || e.pointerId !== held.id) return;
+    const p = pointerAngle(e), now = performance.now();
+    // the angle is unstable right at the spindle, so just track it there
+    if (p.near) { held.a = p.a; held.t = now; return; }
+    let d = p.a - held.a;
+    if (d > 180) d -= 360;
+    if (d < -180) d += 360;
+    const dt = Math.max((now - held.t) / 1000, 0.004);
+    held.v = held.v * 0.5 + (d / dt) * 0.5;
+    held.turned += Math.abs(d);
+    held.a = p.a;
+    held.t = now;
+    angle += d;
+    paint();
+  });
+  function release(e) {
+    if (!held || e.pointerId !== held.id) return;
+    const paused = performance.now() - held.t > 90;   // held still before letting go: no fling
+    vel = reduced || paused ? 0 : Math.max(-FLING, Math.min(FLING, held.v));
+    deck._scratched = held.turned > 6;
+    setTimeout(() => { deck._scratched = false; }, 80);
+    held = null;
+    deck.classList.remove('scratching');
+    cursor && cursor.classList.remove('grabbing');
+  }
+  disc.addEventListener('pointerup', release);
+  disc.addEventListener('pointercancel', release);
+  // a scratch is not a click; a clean tap still opens the playlist
+  deck.addEventListener('click', e => {
+    if (deck._scratched) { e.preventDefault(); deck._scratched = false; }
+  });
+
+  paint();
+  start();
+})();
 
 /* ---------- live analogue clock ---------- */
 (function clock() {
@@ -1245,10 +1389,14 @@ if (ideaForm) {
   if (!reduced) gsap.from('.hero-cta', { opacity: 0, y: 16, duration: 0.7, ease: 'power3.out', delay: 0.9 });
   const IDEA_EMAIL = 'samleemac@outlook.com';
   const ideaInput = document.getElementById('ideaInput');
-  const mailPick = document.getElementById('mailPick');
+  const ideaEmail = document.getElementById('ideaEmail');
+  const eyebrow = document.getElementById('ideaEyebrow');
+  const back = document.getElementById('ideaBack');
+  const done = ideaForm.querySelector('.cta-done');
   const sendBtn = ideaForm.querySelector('button[type="submit"]');
   const narrow = window.matchMedia(PHONE_HERO);
-  const chooser = window.matchMedia('(max-width:1024px)');
+  const EYEBROW = eyebrow.textContent;
+  const EMAIL_OK = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
   const setHint = () => {
     const phone = narrow.matches;
     ideaInput.placeholder = phone
@@ -1258,93 +1406,64 @@ if (ideaForm) {
   };
   setHint();
   narrow.addEventListener('change', setHint);
-  chooser.addEventListener('change', () => {
-    if (chooser.matches) return;
-    mailPick.hidden = true;
-    mailPick.classList.remove('open');
-  });
-  ideaForm.addEventListener('submit', e => {
-    e.preventDefault();
-    const idea = ideaInput.value.trim().slice(0, 500);
-    const subject = encodeURIComponent('I have an idea for you to build');
-    const body = encodeURIComponent('Hi Sam,\n\n' +
-      (idea ? "Here's what I'd love you to build:\n" + idea : "I have an idea I'd love you to build:\n") + '\n\n');
-    const mailto = `mailto:${IDEA_EMAIL}?subject=${subject}&body=${body}`;
-    if (!chooser.matches) {
-      window.location.href = mailto;
-      return;
-    }
-    mailPick.hidden = false;
-    mailPick.classList.add('open');
-    mailPick.dataset.mailto = mailto;
-    mailPick.dataset.subject = subject;
-    mailPick.dataset.body = body;
-  });
-  // Android Chrome hands the website address to the system, which opens it only
-  // when the app is missing. Everywhere else, try the app link and load the
-  // website only if this page is still here afterwards.
-  let appAttempt = null;
-  const openInstalledApp = (scheme, web) => {
-    if (appAttempt) appAttempt();
-    let left = false;
-    let timer = 0;
-    const cleanup = () => {
-      clearTimeout(timer);
-      document.removeEventListener('visibilitychange', onVis);
-      window.removeEventListener('pagehide', onHide);
-      window.removeEventListener('blur', onBlur);
-      window.removeEventListener('focus', onFocus);
-      if (appAttempt === cleanup) appAttempt = null;
-    };
-    const onHide = () => { left = true; cleanup(); };
-    const onVis = () => { if (document.hidden) onHide(); };
-    const decide = () => {
-      if (left || document.hidden) { cleanup(); return; }
-      // Blur means a system prompt or the mail app has the screen. Stay put
-      // until this page is focused again, which is the missing-app path.
-      if (!document.hasFocus()) { clearTimeout(timer); return; }
-      cleanup();
-      window.location.href = web;
-    };
-    const onBlur = () => { if (!left) { clearTimeout(timer); timer = setTimeout(decide, 2500); } };
-    const onFocus = () => {
-      if (left || document.hidden) { onHide(); return; }
-      clearTimeout(timer);
-      timer = setTimeout(decide, 1200);
-    };
-    document.addEventListener('visibilitychange', onVis);
-    window.addEventListener('pagehide', onHide);
-    window.addEventListener('blur', onBlur);
-    window.addEventListener('focus', onFocus);
-    appAttempt = cleanup;
-    try { window.location.href = scheme; }
-    catch (e) { if (!left) window.location.href = web; }
-    timer = setTimeout(decide, 2000);
+  const shake = () => {
+    if (reduced) return;
+    ideaForm.classList.remove('shake');
+    void ideaForm.offsetWidth;
+    ideaForm.classList.add('shake');
   };
-  mailPick.addEventListener('click', e => {
-    const choice = e.target.closest('[data-mail]');
-    if (!choice) return;
-    const { mailto, subject, body } = mailPick.dataset;
-    const to = encodeURIComponent(IDEA_EMAIL);
-    const kind = choice.dataset.mail;
-    if (kind === 'native') {
-      window.location.href = mailto;
+  ideaForm.addEventListener('animationend', () => ideaForm.classList.remove('shake'));
+
+  function step(name) {
+    ideaForm.dataset.step = name;
+    const onEmail = name === 'email' || name === 'sending';
+    ideaInput.hidden = name !== 'idea';
+    ideaEmail.hidden = !onEmail;
+    done.hidden = name !== 'sent';
+    back.hidden = name !== 'email';
+    if (name === 'idea') { eyebrow.textContent = EYEBROW; ideaInput.focus(); }
+    if (name === 'email') { eyebrow.textContent = 'Love it. Where should I reply?'; ideaEmail.focus(); }
+    if (name === 'sending') eyebrow.textContent = 'Sending…';
+    if (name === 'sent') eyebrow.textContent = 'Idea received';
+  }
+  back.addEventListener('click', () => step('idea'));
+
+  ideaForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    const current = ideaForm.dataset.step;
+    if (current === 'sending' || current === 'sent') return;
+    const idea = ideaInput.value.trim().slice(0, 1000);
+    if (current === 'idea') {
+      if (!idea) { shake(); ideaInput.focus(); return; }
+      step('email');
       return;
     }
-    const web = kind === 'gmail'
-      ? `https://mail.google.com/mail/?view=cm&fs=1&to=${to}&su=${subject}&body=${body}`
-      : kind === 'outlook'
-        ? `https://outlook.office.com/mail/deeplink/compose?to=${to}&subject=${subject}&body=${body}`
-        : `https://outlook.live.com/mail/0/deeplink/compose?to=${to}&subject=${subject}&body=${body}`;
-    const android = /Android/i.test(navigator.userAgent) && !/Firefox/i.test(navigator.userAgent);
-    const scheme = kind === 'gmail'
-      ? (android
-        ? `intent://co?to=${to}&subject=${subject}&body=${body}#Intent;scheme=googlegmail;package=com.google.android.gm;S.browser_fallback_url=${encodeURIComponent(web)};end`
-        : `googlegmail://co?to=${to}&subject=${subject}&body=${body}`)
-      : (android
-        ? `intent://compose?to=${to}&subject=${subject}&body=${body}#Intent;scheme=ms-outlook;package=com.microsoft.office.outlook;S.browser_fallback_url=${encodeURIComponent(web)};end`
-        : `ms-outlook://compose?to=${to}&subject=${subject}&body=${body}`);
-    openInstalledApp(scheme, web);
+    const email = ideaEmail.value.trim();
+    if (!EMAIL_OK.test(email)) {
+      shake();
+      eyebrow.textContent = 'That email doesn’t look right. Try again?';
+      ideaEmail.focus();
+      return;
+    }
+    step('sending');
+    try {
+      const res = await fetch('/api/idea', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idea, email, company: ideaForm.elements.company.value }),
+      });
+      if (!res.ok) throw new Error(`idea: ${res.status}`);
+      step('sent');
+      if (!reduced) {
+        const r = ideaForm.getBoundingClientRect();
+        burst(r.left + r.width / 2, r.top + r.height / 2);
+      }
+    } catch (err) {
+      step('email');
+      const subject = encodeURIComponent('An idea for you to build');
+      const body = encodeURIComponent(`Hi Sam,\n\n${idea}\n\n`);
+      eyebrow.innerHTML = `That didn’t send. <a href="mailto:${IDEA_EMAIL}?subject=${subject}&body=${body}">Email me instead</a>`;
+    }
   });
 }
 
