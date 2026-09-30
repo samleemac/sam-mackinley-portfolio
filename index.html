@@ -135,9 +135,30 @@ section{position:relative;z-index:5}
 .cta-done{font-family:var(--font-body);font-size:14px;color:var(--ink);width:268px;
   display:flex;align-items:center;gap:8px;height:40px;padding-right:12px}
 .cta-done::before{content:"";width:8px;height:8px;border-radius:50%;background:#7BC24A;flex-shrink:0}
-.cta-back{border:none;background:none;padding:2px 6px;cursor:none;font-family:var(--font-mono);font-size:11px;
-  letter-spacing:.04em;color:var(--muted);text-decoration:underline;text-underline-offset:3px}
+.cta-back{flex-shrink:0;border:none;background:none;padding:2px 0;cursor:none;font-family:var(--font-mono);
+  font-size:11px;letter-spacing:.04em;color:var(--muted);text-decoration:underline;text-underline-offset:3px}
 .cta-back[hidden]{display:none}
+/* step 2: the email field has to read as the next thing to do */
+.cta-mail{display:none;width:16px;height:16px;flex-shrink:0;color:#6aa83f}
+.cta-form[data-step="email"] .cta-mail,.cta-form[data-step="sending"] .cta-mail{display:block}
+.cta-form[data-step="email"] #ideaEmail,.cta-form[data-step="sending"] #ideaEmail{width:245px}
+.cta-form[data-step="email"]{border-color:#7BC24A;
+  box-shadow:0 0 0 4px rgba(123,194,74,.2),0 18px 34px -18px rgba(40,38,30,.45)}
+.cta-form.nudge{animation:ctaNudge .9s ease-out 2}
+@keyframes ctaNudge{
+  0%{box-shadow:0 0 0 0 rgba(123,194,74,.55),0 18px 34px -18px rgba(40,38,30,.45)}
+  100%{box-shadow:0 0 0 14px rgba(123,194,74,0),0 18px 34px -18px rgba(40,38,30,.45)}
+}
+.cta-eyebrow.ask{color:var(--ink)}
+/* their idea, shown back to them under the bar */
+.cta-recap{align-self:stretch;width:0;min-width:100%;display:flex;align-items:flex-start;gap:12px;
+  padding:10px 14px 11px;background:rgba(251,250,247,.9);border:1px dashed #d6d2c6;border-radius:14px;text-align:left}
+.cta-recap[hidden]{display:none}
+.cta-recap .body{flex:1;min-width:0}
+.cta-recap .lbl{display:block;font-family:var(--font-mono);font-size:9px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted)}
+.cta-recap .txt{margin:4px 0 0;font-size:13px;line-height:1.45;color:#3c3a34;overflow:hidden;
+  overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
 .cta-eyebrow a{color:inherit}
 .visually-hidden{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;
   clip:rect(0 0 0 0);white-space:nowrap;border:0}
@@ -787,6 +808,13 @@ footer .made svg{width:14px;height:14px}
   .cta-send-in{display:inline}
   .cta-done{width:100%;height:auto;justify-content:center;padding:14px 0;font-size:16px}
   .cta-back{cursor:pointer;font-size:12px}
+  .cta-form[data-step="email"]{border:none;box-shadow:none}
+  .cta-form.nudge{animation:none}
+  .cta-form[data-step="email"] .cta-mail,.cta-form[data-step="sending"] .cta-mail{display:none}
+  .cta-form[data-step="email"] #ideaEmail,.cta-form[data-step="sending"] #ideaEmail{width:100%}
+  .cta-form[data-step="email"] #ideaEmail{border-color:#7BC24A;
+    box-shadow:0 0 0 4px rgba(123,194,74,.2),0 18px 34px -18px rgba(40,38,30,.45)}
+  .cta-recap .txt{font-size:14px}
 }
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
@@ -834,13 +862,20 @@ footer .made svg{width:14px;height:14px}
       <form class="cta-form" id="ideaForm" data-step="idea" novalidate>
         <label class="visually-hidden" for="ideaInput">Your idea</label>
         <input type="text" id="ideaInput" name="idea" maxlength="1000" placeholder="A site for my bakery, a portfolio, an app…" autocomplete="off" />
-        <label class="visually-hidden" for="ideaEmail">Your email</label>
-        <input type="email" id="ideaEmail" name="email" maxlength="200" placeholder="Your email, so I can reply" autocomplete="email" hidden />
+        <svg class="cta-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+        <label class="visually-hidden" for="ideaEmail">Your email address</label>
+        <input type="email" id="ideaEmail" name="email" maxlength="200" placeholder="Your email address" autocomplete="email" hidden />
         <input type="text" name="company" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
         <span class="cta-done" hidden>Got it — I'll reply within a day.</span>
         <button type="submit" aria-label="Send"><span class="cta-send">Send</span><span class="cta-send-in">Send in</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
       </form>
-      <button type="button" class="cta-back" id="ideaBack" hidden>← Edit my idea</button>
+      <div class="cta-recap" id="ideaRecap" hidden>
+        <div class="body">
+          <span class="lbl">Your idea</span>
+          <p class="txt" id="ideaRecapText"></p>
+        </div>
+        <button type="button" class="cta-back" id="ideaBack">Edit</button>
+      </div>
     </div>
 
     <!-- profile device -> linkedin -->
@@ -1392,6 +1427,8 @@ if (ideaForm) {
   const ideaEmail = document.getElementById('ideaEmail');
   const eyebrow = document.getElementById('ideaEyebrow');
   const back = document.getElementById('ideaBack');
+  const recap = document.getElementById('ideaRecap');
+  const recapText = document.getElementById('ideaRecapText');
   const done = ideaForm.querySelector('.cta-done');
   const sendBtn = ideaForm.querySelector('button[type="submit"]');
   const narrow = window.matchMedia(PHONE_HERO);
@@ -1412,17 +1449,25 @@ if (ideaForm) {
     void ideaForm.offsetWidth;
     ideaForm.classList.add('shake');
   };
-  ideaForm.addEventListener('animationend', () => ideaForm.classList.remove('shake'));
+  ideaForm.addEventListener('animationend', () => ideaForm.classList.remove('shake', 'nudge'));
 
   function step(name) {
+    const from = ideaForm.dataset.step;
     ideaForm.dataset.step = name;
     const onEmail = name === 'email' || name === 'sending';
     ideaInput.hidden = name !== 'idea';
     ideaEmail.hidden = !onEmail;
     done.hidden = name !== 'sent';
+    recap.hidden = name === 'idea';
     back.hidden = name !== 'email';
+    if (name !== 'idea') recapText.textContent = ideaInput.value.trim();
+    eyebrow.classList.toggle('ask', name === 'email');
     if (name === 'idea') { eyebrow.textContent = EYEBROW; ideaInput.focus(); }
-    if (name === 'email') { eyebrow.textContent = 'Love it. Where should I reply?'; ideaEmail.focus(); }
+    if (name === 'email') {
+      eyebrow.textContent = 'Step 2 of 2 · Where can I reply?';
+      ideaEmail.focus();
+      if (from === 'idea' && !reduced) ideaForm.classList.add('nudge');
+    }
     if (name === 'sending') eyebrow.textContent = 'Sending…';
     if (name === 'sent') eyebrow.textContent = 'Idea received';
   }
