@@ -159,6 +159,25 @@ section{position:relative;z-index:5}
   text-transform:uppercase;color:var(--muted)}
 .cta-recap .txt{margin:4px 0 0;font-size:13px;line-height:1.45;color:#3c3a34;overflow:hidden;
   overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
+/* optional attachments, asked for alongside the email */
+.cta-files{margin-top:9px;padding-top:9px;border-top:1px dashed #e1ded4}
+.cta-files[hidden],.cta-attach[hidden]{display:none}
+.cta-file-list{list-style:none;margin:0 0 7px;padding:0;display:flex;flex-direction:column;gap:4px}
+.cta-file-list:empty{display:none}
+.cta-file{display:flex;align-items:center;gap:8px;min-width:0;font-size:12.5px;line-height:1.3;color:#3c3a34}
+.cta-file .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cta-file .sz{flex-shrink:0;font-family:var(--font-mono);font-size:10px;color:var(--muted)}
+.cta-file button{flex-shrink:0;width:18px;height:18px;padding:0;border:none;border-radius:50%;cursor:none;
+  background:none;color:var(--muted);font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center}
+.cta-file button:hover{background:#ebe8df;color:var(--ink)}
+.cta-attach{display:inline-flex;align-items:center;gap:6px;border:none;background:none;padding:2px 0;cursor:none;
+  font-family:var(--font-body);font-size:12.5px;color:var(--ink)}
+.cta-attach svg{width:14px;height:14px;flex-shrink:0;color:#6aa83f}
+.cta-attach .t{text-decoration:underline;text-decoration-color:#d6d2c6;text-underline-offset:3px}
+.cta-attach:hover .t{text-decoration-color:currentColor}
+.cta-attach .opt{font-family:var(--font-mono);font-size:10px;letter-spacing:.04em;color:var(--muted)}
+.cta-files-note{margin:5px 0 0;font-size:12px;line-height:1.4;color:#a8433f}
+.cta-files-note:empty{display:none}
 .cta-eyebrow a{color:inherit}
 .visually-hidden{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;
   clip:rect(0 0 0 0);white-space:nowrap;border:0}
@@ -815,6 +834,10 @@ footer .made svg{width:14px;height:14px}
   .cta-form[data-step="email"] #ideaEmail{border-color:#7BC24A;
     box-shadow:0 0 0 4px rgba(123,194,74,.2),0 18px 34px -18px rgba(40,38,30,.45)}
   .cta-recap .txt{font-size:14px}
+  .cta-attach,.cta-file button{cursor:pointer}
+  .cta-attach{font-size:14px;padding:6px 0}
+  .cta-file{font-size:14px}
+  .cta-file button{width:28px;height:28px;font-size:18px}
 }
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
@@ -873,6 +896,16 @@ footer .made svg{width:14px;height:14px}
         <div class="body">
           <span class="lbl">Your idea</span>
           <p class="txt" id="ideaRecapText"></p>
+          <div class="cta-files">
+            <ul class="cta-file-list" id="ideaFileList" aria-label="Attached files"></ul>
+            <button type="button" class="cta-attach" id="ideaAttach">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.4 11.1-8.9 8.9a5.5 5.5 0 0 1-7.8-7.8l8.9-8.9a3.7 3.7 0 0 1 5.2 5.2l-8.9 8.9a1.8 1.8 0 0 1-2.6-2.6l8.2-8.2"/></svg>
+              <span class="t">Add sketches or a brief</span><span class="opt">optional</span>
+            </button>
+            <p class="cta-files-note" id="ideaFilesNote" aria-live="polite"></p>
+            <input type="file" id="ideaFileInput" multiple hidden
+              accept="image/*,.pdf,.doc,.docx,.txt,.rtf,.pages,.key,.ppt,.pptx,.xls,.xlsx,.csv,.numbers,.zip" />
+          </div>
         </div>
         <button type="button" class="cta-back" id="ideaBack">Edit</button>
       </div>
@@ -1431,6 +1464,63 @@ if (ideaForm) {
   const recapText = document.getElementById('ideaRecapText');
   const done = ideaForm.querySelector('.cta-done');
   const sendBtn = ideaForm.querySelector('button[type="submit"]');
+  const attachBtn = document.getElementById('ideaAttach');
+  const fileInput = document.getElementById('ideaFileInput');
+  const fileList = document.getElementById('ideaFileList');
+  const filesNote = document.getElementById('ideaFilesNote');
+  const filesBox = recap.querySelector('.cta-files');
+  // Vercel caps a function request at 4.5 MB, so the files have to fit under that.
+  const MAX_FILES = 5, MAX_BYTES = 4 * 1024 * 1024;
+  const FILE_OK = /\.(png|jpe?g|gif|webp|avif|heic|heif|bmp|tiff?|svg|pdf|docx?|txt|rtf|pages|key|pptx?|xlsx?|csv|numbers|zip)$/i;
+  let files = [];
+  const size = n => n < 1024 * 1024 ? `${Math.max(1, Math.round(n / 1024))} KB` : `${(n / 1048576).toFixed(1)} MB`;
+  function renderFiles() {
+    const locked = ideaForm.dataset.step !== 'email';
+    fileList.replaceChildren(...files.map((f, i) => {
+      const li = document.createElement('li');
+      li.className = 'cta-file';
+      const nm = document.createElement('span');
+      nm.className = 'nm';
+      nm.textContent = f.name;
+      const sz = document.createElement('span');
+      sz.className = 'sz';
+      sz.textContent = size(f.size);
+      li.append(nm, sz);
+      if (!locked) {
+        const rm = document.createElement('button');
+        rm.type = 'button';
+        rm.textContent = '×';
+        rm.setAttribute('aria-label', `Remove ${f.name}`);
+        rm.addEventListener('click', () => {
+          files.splice(i, 1);
+          filesNote.textContent = '';
+          renderFiles();
+          attachBtn.focus();
+        });
+        li.append(rm);
+      }
+      return li;
+    }));
+    attachBtn.hidden = locked || files.length >= MAX_FILES;
+    attachBtn.querySelector('.t').textContent = files.length ? 'Add another file' : 'Add sketches or a brief';
+    attachBtn.querySelector('.opt').hidden = files.length > 0;
+    filesBox.hidden = locked && !files.length;
+  }
+  attachBtn.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', () => {
+    const picked = [...fileInput.files];
+    fileInput.value = '';
+    let note = '';
+    for (const f of picked) {
+      if (files.length >= MAX_FILES) { note = `That’s the limit — ${MAX_FILES} files at most.`; break; }
+      if (!FILE_OK.test(f.name)) { note = `I can’t take ${f.name}. Images, PDFs, docs, slides or a zip work.`; continue; }
+      const total = files.reduce((n, x) => n + x.size, 0) + f.size;
+      if (total > MAX_BYTES) { note = `${f.name} is too big. Files can add up to 4 MB.`; continue; }
+      if (!files.some(x => x.name === f.name && x.size === f.size)) files.push(f);
+    }
+    filesNote.textContent = note;
+    renderFiles();
+  });
   const narrow = window.matchMedia(PHONE_HERO);
   const EYEBROW = eyebrow.textContent;
   const EMAIL_OK = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -1461,6 +1551,8 @@ if (ideaForm) {
     recap.hidden = name === 'idea';
     back.hidden = name !== 'email';
     if (name !== 'idea') recapText.textContent = ideaInput.value.trim();
+    if (name !== 'email') filesNote.textContent = '';
+    renderFiles();
     eyebrow.classList.toggle('ask', name === 'email');
     if (name === 'idea') { eyebrow.textContent = EYEBROW; ideaInput.focus(); }
     if (name === 'email') {
@@ -1492,11 +1584,12 @@ if (ideaForm) {
     }
     step('sending');
     try {
-      const res = await fetch('/api/idea', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ idea, email, company: ideaForm.elements.company.value }),
-      });
+      const body = new FormData();
+      body.append('idea', idea);
+      body.append('email', email);
+      body.append('company', ideaForm.elements.company.value);
+      for (const f of files) body.append('files', f, f.name);
+      const res = await fetch('/api/idea', { method: 'POST', body });
       if (!res.ok) throw new Error(`idea: ${res.status}`);
       step('sent');
       if (!reduced) {
@@ -1507,7 +1600,8 @@ if (ideaForm) {
       step('email');
       const subject = encodeURIComponent('An idea for you to build');
       const body = encodeURIComponent(`Hi Sam,\n\n${idea}\n\n`);
-      eyebrow.innerHTML = `That didn’t send. <a href="mailto:${IDEA_EMAIL}?subject=${subject}&body=${body}">Email me instead</a>`;
+      const extra = files.length ? ' (attach your files there)' : '';
+      eyebrow.innerHTML = `That didn’t send. <a href="mailto:${IDEA_EMAIL}?subject=${subject}&body=${body}">Email me instead</a>${extra}`;
     }
   });
 }
