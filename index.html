@@ -293,7 +293,7 @@ section{position:relative;z-index:5}
 .vinyl .arm{position:absolute;right:-9px;top:-6px;width:20px;height:96px;pointer-events:none;
   transform-origin:10px 14px;transform:rotate(-4deg);transition:transform .7s cubic-bezier(.3,1.35,.5,1);
   filter:drop-shadow(0 3px 3px rgba(20,19,15,.28))}
-.vinyl:hover .arm,.vinyl:focus-visible .arm,.vinyl.scratching .arm{transform:rotate(20deg)}
+.vinyl:hover .arm,.vinyl:focus-visible .arm,.vinyl.scratching .arm,.vinyl.playing .arm{transform:rotate(20deg)}
 .vinyl .pl{font-family:var(--font-mono);font-size:8px;letter-spacing:.28em;color:var(--muted);
   margin-top:12px;position:relative;z-index:2}
 .vinyl .ttl{font-weight:700;font-size:15px;line-height:1.2;margin-top:4px;position:relative;z-index:2;
@@ -307,9 +307,9 @@ section{position:relative;z-index:5}
   transform:scaleY(.45)}
 .vinyl .eq i:nth-child(2){transform:scaleY(.85)}
 .vinyl .eq i:nth-child(3){transform:scaleY(.6)}
-.vinyl:hover .eq i,.vinyl.scratching .eq i{animation:eq .8s ease-in-out infinite alternate}
-.vinyl:hover .eq i:nth-child(2),.vinyl.scratching .eq i:nth-child(2){animation-duration:.55s;animation-delay:-.2s}
-.vinyl:hover .eq i:nth-child(3),.vinyl.scratching .eq i:nth-child(3){animation-duration:.7s;animation-delay:-.45s}
+.vinyl:hover .eq i,.vinyl.scratching .eq i,.vinyl.playing .eq i{animation:eq .8s ease-in-out infinite alternate}
+.vinyl:hover .eq i:nth-child(2),.vinyl.scratching .eq i:nth-child(2),.vinyl.playing .eq i:nth-child(2){animation-duration:.55s;animation-delay:-.2s}
+.vinyl:hover .eq i:nth-child(3),.vinyl.scratching .eq i:nth-child(3),.vinyl.playing .eq i:nth-child(3){animation-duration:.7s;animation-delay:-.45s}
 @keyframes eq{from{transform:scaleY(.25)}to{transform:scaleY(1)}}
 /* same tag as the draggable stickers, so the record reads as something to grab */
 .vinyl::after{content:"⟲ spin it";position:absolute;top:-13px;left:50%;
@@ -319,6 +319,21 @@ section{position:relative;z-index:5}
   box-shadow:0 5px 12px -5px rgba(40,38,30,.35);transition:opacity .2s ease,transform .2s ease}
 .vinyl:hover::after{opacity:1;transform:translateX(-50%) translateY(0)}
 .vinyl.scratching::after{opacity:0}
+/* hover player: Spotify's own embed, so the preview is licensed; their terms need it visible */
+.vinyl-player{position:fixed;left:0;top:0;z-index:250;display:flex;align-items:center;gap:8px;
+  opacity:0;transform:translateX(-10px);pointer-events:none;
+  transition:opacity .25s,transform .35s cubic-bezier(.3,1.3,.5,1)}
+.vinyl-player.on{opacity:1;transform:none;pointer-events:auto}
+.vinyl-player .vp-embed{width:280px;height:80px;border-radius:12px;overflow:hidden;background:#efeee7;
+  box-shadow:var(--shadow)}
+.vinyl-player iframe{display:block;border:0}
+.vp-mute{flex-shrink:0;width:34px;height:34px;border-radius:50%;border:1px solid #dcd8ce;background:#fbfaf7;
+  color:var(--ink);cursor:none;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);
+  transition:background .2s}
+.vp-mute:hover{background:#efeee7}
+.vp-mute svg{width:16px;height:16px}
+.vp-mute .off,.vp-mute[aria-pressed="true"] .on{display:none}
+.vp-mute[aria-pressed="true"] .off{display:block}
 
 /* terminal */
 .term{left:71%;top:68%;width:248px}
@@ -851,6 +866,13 @@ footer .made svg{width:14px;height:14px}
 <div id="cursor"></div>
 <div id="sparks"></div>
 <div id="linkprev"></div>
+<div class="vinyl-player" id="vinylPlayer" role="region" aria-label="Song preview" inert>
+  <div class="vp-embed"><div id="vinylEmbed"></div></div>
+  <button type="button" class="vp-mute" id="vinylMute" aria-pressed="false" aria-label="Mute the record">
+    <svg class="on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+    <svg class="off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="m22 9-6 6M16 9l6 6"/></svg>
+  </button>
+</div>
 
 <div class="layout-tools" id="layoutTools">
   <div class="drag-tip" id="dragTip">✦ drag the objects to rearrange</div>
@@ -1194,7 +1216,7 @@ document.querySelectorAll('[data-link]').forEach(el => {
   let angle = 0, vel = reduced ? 0 : REST, hover = false, held = null, raf = 0, last = 0, onScreen = true;
 
   const paint = () => { rec.style.transform = `rotate(${angle % 360}deg)`; };
-  const target = () => (reduced ? 0 : hover ? PLAY : REST);
+  const target = () => (reduced ? 0 : hover || deck.classList.contains('playing') ? PLAY : REST);
 
   function tick(t) {
     const dt = Math.min((t - last) / 1000, 0.05);
@@ -1276,6 +1298,121 @@ document.querySelectorAll('[data-link]').forEach(el => {
 
   paint();
   start();
+})();
+
+/* ---------- vinyl: hovering plays a Spotify preview of one track ---------- */
+(function vinylSound() {
+  const deck = document.querySelector('#hero .vinyl');
+  const player = document.getElementById('vinylPlayer');
+  if (!deck || !player || !window.matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+  const TRACK = 'spotify:track:0MUXBhPUDF8or0kfQ0EHwV';   // Rein Me In — Sam Fender, Olivia Dean
+  const embed = player.querySelector('.vp-embed');
+  const muteBtn = document.getElementById('vinylMute');
+  let muted = false;
+  try { muted = localStorage.getItem('vinylMuted') === '1'; } catch {}
+  let controller = null, loading = false, open = false, started = false, ended = false;
+  let closeT = 0, raf = 0, px = -1, py = -1;
+
+  function setMuted(m) {
+    muted = m;
+    muteBtn.setAttribute('aria-pressed', String(m));
+    muteBtn.setAttribute('aria-label', m ? 'Unmute the record' : 'Mute the record');
+    try { localStorage.setItem('vinylMuted', m ? '1' : '0'); } catch {}
+  }
+  setMuted(muted);
+
+  // The script and its cookies only load once someone actually hovers the record.
+  function load() {
+    if (loading) return;
+    loading = true;
+    window.onSpotifyIframeApiReady = api => {
+      api.createController(document.getElementById('vinylEmbed'), { uri: TRACK, width: '100%', height: 80 }, c => {
+        controller = c;
+        c.addListener('ready', () => { if (open) play(); });
+        c.addListener('playback_update', e => {
+          const { isPaused, position, duration } = e.data;
+          if (duration) ended = position >= duration - 500;
+          deck.classList.toggle('playing', open && !isPaused);
+        });
+      });
+    };
+    const s = document.createElement('script');
+    s.src = 'https://open.spotify.com/embed/iframe-api/v1';
+    s.async = true;
+    document.head.append(s);
+  }
+
+  function play() {
+    // Browsers block sound until the visitor has clicked or typed somewhere on the page;
+    // until then the player just shows with Spotify's own play button.
+    if (!controller || muted || navigator.userActivation?.hasBeenActive === false) return;
+    if (!started || ended) { controller.play(); started = true; ended = false; }
+    else controller.resume();
+  }
+
+  function place() {
+    const r = deck.getBoundingClientRect();
+    const w = player.offsetWidth, h = player.offsetHeight;
+    let x = r.right + 14;
+    if (x + w > innerWidth - 12) x = r.left - 14 - w;
+    player.style.left = `${Math.round(x)}px`;
+    player.style.top = `${Math.round(r.top + r.height / 2 - h / 2)}px`;
+  }
+  const follow = () => { place(); raf = requestAnimationFrame(follow); };
+
+  function show() {
+    clearTimeout(closeT);
+    closeT = 0;
+    if (open) return;
+    open = true;
+    load();
+    player.classList.add('on');
+    player.inert = false;
+    cancelAnimationFrame(raf);
+    follow();
+    play();
+  }
+  function hide() {
+    if (!open || closeT) return;
+    closeT = setTimeout(() => {
+      closeT = 0;
+      open = false;
+      player.classList.remove('on');
+      player.inert = true;
+      cancelAnimationFrame(raf);
+      deck.classList.remove('playing');
+      if (cursor) cursor.style.opacity = '';
+      if (controller) controller.pause();
+    }, 350);
+  }
+
+  const within = (el, pad) => {
+    const r = el.getBoundingClientRect();
+    return px >= r.left - pad && px <= r.right + pad && py >= r.top - pad && py <= r.bottom + pad;
+  };
+  // The embed is an iframe, so the page stops seeing the pointer once it's inside.
+  // Judge by the last position the page saw instead of leave events.
+  function check() {
+    if (!open) return;
+    if (within(deck, 0) || within(player, 16)) { clearTimeout(closeT); closeT = 0; }
+    else if (!player.contains(document.activeElement)) hide();
+    if (cursor) cursor.style.opacity = within(embed, 0) ? '0' : '';
+  }
+  deck.addEventListener('pointerenter', show);
+  document.addEventListener('pointermove', e => { px = e.clientX; py = e.clientY; check(); }, { passive: true });
+  window.addEventListener('scroll', check, { passive: true });
+
+  deck.addEventListener('focus', show);
+  deck.addEventListener('blur', e => { if (!player.contains(e.relatedTarget)) hide(); });
+  player.addEventListener('focusout', e => {
+    if (!player.contains(e.relatedTarget) && e.relatedTarget !== deck) hide();
+  });
+
+  muteBtn.addEventListener('click', () => {
+    setMuted(!muted);
+    if (muted) { if (controller) controller.pause(); }
+    else play();
+  });
 })();
 
 /* ---------- live analogue clock ---------- */
