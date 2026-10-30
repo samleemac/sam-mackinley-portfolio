@@ -423,6 +423,59 @@ section{position:relative;z-index:5}
 .fold:hover .ic{transform:translateY(-4px) scale(1.04)}
 .fold.sel .lbl{font-weight:600;color:#1b1b18}
 .fold .lbl{font-size:11.5px;margin-top:8px;color:#3c3a34;line-height:1.3}
+/* ----- "your-project" drop folder (fills the space under the folders) ----- */
+.drop{grid-column:1/-1;display:flex;flex-direction:column;gap:12px;margin-top:6px;padding-top:22px;
+  border-top:1px solid #e6e4dc;cursor:auto}
+.drop-head{display:flex;align-items:center;gap:12px}
+.drop-ic{width:44px;height:36px;flex:none;opacity:.9}
+.drop-name{font-size:13px;font-weight:600;color:#1b1b18;font-family:var(--font-mono)}
+.drop-sub{font-size:12px;color:#8c897f;margin-top:2px}
+.drop-well{position:relative;min-height:220px;border:2px dashed #d3cfc4;border-radius:14px;background:
+  repeating-linear-gradient(135deg,#f4f3f0 0 12px,#f0eee9 12px 24px);display:flex;align-items:center;
+  justify-content:center;padding:18px;cursor:none;transition:border-color .2s,background .2s,transform .25s}
+.drop-well:hover,.drop-well:focus-visible{border-color:#a9a497;outline:none}
+.drop.over .drop-well{border-color:var(--ink);background:#fffbe9;transform:scale(1.01)}
+.drop.over .drop-ic{animation:dropBounce .6s ease infinite alternate}
+@keyframes dropBounce{to{transform:translateY(-4px) rotate(-3deg)}}
+.drop-empty{flex:1 1 100%;width:100%;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none}
+.drop-big{font-size:17px;font-weight:600;color:#2a2823;letter-spacing:-.01em}
+.drop-touch{display:none}
+.drop-small{font-size:12.5px;color:#8c897f;max-width:36ch;line-height:1.45}
+.drop-browse{margin-top:6px;font-family:var(--font-mono);font-size:11.5px;background:var(--ink);color:#fff;
+  padding:8px 14px;border-radius:20px}
+.drop.has-files .drop-empty{display:none}
+.drop:not(.has-files) .drop-files{display:none}
+.drop.has-files .drop-well{align-items:flex-start;justify-content:flex-start;min-height:0}
+.drop-files{list-style:none;display:flex;flex-wrap:wrap;gap:16px 18px;width:100%}
+.drop-file{position:relative;width:92px;display:flex;flex-direction:column;align-items:center;gap:5px;
+  text-align:center;animation:fileIn .4s cubic-bezier(.3,1.5,.5,1)}
+@keyframes fileIn{from{transform:translateY(-14px) scale(.8);opacity:0}}
+.drop-thumb{width:64px;height:64px;border-radius:8px;overflow:hidden;background:#fff;
+  box-shadow:0 6px 14px -8px rgba(0,0,0,.45);display:grid;place-items:center}
+.drop-thumb img{width:100%;height:100%;object-fit:cover}
+.drop-thumb.doc{width:50px;border-radius:4px 14px 4px 4px;background:linear-gradient(#fff,#f1efe9);
+  font-family:var(--font-mono);font-size:10px;font-weight:700;color:#7a62a8;border:1px solid #e2dfd6}
+.drop-file .nm{font-size:11px;color:#2a2823;line-height:1.25;max-width:100%;overflow:hidden;
+  text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;word-break:break-all}
+.drop-file .sz{font-size:10px;color:#8c897f;font-family:var(--font-mono)}
+.drop-file .rm{position:absolute;top:-6px;right:8px;width:20px;height:20px;border-radius:50%;border:none;
+  background:#1b1b18;color:#fff;font-size:13px;line-height:1;cursor:none;opacity:0;transition:opacity .2s}
+.drop-file:hover .rm,.drop-file .rm:focus-visible{opacity:1}
+.drop.sent .drop-file .rm{display:none}
+.drop-note{font-size:12.5px;color:#7a5b2a;min-height:1em}
+.drop.sent .drop-note{color:#2f7a45;font-weight:600}
+.drop-note a{color:inherit}
+.drop-form{display:flex;gap:8px;flex-wrap:wrap}
+.drop-form[hidden]{display:none}
+.drop-form input{flex:1 1 200px;min-width:0;border:1px solid #dcd8ce;background:#fff;border-radius:22px;
+  padding:11px 16px;font:500 13.5px/1 var(--font-body);color:var(--ink);outline:none;cursor:none}
+.drop-form input:focus{border-color:var(--ink)}
+.drop-form button{flex:none;border:none;border-radius:22px;background:var(--ink);color:#fff;cursor:none;
+  font-family:var(--font-mono);font-size:12px;padding:11px 18px;transition:transform .2s,background .2s}
+.drop-form button:hover:not(:disabled){transform:translateY(-1px);background:#000}
+.drop-form button:disabled{opacity:.6}
+.drop .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+@media (hover:none),(max-width:900px){.drop-desk{display:none}.drop-touch{display:inline}}
 .finder .detail{flex:0 0 0;width:0;overflow:hidden;background:#fff;border-left:1px solid #e6e4dc;
   transition:flex .4s,width .4s;display:flex;flex-direction:column}
 .finder.open .detail{flex:0 0 47%;width:47%;}
@@ -2006,6 +2059,167 @@ FOLDERS.forEach(f => {
   d.addEventListener('click', () => openFolder(f.key));
   grid.appendChild(d);
 });
+
+/* ---------- the empty space under the folders is a drop folder: "your-project" ----------
+   Drag in a sketch, a logo or photos; they land as file icons like real Finder,
+   then go to Sam through the same /api/idea endpoint the hero form uses. */
+(function dropFolder() {
+  const MAX_FILES = 5, MAX_BYTES = 4 * 1024 * 1024;
+  const OK = /\.(png|jpe?g|gif|webp|avif|heic|heif|bmp|tiff?|svg|pdf|docx?|txt|rtf|pages|key|pptx?|xlsx?|csv|numbers|zip)$/i;
+  const MAIL = 'samleemac@outlook.com';
+  const EMAIL_OK = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  const size = n => n < 1048576 ? `${Math.max(1, Math.round(n / 1024))} KB` : `${(n / 1048576).toFixed(1)} MB`;
+  const ext = n => (n.split('.').pop() || '').slice(0, 4).toUpperCase();
+  let files = [];
+  const urls = new Map();
+
+  const zone = document.createElement('section');
+  zone.className = 'drop';
+  zone.setAttribute('aria-label', 'Send Sam your files');
+  zone.innerHTML = `
+    <div class="drop-head">
+      <span class="drop-ic" aria-hidden="true">${folderSVG('#d9d5ca', 'pen')}</span>
+      <div>
+        <p class="drop-name">your-project</p>
+        <p class="drop-sub">An empty folder, waiting for yours.</p>
+      </div>
+    </div>
+    <div class="drop-well" tabindex="0" role="button" aria-describedby="dropHint">
+      <div class="drop-empty">
+        <p class="drop-big"><span class="drop-desk">Drag your sketch, logo or photos in here.</span><span class="drop-touch">Add your sketch, logo or photos.</span></p>
+        <p class="drop-small" id="dropHint">Up to 5 files, 4 MB. I’ll look at them myself and reply within a day.</p>
+        <span class="drop-browse">Choose files</span>
+      </div>
+      <ul class="drop-files" aria-label="Files in your-project"></ul>
+      <input type="file" class="drop-input" multiple hidden accept="image/*,.pdf,.doc,.docx,.txt,.rtf,.pages,.key,.ppt,.pptx,.xls,.xlsx,.csv,.numbers,.zip" />
+    </div>
+    <p class="drop-note" aria-live="polite"></p>
+    <form class="drop-form" novalidate hidden>
+      <label class="visually-hidden" for="dropIdea">What’s it for?</label>
+      <input id="dropIdea" name="idea" maxlength="1000" placeholder="What’s it for? e.g. a site for my bakery" autocomplete="off" />
+      <label class="visually-hidden" for="dropEmail">Your email</label>
+      <input id="dropEmail" name="email" type="email" maxlength="200" placeholder="Your email" autocomplete="email" />
+      <input type="text" name="company" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
+      <button type="submit">Send to Sam <span aria-hidden="true">→</span></button>
+    </form>`;
+  grid.appendChild(zone);
+
+  const well = zone.querySelector('.drop-well');
+  const list = zone.querySelector('.drop-files');
+  const input = zone.querySelector('.drop-input');
+  const note = zone.querySelector('.drop-note');
+  const form = zone.querySelector('.drop-form');
+  const ideaIn = form.elements.idea;
+  const emailIn = form.elements.email;
+  const btn = form.querySelector('button');
+
+  function render() {
+    list.replaceChildren(...files.map((f, i) => {
+      const li = document.createElement('li');
+      li.className = 'drop-file';
+      const icon = document.createElement('span');
+      icon.className = 'drop-thumb';
+      if (/^image\//.test(f.type) && !/heic|heif|tiff/i.test(f.type)) {
+        if (!urls.has(f)) urls.set(f, URL.createObjectURL(f));
+        const img = document.createElement('img');
+        img.src = urls.get(f);
+        img.alt = '';
+        icon.append(img);
+      } else {
+        icon.classList.add('doc');
+        icon.textContent = ext(f.name);
+      }
+      const nm = document.createElement('span');
+      nm.className = 'nm';
+      nm.textContent = f.name;
+      const sz = document.createElement('span');
+      sz.className = 'sz';
+      sz.textContent = size(f.size);
+      const rm = document.createElement('button');
+      rm.type = 'button';
+      rm.className = 'rm';
+      rm.textContent = '×';
+      rm.setAttribute('aria-label', `Remove ${f.name}`);
+      rm.addEventListener('click', e => {
+        e.stopPropagation();
+        const gone = files.splice(i, 1)[0];
+        if (urls.has(gone)) { URL.revokeObjectURL(urls.get(gone)); urls.delete(gone); }
+        note.textContent = '';
+        render();
+      });
+      li.append(icon, nm, sz, rm);
+      return li;
+    }));
+    zone.classList.toggle('has-files', files.length > 0);
+    form.hidden = !files.length && !zone.classList.contains('sent');
+    finderPath.textContent = files.length ? `~/sam/projects/your-project — ${files.length} item${files.length > 1 ? 's' : ''}` : '~/sam/projects';
+  }
+
+  function add(picked) {
+    if (zone.classList.contains('sent')) return;
+    let msg = '';
+    for (const f of picked) {
+      if (files.length >= MAX_FILES) { msg = `That’s the limit — ${MAX_FILES} files at most.`; break; }
+      if (!OK.test(f.name)) { msg = `I can’t take ${f.name}. Images, PDFs, docs, slides or a zip work.`; continue; }
+      if (files.reduce((n, x) => n + x.size, 0) + f.size > MAX_BYTES) { msg = `${f.name} is too big. Files can add up to 4 MB.`; continue; }
+      if (!files.some(x => x.name === f.name && x.size === f.size)) files.push(f);
+    }
+    note.textContent = msg;
+    const first = !form.hidden;
+    render();
+    if (files.length && !first) setTimeout(() => ideaIn.focus({ preventScroll: true }), 50);
+  }
+
+  well.addEventListener('click', e => { if (!e.target.closest('.rm')) input.click(); });
+  well.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); input.click(); } });
+  input.addEventListener('change', () => { add([...input.files]); input.value = ''; });
+
+  // Dragging files anywhere over the Finder lights up the folder.
+  let depth = 0;
+  const hasFiles = e => [...(e.dataTransfer?.types || [])].includes('Files');
+  finder.addEventListener('dragenter', e => { if (!hasFiles(e)) return; e.preventDefault(); depth++; zone.classList.add('over'); });
+  finder.addEventListener('dragover', e => { if (!hasFiles(e)) return; e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; });
+  finder.addEventListener('dragleave', e => { if (!hasFiles(e)) return; depth = Math.max(0, depth - 1); if (!depth) zone.classList.remove('over'); });
+  finder.addEventListener('drop', e => {
+    if (!hasFiles(e)) return;
+    e.preventDefault();
+    depth = 0;
+    zone.classList.remove('over');
+    if (typeof switchView === 'function') switchView('projects');
+    add([...e.dataTransfer.files]);
+  });
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const idea = ideaIn.value.trim();
+    const email = emailIn.value.trim();
+    if (!idea) { note.textContent = 'Add a line about what it’s for.'; ideaIn.focus(); return; }
+    if (!EMAIL_OK.test(email)) { note.textContent = 'That email doesn’t look right.'; emailIn.focus(); return; }
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+    note.textContent = '';
+    try {
+      const body = new FormData();
+      body.append('idea', idea);
+      body.append('email', email);
+      body.append('company', form.elements.company.value);
+      for (const f of files) body.append('files', f, f.name);
+      const res = await fetch('/api/idea', { method: 'POST', body });
+      if (!res.ok) throw new Error(`drop: ${res.status}`);
+      zone.classList.add('sent');
+      form.hidden = true;
+      note.textContent = 'Sent. I’ll reply within a day.';
+      finderPath.textContent = '~/sam/projects/your-project — sent';
+      if (!reduced) { const r = zone.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height / 2); }
+    } catch (err) {
+      btn.disabled = false;
+      btn.innerHTML = 'Send to Sam <span aria-hidden="true">→</span>';
+      const subject = encodeURIComponent('My project files');
+      const text = encodeURIComponent(`Hi Sam,\n\n${idea}\n\n`);
+      note.innerHTML = `That didn’t send. <a href="mailto:${MAIL}?subject=${subject}&body=${text}">Email me instead</a> and attach the files there.`;
+    }
+  });
+})();
 
 const PLAY_SVG = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
 const APP_ICONS = [
