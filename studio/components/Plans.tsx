@@ -46,7 +46,7 @@ export function Plans() {
                 ))}
               </ul>
               <Button
-                href="/contact"
+                href={`/contact?plan=${plan.id}`}
                 variant={plan.featured ? "violet" : "grey"}
                 className={styles.cta}
               >

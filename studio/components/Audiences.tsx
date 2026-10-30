@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { audiences } from "@/content";
 import { cx } from "@/lib/cx";
 import styles from "./Audiences.module.css";
@@ -65,6 +66,12 @@ export function Audiences() {
                 <h3 className={styles.title}>{audience.title}</h3>
                 <p className={styles.fit}>{audience.fit}</p>
                 <p className={styles.body}>{audience.body}</p>
+                <Link
+                  href={`/contact?for=${audience.id}`}
+                  className={styles.brief}
+                >
+                  Start a {audience.title.toLowerCase()} brief <span aria-hidden="true">→</span>
+                </Link>
               </div>
               <div className={styles.concepts}>
                 {audience.concepts.map((concept) => (

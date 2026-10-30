@@ -1,19 +1,32 @@
 import type { Metadata } from "next";
-import { Contact } from "@/components/Contact";
+import { Brief } from "@/components/Brief";
 import { Footer } from "@/components/Footer";
 import { site } from "@/content";
 
 export const metadata: Metadata = {
   title: `Start a project - ${site.name}`,
   description:
-    "Tell me what you are trying to ship. If it is a fit, I will send a simple next step.",
+    "Four taps and a name. Your project brief writes itself as you go.",
 };
 
-export default function ContactPage() {
+function first(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+export default async function ContactPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const params = await searchParams;
+
   return (
     <>
       <main id="main">
-        <Contact />
+        <Brief
+          initialPlan={first(params.plan)}
+          initialBusiness={first(params.for)}
+        />
       </main>
       <Footer />
     </>

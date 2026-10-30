@@ -310,3 +310,37 @@
     transform: none;
   }
 }
+
+.brief {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 1.6rem;
+  padding: 1rem 1.8rem;
+  border-radius: 5rem;
+  background: var(--color-primary);
+  color: var(--color-surface);
+  font: 600 1.5rem / 1 var(--font-display), sans-serif;
+  letter-spacing: -0.02rem;
+  text-decoration: none;
+  transition: transform 0.35s var(--ease-spring);
+}
+
+.brief:focus-visible {
+  outline: 0.2rem solid var(--color-primary);
+  outline-offset: 0.3rem;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .brief:hover {
+    transform: translateX(0.3rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brief,
+  .brief:hover {
+    transition: none;
+    transform: none;
+  }
+}

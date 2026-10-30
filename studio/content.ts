@@ -290,6 +290,57 @@ export const faqs = [
   },
 ];
 
+// The /contact brief: every tap writes one line of the enquiry.
+// Plan cards link to /contact?plan=<id>, audience cards to /contact?for=<id>.
+export const brief = {
+  title: "Start a project",
+  lede: "Four taps and a name. Your brief writes itself as you go — no blank box, no jargon.",
+  questions: {
+    business: {
+      label: "What kind of business?",
+      options: [
+        { id: "trades", label: "Trades", phrase: "a trades business" },
+        { id: "creatives", label: "Creative studio", phrase: "a creative studio" },
+        { id: "finance", label: "Finance or consulting", phrase: "a finance or consulting firm" },
+        { id: "athletic", label: "Coach, club or gym", phrase: "a coaching or fitness business" },
+        { id: "coffee", label: "Cafe or roaster", phrase: "a cafe" },
+        { id: "hair", label: "Salon or barber", phrase: "a salon" },
+        { id: "other", label: "Something else", phrase: "an independent business" },
+      ],
+    },
+    plan: {
+      label: "What do you need?",
+      options: [
+        { id: "launch", label: "One sharp page", phrase: "one sharp page that asks for the action", price: "£2,500", time: "typically 3–4 weeks" },
+        { id: "site", label: "A full site", phrase: "a full marketing site with room to grow", price: "£6,500", time: "typically 6–10 weeks" },
+        { id: "partner", label: "Ongoing help", phrase: "ongoing design and build each month", price: "£1,500/mo", time: "12 hours a month" },
+        { id: "unsure", label: "Not sure yet", phrase: "help working out what I need", price: "", time: "" },
+      ],
+    },
+    current: {
+      label: "Where’s your site now?",
+      options: [
+        { id: "none", label: "No site yet", phrase: "Right now I don’t have a site." },
+        { id: "diy", label: "DIY builder", phrase: "Right now it’s on a DIY builder I’ve outgrown." },
+        { id: "tired", label: "Have one, it’s tired", phrase: "Right now I have a site, but it’s tired." },
+      ],
+    },
+    timing: {
+      label: "When do you want to start?",
+      options: [
+        { id: "asap", label: "As soon as possible", phrase: "as soon as possible" },
+        { id: "soon", label: "In the next few months", phrase: "in the next few months" },
+        { id: "exploring", label: "Just exploring", phrase: "whenever it makes sense — I’m exploring" },
+      ],
+    },
+  },
+  next: [
+    "I read every brief myself.",
+    "If it’s a fit, we book a short call.",
+    "You get a simple proposal with a fixed scope.",
+  ],
+};
+
 export const nav = [
   { label: "Work", href: "#work" },
   { label: "Templates", href: "/templates" },
