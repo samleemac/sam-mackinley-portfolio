@@ -3,7 +3,7 @@
 import { useState, useSyncExternalStore } from "react";
 import { Button } from "@/components/Button";
 import { PillTag } from "@/components/PillTag";
-import { process } from "@/content";
+import { plans, process } from "@/content";
 import { cx } from "@/lib/cx";
 import styles from "./Process.module.css";
 
@@ -94,20 +94,28 @@ export function Process() {
         <div className={styles.planner}>
           <div className={styles.controls}>
             <div className={styles.switch} role="group" aria-label="Plan">
-              {planIds.map((id) => (
-                <button
-                  key={id}
-                  type="button"
-                  aria-pressed={plan === id}
-                  className={cx(styles.switchBtn, plan === id && styles.switchOn)}
-                  onClick={() => setPlan(id)}
-                >
-                  {process.plans[id].label}
-                  <span className={styles.switchMeta}>
-                    {process.plans[id].range[0]}–{process.plans[id].range[1]} weeks
-                  </span>
-                </button>
-              ))}
+              {planIds.map((id) => {
+                const option = process.plans[id];
+                const price = plans.find((item) => item.id === id)?.price;
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    aria-pressed={plan === id}
+                    className={cx(styles.switchBtn, plan === id && styles.switchOn)}
+                    onClick={() => setPlan(id)}
+                  >
+                    <span className={styles.switchTop}>
+                      <span className={styles.switchName}>{option.label}</span>
+                      <span className={styles.switchMeta}>
+                        {option.range[0]}–{option.range[1]} weeks
+                        {price ? ` · from ${price}` : ""}
+                      </span>
+                    </span>
+                    <span className={styles.switchWhat}>{option.what}</span>
+                  </button>
+                );
+              })}
             </div>
 
             <label className={styles.startField}>

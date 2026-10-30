@@ -134,8 +134,18 @@ export const process = {
     },
   ],
   plans: {
-    launch: { label: "Launch", weeks: [0.5, 1, 1.5, 0.5], range: [3, 4] },
-    site: { label: "Site", weeks: [1, 2, 4, 1], range: [6, 10] },
+    launch: {
+      label: "Launch",
+      weeks: [0.5, 1, 1.5, 0.5],
+      range: [3, 4],
+      what: "One page that says what you do and asks for the booking. Right if you need to look credible and get enquiries, fast.",
+    },
+    site: {
+      label: "Site",
+      weeks: [1, 2, 4, 1],
+      range: [6, 10],
+      what: "A full site: several pages, a look built for your brand, and room to add more later. Right for most businesses.",
+    },
   },
   partnerNote: "On Partner? It’s 12 hours a month, scoped as we go — no start line to wait for.",
 };
