@@ -1,38 +1,120 @@
-import { Button } from "@/components/Button";
-import { PillTag } from "@/components/PillTag";
-import { hero } from "@/content";
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { hero, work } from "@/content";
+import { cx } from "@/lib/cx";
 import styles from "./Hero.module.css";
 
+const sites = hero.showcase
+  .map((title) => work.find((item) => item.title === title))
+  .filter((item): item is (typeof work)[number] => Boolean(item));
+
+const CYCLE_MS = 3600;
+
 export function Hero() {
+  const [front, setFront] = useState(0);
+  const [paused, setPaused] = useState(false);
+
+  useEffect(() => {
+    if (paused || sites.length < 2) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const timer = window.setInterval(() => {
+      setFront((index) => (index + 1) % sites.length);
+    }, CYCLE_MS);
+    return () => window.clearInterval(timer);
+  }, [paused]);
+
   return (
     <section className={styles.hero}>
       <div className={styles.inner}>
-        <div className={styles.tag}>
-          <PillTag size="s" className={styles.pill}>
-            <strong className={styles.pillLead}>{hero.pillLead}</strong>
-            <span>{hero.pill}</span>
-            <a
-              className={styles.pillLink}
-              href={hero.pillHref}
-              target="_blank"
-              rel="noreferrer noopener"
-            >
-              {hero.pillLink}
+        <div className={styles.copy}>
+          <h1 className={`display-hero ${styles.title}`}>
+            {hero.titleLine1}
+            <br />
+            {hero.titleLine2}
+          </h1>
+          <p className={`body-lg ${styles.lede}`}>{hero.lede}</p>
+
+          <div className={styles.start}>
+            <p className={styles.ask} id="hero-ask">
+              {hero.ask}
+            </p>
+            <ul className={styles.chips} aria-labelledby="hero-ask">
+              {hero.starts.map((option) => (
+                <li key={option.for}>
+                  <Link
+                    href={`${hero.ctaHref}?for=${option.for}`}
+                    className={styles.chip}
+                  >
+                    {option.label}
+                  </Link>
+                </li>
+              ))}
+              <li>
+                <Link href={hero.ctaHref} className={cx(styles.chip, styles.chipOther)}>
+                  {hero.other} <span aria-hidden="true">→</span>
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          <p className={styles.proof}>
+            {hero.proof}{" "}
+            <a href="#work" className={styles.workLink}>
+              {hero.workLink} <span aria-hidden="true">↓</span>
             </a>
-          </PillTag>
+          </p>
         </div>
-        <h1 className={`display-hero ${styles.title}`}>
-          {hero.titleLine1}
-          <br />
-          {hero.titleLine2}
-        </h1>
-        <p className={`body-lg centered ${styles.lede}`}>{hero.lede}</p>
-        <div className={styles.cta}>
-          <Button href={hero.ctaHref} size="lg">
-            {hero.cta}
-          </Button>
+
+        <div
+          className={styles.stack}
+          role="group"
+          aria-label="Recent client sites"
+          onPointerEnter={() => setPaused(true)}
+          onPointerLeave={() => setPaused(false)}
+          onFocus={() => setPaused(true)}
+          onBlur={() => setPaused(false)}
+        >
+          {sites.map((site, index) => {
+            const depth = (index - front + sites.length) % sites.length;
+            return (
+              <button
+                key={site.title}
+                type="button"
+                className={cx(styles.card, styles[`depth${depth}`])}
+                aria-label={`${site.title}, ${site.meta}${depth === 0 ? " (showing)" : " — bring to front"}`}
+                aria-pressed={depth === 0}
+                onClick={() => setFront(index)}
+              >
+                <span className={styles.chrome} aria-hidden="true">
+                  <span className={styles.lights}>
+                    <i />
+                    <i />
+                    <i />
+                  </span>
+                  <span className={styles.url}>
+                    {site.href.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "")}
+                  </span>
+                </span>
+                <span className={styles.shot}>
+                  <Image
+                    src={site.image}
+                    alt=""
+                    fill
+                    sizes="(max-width: 1024px) 86vw, 44vw"
+                    className={styles.img}
+                    priority={index === 0}
+                  />
+                </span>
+                <span className={styles.label} aria-hidden="true">
+                  <strong>{site.title}</strong> {site.meta}
+                </span>
+              </button>
+            );
+          })}
         </div>
-        <p className={styles.proof}>{hero.proof}</p>
       </div>
     </section>
   );

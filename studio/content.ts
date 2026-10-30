@@ -9,17 +9,25 @@ export const site = {
 };
 
 export const hero = {
-  pillLead: "Studio notes:",
-  pill: "New work, built right into the practice.",
-  pillLink: "See the work",
-  pillHref: "https://sammackinley.com",
   titleLine1: "Sites that look sharp.",
   titleLine2: "Built to work hard.",
-  lede: "For owner-operators and independent businesses who have outgrown DIY — a salon, a coach, a contractor, a shop. One designer, not a junior team.",
-  cta: "Start a project",
+  lede: "For owner-operators and independent businesses who have outgrown DIY. One designer, not a junior team.",
+  // One tap answers the brief's first question (/contact?for=<id>).
+  ask: "I run a…",
+  starts: [
+    { for: "hair", label: "Salon" },
+    { for: "trades", label: "Trade business" },
+    { for: "coffee", label: "Café" },
+    { for: "athletic", label: "Gym or coaching" },
+    { for: "finance", label: "Advisory firm" },
+    { for: "creatives", label: "Creative studio" },
+  ],
+  other: "Something else",
   ctaHref: "/contact",
-  proof:
-    "One designer, first sketch to launch. 8+ years, 20+ projects.",
+  workLink: "See the work",
+  // Real client sites shown in the hero stack, by title from `work`.
+  showcase: ["Elle Vie", "Gijs Running", "James Agro", "Routes2Change"],
+  proof: "One designer, first sketch to launch. 8+ years, 20+ projects.",
 };
 
 export const services: {
