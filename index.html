@@ -546,6 +546,7 @@ section{position:relative;z-index:5}
 .jug-btn,.jug-go{border:none;border-radius:20px;font-family:var(--font-mono);font-size:11px;padding:8px 14px;cursor:none;
   transition:transform .2s,background .2s}
 .jug-btn{background:#6B4423;color:#fff}
+.jug-btn:disabled{opacity:.5;transform:none}
 .jug-btn:hover{transform:translateY(-1px) rotate(-2deg);background:#57361b}
 .jug-go{background:var(--ink);color:#fff;animation:fileIn .4s cubic-bezier(.3,1.5,.5,1)}
 .jug-go:hover{transform:translateY(-1px);background:#000}
@@ -2355,7 +2356,7 @@ function renderSnapshot() {
     <div class="snap-row r1">
       <div class="card-s now-card">
         <div class="ch"><span class="now-dot" aria-hidden="true"></span>Right now</div>
-        <p class="now-time"><span id="nowTime">--:--</span><span class="now-where">in Xermade, Galicia</span></p>
+        <p class="now-time"><span id="nowTime">--:--</span><span class="now-where">in Galicia, Spain</span></p>
         <p class="now-weather" id="nowWeather" hidden></p>
         <p class="now-status" id="nowStatus"></p>
         <p class="now-reply" id="nowReply"></p>
@@ -2437,7 +2438,7 @@ function renderSnapshot() {
   }
 }
 
-/* ---------- Snapshot, live: Sam's real time, weather and coffee in Xermade ---------- */
+/* ---------- Snapshot, live: Sam's real time, weather and coffee in Galicia ---------- */
 function madridNow() {
   const parts = Object.fromEntries(new Intl.DateTimeFormat('en-GB', {
     timeZone: 'Europe/Madrid', hour: '2-digit', minute: '2-digit', weekday: 'short', hourCycle: 'h23',
@@ -2461,12 +2462,21 @@ function coffeeLine(level, hm) {
   if (level > 0.35) return 'Half a cup in. Still buzzing.';
   return 'Running on fumes. Needs more coffee.';
 }
+// A different line each time the card loads, picked from the pool for the hour.
+const pick = list => list[Math.floor(Math.random() * list.length)];
 function statusFor(t) {
-  if (t.hm < 7 || t.hm >= 23) return { cls: 'off', text: 'Asleep', reply: 'Send it anyway — I’ll reply within a day.' };
-  if (t.weekend) return { cls: 'away', text: 'Weekend — working on the house', reply: 'Messages still welcome. I’ll reply within a day.' };
-  if (t.hm < 9) return { cls: 'away', text: 'Morning coffee, desk at 9', reply: 'Message now and it’ll be the first thing I read.' };
-  if (t.hm >= 9 && t.hm < 19) return { cls: 'on', text: 'At my desk, building', reply: 'Good time to message — I’m around.' };
-  return { cls: 'away', text: 'Off for the evening', reply: 'Leave me a message and I’ll reply within a day.' };
+  const off = 'Leave me a message and I’ll reply within a day.';
+  if (t.weekend) return { cls: 'off', text: pick(['Weekend. Laptop’s closed.', 'Weekend — out with the dogs', 'Off for the weekend, back Monday']), reply: off };
+  if (t.hm >= 9 && t.hm < 18) return {
+    cls: 'on',
+    text: pick(['Around — pushing pixels', 'At my desk, arguing with a CSS grid', 'Around, and caffeinated', 'Building something. Probably a button.', 'Around — renaming layers nobody will see']),
+    reply: 'Good time to message — I’m around.',
+  };
+  if (t.hm >= 23 || t.hm < 6.5) return { cls: 'off', text: 'Sleeping. Dreaming in hex codes.', reply: 'Send it anyway — I’ll reply within a day.' };
+  if (t.hm < 8) return { cls: 'away', text: 'Drinking my morning coffee', reply: 'Back at my desk at 9. ' + off };
+  if (t.hm < 9) return { cls: 'away', text: 'Walking the dogs', reply: 'Back at my desk at 9. ' + off };
+  if (t.hm < 19) return { cls: 'away', text: 'Out walking the dogs', reply: off };
+  return { cls: 'away', text: pick(['Off for the evening', 'Off for the evening. Feet up.', 'Done for the day — dinner time']), reply: off };
 }
 const WEATHER = { 0: 'clear skies', 1: 'mostly clear', 2: 'partly cloudy', 3: 'overcast', 45: 'fog', 48: 'fog',
   51: 'light drizzle', 53: 'drizzle', 55: 'heavy drizzle', 61: 'light rain', 63: 'rain', 65: 'heavy rain',
@@ -2503,13 +2513,18 @@ function liveSnapshot(v, y0, y100) {
     };
     anim = requestAnimationFrame(step);
   }
+  let lastCls = '';
   function tick() {
     const t = madridNow();
     timeEl.textContent = t.time;
     const st = statusFor(t);
-    statusEl.className = `now-status ${st.cls}`;
-    statusEl.textContent = st.text;
-    replyEl.textContent = st.reply;
+    // Only re-pick the line when the state changes, so it doesn't flicker every 30s.
+    if (st.cls + st.reply !== lastCls) {
+      lastCls = st.cls + st.reply;
+      statusEl.className = `now-status ${st.cls}`;
+      statusEl.textContent = st.text;
+      replyEl.textContent = st.reply;
+    }
     if (!toppedUp) {
       const l = coffeeLevel(t.hm);
       sub.textContent = coffeeLine(l, t.hm);
@@ -2524,11 +2539,16 @@ function liveSnapshot(v, y0, y100) {
     card.classList.remove('pouring');
     void card.offsetWidth;
     card.classList.add('pouring');
-    pourTo(1, 1100);
-    sub.textContent = toppedUp === 1
-      ? 'Topped up — thank you! Fully caffeinated now.'
-      : `That’s ${toppedUp} cups. I’m vibrating.`;
-    btn.textContent = 'Another cup?';
+    const target = Math.min(1, level + 0.1);
+    pourTo(target, 700);
+    const pct = Math.round(target * 100);
+    sub.textContent = pct >= 100
+      ? 'Full to the brim. I’m vibrating — thank you!'
+      : toppedUp === 1
+        ? `A splash more — thank you! Now at ${pct}%.`
+        : `Topped up to ${pct}%. Keep going?`;
+    btn.textContent = pct >= 100 ? 'Jug’s full' : 'Another splash?';
+    btn.disabled = pct >= 100;
     go.hidden = false;
     setTimeout(() => card.classList.remove('pouring'), 1200);
   });
@@ -2538,14 +2558,14 @@ function liveSnapshot(v, y0, y100) {
     setTimeout(() => input && input.focus({ preventScroll: true }), reduced ? 0 : 700);
   });
 
-  // Live weather in Xermade (Open-Meteo, no key). Hidden if it can't load.
-  fetch('https://api.open-meteo.com/v1/forecast?latitude=43.36&longitude=-7.81&current=temperature_2m,weather_code&timezone=Europe%2FMadrid')
+  // Live weather for Galicia, taken from Santiago de Compostela (Open-Meteo, no key). Hidden if it can't load.
+  fetch('https://api.open-meteo.com/v1/forecast?latitude=42.88&longitude=-8.54&current=temperature_2m,weather_code&timezone=Europe%2FMadrid')
     .then(r => (r.ok ? r.json() : Promise.reject()))
     .then(d => {
       const c = d.current;
       if (!c || typeof c.temperature_2m !== 'number') return;
       const what = WEATHER[c.weather_code] || 'Galician weather';
-      weatherEl.textContent = `${Math.round(c.temperature_2m)}°C and ${what}`;
+      weatherEl.textContent = `${Math.round(c.temperature_2m)}°C and ${what} in Galicia`;
       weatherEl.hidden = false;
     })
     .catch(() => {});
