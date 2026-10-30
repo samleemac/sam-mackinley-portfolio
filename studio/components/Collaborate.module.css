@@ -1,126 +1,337 @@
-.layout {
-  display: flex;
-  flex-direction: column;
-  gap: 4rem;
-}
-
-.intro {
+.header {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 3rem;
+  gap: 2.4rem;
+  margin-bottom: 4rem;
 }
 
 .heading {
   text-align: left;
-  max-width: 12ch;
+  max-width: 11ch;
 }
 
-.lead {
-  color: var(--color-primary);
-  max-width: 42rem;
+.lede {
+  color: var(--color-secondary);
 }
 
-.cards {
+/* ---------- Request picker ---------- */
+
+.scenarios {
   display: flex;
-  flex-direction: column;
-  gap: 1.6rem;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin: 0 0 2.4rem;
 }
 
-.card {
+.scenario {
+  appearance: none;
+  min-height: 5.2rem;
+  padding: 0.8rem 2.2rem;
+  text-align: left;
+  border: 0.15rem solid var(--color-grey-300);
+  border-radius: 5rem;
+  background: var(--color-surface);
+  color: var(--color-primary);
+  font: 600 1.6rem / 1.2 var(--font-display), sans-serif;
+  letter-spacing: -0.02rem;
+  cursor: pointer;
+  transition:
+    background 0.25s var(--ease-standard),
+    color 0.25s var(--ease-standard),
+    border-color 0.25s var(--ease-standard),
+    transform 0.4s var(--ease-spring);
+}
+
+.scenarioOn {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-surface);
+}
+
+.scenario:focus-visible,
+.switchBtn:focus-visible {
+  outline: 0.2rem solid var(--color-tertiary);
+  outline-offset: 0.3rem;
+}
+
+.scenario:active {
+  transform: scale(0.97);
+}
+
+/* Phone-only: choose which conversation to watch */
+.switch {
+  display: flex;
+  padding: 0.4rem;
+  margin-bottom: 1.6rem;
+  border-radius: 5rem;
   background: var(--color-neutral);
-  border-radius: 4rem;
-  min-height: 22rem;
-  padding: 4rem 3rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
+}
+
+.switchBtn {
+  appearance: none;
+  flex: 1;
+  min-height: 4.4rem;
+  border: 0;
+  border-radius: 5rem;
+  background: transparent;
+  color: var(--color-primary);
+  font: 600 1.4rem / 1 var(--font-display), sans-serif;
+  cursor: pointer;
+}
+
+.switchOn {
+  background: var(--color-surface);
+  box-shadow: 0 0.2rem 0.8rem #19171c1a;
+}
+
+/* ---------- Conversations ---------- */
+
+.columns {
+  display: grid;
   gap: 1.6rem;
 }
 
-.title {
-  margin: 0;
+.column {
+  display: none;
+  flex-direction: column;
+  gap: 1.6rem;
+  min-height: 46rem;
+  padding: 2rem;
+  border-radius: 2.8rem;
+  background: var(--color-neutral);
 }
 
-.body {
+.columnShown {
+  display: flex;
+}
+
+.columnSam {
+  background: var(--color-violet-900);
+  color: var(--color-surface);
+}
+
+.columnHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.4rem 0.4rem 1.2rem;
+  border-bottom: 0.1rem solid #19171c14;
+}
+
+.columnSam .columnHead {
+  border-color: #ffffff1f;
+}
+
+.columnName {
+  font: 800 2rem / 1 var(--font-display), sans-serif;
+  letter-spacing: -0.06rem;
+}
+
+.badge {
+  padding: 0.5rem 1rem;
+  border-radius: 5rem;
+  background: var(--color-lime-400);
   color: var(--color-primary);
-  font-family: var(--font-body), Inter, sans-serif;
-  font-size: 1.8rem;
-  font-weight: 400;
-  line-height: 1.5;
-  letter-spacing: -0.0396rem;
-  max-width: 42rem;
+  font: 600 1.1rem / 1 var(--font-display), sans-serif;
+  letter-spacing: 0.04rem;
+  text-transform: uppercase;
+}
+
+.thread {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex: 1;
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  max-width: 88%;
+}
+
+.you {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+
+.them {
+  align-self: flex-start;
+}
+
+.name {
+  padding-left: 1.2rem;
+  font: 600 1.15rem / 1 var(--font-display), sans-serif;
+  color: var(--color-secondary);
+}
+
+.columnSam .name {
+  color: var(--color-lime-400);
+}
+
+.bubble {
+  display: block;
+  padding: 1.1rem 1.5rem;
+  border-radius: 1.8rem;
+  font: 400 1.5rem / 1.4 var(--font-body), sans-serif;
   text-wrap: pretty;
 }
 
+.you .bubble {
+  background: var(--color-primary);
+  color: var(--color-surface);
+  border-bottom-right-radius: 0.6rem;
+}
+
+.them .bubble {
+  background: var(--color-surface);
+  color: var(--color-primary);
+  border-bottom-left-radius: 0.6rem;
+}
+
+.columnSam .you .bubble {
+  background: #ffffff1f;
+}
+
+.columnSam .them .bubble {
+  background: var(--color-lime-400);
+}
+
+.tally {
+  margin: 0;
+  padding-top: 1.4rem;
+  border-top: 0.1rem dashed #19171c26;
+  font: 700 1.6rem / 1.35 var(--font-display), sans-serif;
+  letter-spacing: -0.02rem;
+  text-wrap: balance;
+}
+
+.columnSam .tally {
+  border-color: #ffffff33;
+  color: var(--color-lime-400);
+}
+
+/* Play: messages arrive one by one. The agency and DIY threads are paced
+   slower than mine, so the difference shows before anyone reads a word. */
+.message,
+.tally {
+  opacity: 0;
+  transform: translateY(0.8rem) scale(0.98);
+}
+
+.play .message,
+.play .tally {
+  animation: arrive 0.45s var(--ease-spring) forwards;
+  animation-delay: calc(var(--i) * 0.95s + 0.2s);
+}
+
+.play .columnSam .message,
+.play .columnSam .tally {
+  animation-delay: calc(var(--i) * 0.55s + 0.2s);
+}
+
+.you {
+  transform-origin: 100% 100%;
+}
+
+.them {
+  transform-origin: 0% 100%;
+}
+
+@keyframes arrive {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------- CTA ---------- */
+
 .cta {
   display: flex;
-  justify-content: center;
-  margin-top: 6rem;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.4rem;
+  margin-top: 4.8rem;
+  text-align: center;
 }
+
+.ctaNote {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--color-secondary);
+}
+
+/* ---------- Layout ---------- */
 
 @media screen and (width >= 1025px) {
-  .layout {
-    display: grid;
-    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
-    column-gap: 4rem;
-    align-items: start;
-  }
-
-  .intro {
-    position: sticky;
-    top: 12rem;
-    padding-bottom: 2rem;
-  }
-
-  .heading {
-    max-width: 10ch;
-  }
-
-  .cards {
-    gap: 2rem;
-  }
-
-  .card {
-    min-height: 28rem;
-    padding: 5.5rem 4.5rem 4.5rem;
-  }
-
-  .cta {
-    margin-top: 8rem;
-  }
-}
-
-@media screen and (width >= 1441px) {
-  .layout {
+  .header {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
     column-gap: 6rem;
+    margin-bottom: 4.8rem;
   }
 
-  .intro {
-    top: 14rem;
-    gap: 3.5rem;
+  .tag {
+    flex-basis: 100%;
   }
 
-  .lead,
-  .body {
-    font-size: 2rem;
-    letter-spacing: -0.04rem;
-    max-width: 48rem;
+  .lede {
+    max-width: 40rem;
   }
 
-  .card {
-    min-height: 32rem;
-    padding: 6.5rem 5rem 5rem;
+  .scenarios {
+    margin: 0 0 3.2rem;
   }
 
-  .cta {
-    margin-top: 10rem;
+  .switch {
+    display: none;
+  }
+
+  .columns {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
+  }
+
+  .column {
+    display: flex;
+    padding: 2.4rem;
+  }
+
+  .columnSam {
+    transform: translateY(-1.2rem);
+    box-shadow: 0 3rem 6rem -2.4rem #17082c80;
   }
 }
 
-@media screen and (width >= 1729px) {
-  .card {
-    min-height: 34rem;
-    padding: 7rem 5.5rem 5.5rem;
+@media (hover: hover) and (pointer: fine) {
+  .scenario:not(.scenarioOn):hover {
+    border-color: var(--color-primary);
+    transform: translateY(-0.2rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .message,
+  .tally {
+    opacity: 1;
+    transform: none;
+  }
+
+  .play .message,
+  .play .tally {
+    animation: none;
+  }
+
+  .scenario {
+    transition: none;
   }
 }

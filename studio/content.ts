@@ -211,6 +211,114 @@ export const plans: {
   },
 ];
 
+// "Built as a practice" — the same request played out three ways.
+// Sam's replies must stay true to the FAQ: revisions are included in the
+// plan, and anything outside scope is quoted before it starts.
+type PracticeMessage = { from: "you" | "them"; name?: string; text: string };
+export const practice: {
+  modes: { id: "diy" | "agency" | "sam"; label: string }[];
+  scenarios: {
+    id: string;
+    label: string;
+    threads: Record<"diy" | "agency" | "sam", PracticeMessage[]>;
+    tally: Record<"diy" | "agency" | "sam", string>;
+  }[];
+} = {
+  modes: [
+    { id: "diy", label: "DIY builder" },
+    { id: "agency", label: "Typical agency" },
+    { id: "sam", label: "With me" },
+  ],
+  scenarios: [
+    {
+      id: "headline",
+      label: "“Can the headline say what we actually do?”",
+      threads: {
+        diy: [
+          { from: "you", text: "The headline needs to say what we actually do." },
+          { from: "them", name: "Builder", text: "Text is locked to this template’s layout. Try a different template?" },
+          { from: "you", text: "Changed it. Now the button’s fallen off the screen on my phone." },
+          { from: "you", text: "…I’ll leave it for now." },
+        ],
+        agency: [
+          { from: "you", text: "The headline needs to say what we actually do." },
+          { from: "them", name: "Account manager", text: "Great note! I’ll pass it to the copy team." },
+          { from: "them", name: "Account manager", text: "Copy has a new line. Design needs to check it fits." },
+          { from: "them", name: "Account manager", text: "Design has adjusted the layout. It’s with development." },
+          { from: "them", name: "Account manager", text: "Updated version in the next round of reviews." },
+        ],
+        sam: [
+          { from: "you", text: "The headline needs to say what we actually do." },
+          { from: "them", name: "Sam", text: "Agreed. Here are two options on the real page, phone and desktop. Which sounds like you?" },
+          { from: "you", text: "The second one." },
+          { from: "them", name: "Sam", text: "Done. It’s on the preview link." },
+        ],
+      },
+      tally: {
+        diy: "Just you, and a template that doesn’t bend.",
+        agency: "4 people, 3 handoffs, wait for the next round.",
+        sam: "1 person. You choose on the real page.",
+      },
+    },
+    {
+      id: "page",
+      label: "“We’ve got a new offer. Can we add a page?”",
+      threads: {
+        diy: [
+          { from: "you", text: "We need a page for our new offer." },
+          { from: "them", name: "Builder", text: "Your plan includes 5 pages. Upgrade to Business to add more." },
+          { from: "you", text: "Upgraded. Where does it go in the menu?" },
+          { from: "you", text: "Why does this page look different from the others?" },
+        ],
+        agency: [
+          { from: "you", text: "We need a page for our new offer." },
+          { from: "them", name: "Account manager", text: "Love it. I’ll scope it with the team." },
+          { from: "them", name: "Account manager", text: "Here’s a change request to sign." },
+          { from: "them", name: "Account manager", text: "It’s booked in for when design and dev both have space." },
+        ],
+        sam: [
+          { from: "you", text: "We need a page for our new offer." },
+          { from: "them", name: "Sam", text: "Good idea. It’s outside the plan, so here’s the price before I start anything." },
+          { from: "you", text: "Go for it." },
+          { from: "them", name: "Sam", text: "It’s built from the same parts as the rest of the site, so it matches. Have a look." },
+        ],
+      },
+      tally: {
+        diy: "Just you, an upgrade, and a page that doesn’t match.",
+        agency: "3 people, a change request and a queue.",
+        sam: "1 person. Price first, no surprise invoices.",
+      },
+    },
+    {
+      id: "phone",
+      label: "“It looks a bit off on my phone.”",
+      threads: {
+        diy: [
+          { from: "you", text: "It looks a bit off on my phone." },
+          { from: "them", name: "Help centre", text: "Mobile layout is generated automatically and can’t be edited separately." },
+          { from: "you", text: "So… how do I fix it?" },
+        ],
+        agency: [
+          { from: "you", text: "It looks a bit off on my phone." },
+          { from: "them", name: "Account manager", text: "Could you send a screenshot, your phone model and browser?" },
+          { from: "them", name: "Account manager", text: "Thanks — I’ve logged a ticket with QA." },
+          { from: "them", name: "Account manager", text: "QA has passed it to development." },
+        ],
+        sam: [
+          { from: "you", text: "It looks a bit off on my phone." },
+          { from: "them", name: "Sam", text: "Good catch. I built it, so I know where to look. Fixed on the preview link — check again?" },
+          { from: "you", text: "Sorted." },
+        ],
+      },
+      tally: {
+        diy: "Just you, and a help article.",
+        agency: "3 people and a ticket number.",
+        sam: "1 person, who built it.",
+      },
+    },
+  ],
+};
+
 export const quote = {
   text: "The scroll-driven site genuinely feels alive — it has become my best tool for bringing new runners on board.",
   name: "Gijs de Jong",
