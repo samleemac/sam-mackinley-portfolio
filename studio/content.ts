@@ -320,11 +320,34 @@ export const practice: {
 };
 
 export const quote = {
-  text: "The scroll-driven site genuinely feels alive — it has become my best tool for bringing new runners on board.",
+  text: "The scroll-driven site genuinely feels alive — it captures the energy of my coaching perfectly. It has become my best tool for bringing new runners on board.",
   name: "Gijs de Jong",
   role: "Running Coach · Gijs Running",
   site: "Gijs Running", // title in `work`
 };
+
+// More client reviews, word for word from the portfolio's Testimonials view
+// (index.html → TESTIMONIALS). `site` is a title in `work`.
+export const reviews: { text: string; name: string; role: string; site: string }[] = [
+  {
+    text: "Sam took our old website and made it much more professional and sleek. It looks great and our clients find it easy to use.",
+    name: "Lyndi",
+    role: "Owner · Elle Vie",
+    site: "Elle Vie",
+  },
+  {
+    text: "Professional from the first call to launch. Sam delivered a clean, trustworthy website that finally matches the quality of the work we do out in the field.",
+    name: "James",
+    role: "Owner · James Agro BV",
+    site: "James Agro",
+  },
+  {
+    text: "We handed over a rough idea and Sam turned it into a fast, beautiful app. The little design details are exactly what makes our home cooks keep coming back.",
+    name: "Sara",
+    role: "Founder · Recipy",
+    site: "Recipy",
+  },
+];
 
 export const testimonial = {
   name: "Paula Dawson",

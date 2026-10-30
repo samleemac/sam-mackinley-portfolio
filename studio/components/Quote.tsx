@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { Fragment, useState, type ReactNode } from "react";
 import { PillTag } from "@/components/PillTag";
-import { quote, testimonial, work } from "@/content";
+import { quote, reviews, testimonial, work } from "@/content";
 import { cx } from "@/lib/cx";
 import styles from "./Quote.module.css";
 
@@ -41,7 +41,15 @@ function markUp(paragraph: string, active: string | null): ReactNode[] {
   return out;
 }
 
-function SiteStrip({ title, label }: { title: string; label: string }) {
+function SiteStrip({
+  title,
+  label,
+  light,
+}: {
+  title: string;
+  label: string;
+  light?: boolean;
+}) {
   const site = siteFor(title);
   if (!site) return null;
   return (
@@ -49,7 +57,7 @@ function SiteStrip({ title, label }: { title: string; label: string }) {
       href={site.href}
       target="_blank"
       rel="noreferrer noopener"
-      className={styles.site}
+      className={cx(styles.site, light && styles.siteLight)}
     >
       <span className={styles.siteShot}>
         <Image src={site.image} alt="" fill sizes="(max-width: 1024px) 40vw, 18rem" className={styles.siteImg} />
@@ -137,9 +145,34 @@ export function Quote() {
                 <span className={styles.role}>{testimonial.role}</span>
               </span>
             </figcaption>
-            <SiteStrip title={testimonial.site} label="The site she’s talking about" />
+            <SiteStrip title={testimonial.site} label="The site she’s talking about" light />
           </figure>
         </div>
+
+        <ul className={styles.more}>
+          {reviews.map((review) => (
+            <li key={review.name}>
+              <figure className={styles.card}>
+                <span className={styles.cardMark} aria-hidden="true">
+                  “
+                </span>
+                <blockquote className={styles.cardText}>
+                  <p>{review.text}</p>
+                </blockquote>
+                <figcaption className={styles.who}>
+                  <span className={cx(styles.avatar, styles.avatarLight)} aria-hidden="true">
+                    {review.name.charAt(0)}
+                  </span>
+                  <span>
+                    <span className={styles.name}>{review.name}</span>
+                    <span className={styles.role}>{review.role}</span>
+                  </span>
+                </figcaption>
+                <SiteStrip title={review.site} label="The site" light />
+              </figure>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );

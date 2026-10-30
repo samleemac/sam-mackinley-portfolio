@@ -16,6 +16,7 @@
 
 .grid {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 1.6rem;
 }
 
@@ -114,6 +115,7 @@
 
 .punch {
   position: relative;
+  min-width: 0;
   margin: 0;
   display: flex;
   flex-direction: column;
@@ -153,6 +155,7 @@
 /* ---------- Paula's letter ---------- */
 
 .letter {
+  min-width: 0;
   margin: 0;
   display: flex;
   flex-direction: column;
@@ -163,7 +166,7 @@
   color: var(--color-primary);
 }
 
-.letter .site {
+.siteLight {
   background: var(--color-surface);
 }
 
@@ -260,7 +263,59 @@
   background-size: 100% 0;
 }
 
+/* ---------- More reviews ---------- */
+
+.more {
+  margin: 1.6rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.6rem;
+}
+
+.more > li {
+  min-width: 0;
+}
+
+.card {
+  position: relative;
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2.4rem;
+  padding: 2.8rem 2.4rem 2.4rem;
+  border-radius: 3.2rem;
+  background: var(--color-neutral);
+  color: var(--color-primary);
+}
+
+.cardMark {
+  font: 800 6.4rem / 0.6 var(--font-display), sans-serif;
+  color: var(--color-tertiary);
+  height: 3.2rem;
+}
+
+.cardText {
+  margin: 0;
+  flex: 1;
+}
+
+.cardText p {
+  margin: 0;
+  font: 600 2rem / 1.35 var(--font-display), sans-serif;
+  letter-spacing: -0.04rem;
+  text-wrap: pretty;
+}
+
 /* ---------- Layout ---------- */
+
+@media screen and (640px <= width < 1025px) {
+  .more {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
 
 @media screen and (width < 1025px) {
   .punch {
@@ -307,8 +362,12 @@
   }
 
   .punchText p {
-    font-size: 4.4rem;
-    letter-spacing: -0.16rem;
+    font-size: 4rem;
+    letter-spacing: -0.15rem;
+  }
+
+  .more {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .letter {
@@ -326,7 +385,7 @@
     background: #ffffff24;
   }
 
-  .letter .site:hover {
+  .siteLight:hover {
     background: var(--color-grey-100);
   }
 
