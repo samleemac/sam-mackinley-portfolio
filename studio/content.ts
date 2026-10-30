@@ -150,22 +150,20 @@ export const process = {
 
 // Starting prices for Launch and Site — read by the Process planner.
 export const plans = [
-  { id: "launch", name: "Launch", price: "£2,500" },
-  { id: "site", name: "Site", price: "£6,500" },
+  { id: "launch", name: "Launch", price: "€500" },
+  { id: "site", name: "Site", price: "€1,300" },
 ];
 
 // #plans — Partner (monthly, recommended) or pick and mix (one-off).
-// ALL PRICES HERE ARE STARTING POINTS: set your own. Pick and mix is
-// calibrated so design + build + copy advice for one page = the £2,500
-// Launch price; Partner keeps the old £1,500/12h anchor (£125/h) with a
-// small discount as hours go up.
+// All prices in euros and are starting points. Design and build are priced
+// by site size: 1–10 pages, 10–50 pages (double), 50+ quoted.
 export const pricing = {
   partner: {
     tiers: [
-      { hours: 10, price: 1250, example: "A new page plus a round of changes each month" },
-      { hours: 15, price: 1800, example: "A campaign or offer page every month, with room for tweaks" },
-      { hours: 20, price: 2300, example: "A whole new section of the site over a month or two" },
-      { hours: 25, price: 2750, example: "A steady stream of new pages, features and campaigns" },
+      { hours: 10, price: 250, example: "A new page plus a round of changes each month" },
+      { hours: 15, price: 360, example: "A campaign or offer page every month, with room for tweaks" },
+      { hours: 20, price: 460, example: "A whole new section of the site over a month or two" },
+      { hours: 25, price: 550, example: "A steady stream of new pages, features and campaigns" },
     ],
     beyond: "More than 25 hours? Let’s talk.",
     includes: [
@@ -176,61 +174,60 @@ export const pricing = {
     ],
   },
   pages: [
-    { id: "1", label: "1 page" },
-    { id: "5", label: "Up to 5 pages" },
-    { id: "10", label: "Up to 10 pages" },
-    { id: "more", label: "10+ pages" },
+    { id: "small", label: "1–10 pages" },
+    { id: "large", label: "10–50 pages" },
+    { id: "more", label: "50+ pages" },
   ],
   items: [
     {
       id: "design",
       name: "Web design",
       what: "How your site looks and reads: layout, type, colour and every page designed before it’s built.",
-      byPages: [1000, 2500, 3800],
+      byPages: [500, 1000],
     },
     {
       id: "build",
       name: "Website build",
       what: "Your design turned into a fast, working site that’s great on phones and easy to find.",
-      byPages: [1000, 2500, 3800],
+      byPages: [500, 1000],
     },
     {
       id: "copy",
       name: "Website copy advice",
       what: "Help with the words: headlines, page structure and what to say so visitors take the next step.",
-      price: 500,
+      price: 100,
     },
     {
       id: "seo",
       name: "SEO setup",
       what: "Set up to be found: search terms, page titles, Google Business profile and analytics.",
-      price: 450,
+      price: 90,
     },
     {
       id: "cms",
       name: "Database / CMS",
       what: "Your services, products, team or posts stored as content, not hard-coded, so the site can grow without a rebuild.",
-      price: 900,
+      price: 180,
     },
     {
       id: "admin",
       name: "Admin backend",
       what: "Your own private login to edit what’s in the CMS: add a treatment, change a price, post news. No code, no waiting for me.",
-      price: 700,
+      price: 140,
       needs: "cms",
     },
     {
       id: "hosting",
       name: "Website hosting",
       what: "Fast, secure hosting on your domain, kept running for you.",
-      monthly: 30,
+      monthly: 6,
     },
   ] as {
     id: string;
     name: string;
     what: string;
     price?: number;
-    byPages?: [number, number, number];
+    byPages?: [number, number]; // 1–10 pages, 10–50 pages (double)
     monthly?: number;
     needs?: string;
   }[],
@@ -676,9 +673,9 @@ export const brief = {
     plan: {
       label: "What do you need?",
       options: [
-        { id: "launch", label: "One sharp page", phrase: "one sharp page that asks for the action", price: "£2,500", time: "typically 3–4 weeks" },
-        { id: "site", label: "A full site", phrase: "a full marketing site with room to grow", price: "£6,500", time: "typically 6–10 weeks" },
-        { id: "partner", label: "Ongoing help", phrase: "ongoing design and build each month", price: "£1,250/mo", time: "10–25 hours a month" },
+        { id: "launch", label: "One sharp page", phrase: "one sharp page that asks for the action", price: "€500", time: "typically 3–4 weeks" },
+        { id: "site", label: "A full site", phrase: "a full marketing site with room to grow", price: "€1,300", time: "typically 6–10 weeks" },
+        { id: "partner", label: "Ongoing help", phrase: "ongoing design and build each month", price: "€250/mo", time: "10–25 hours a month" },
         { id: "unsure", label: "Not sure yet", phrase: "help working out what I need", price: "", time: "" },
       ],
     },

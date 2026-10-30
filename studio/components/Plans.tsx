@@ -10,14 +10,14 @@ import styles from "./Plans.module.css";
 type Path = "partner" | "mix";
 type PagesId = (typeof pricing.pages)[number]["id"];
 
-const gbp = (n: number) => `£${n.toLocaleString("en-GB")}`;
+const eur = (n: number) => `€${n.toLocaleString("en-GB")}`;
 const tiers = pricing.partner.tiers;
 const BEYOND = tiers.length; // slider stop after the last tier = "25+"
 
 export function Plans() {
   const [path, setPath] = useState<Path>("partner");
   const [stop, setStop] = useState(1);
-  const [pages, setPages] = useState<PagesId>("5");
+  const [pages, setPages] = useState<PagesId>("small");
   const [picked, setPicked] = useState<Set<string>>(
     () => new Set(["design", "build"]),
   );
@@ -62,16 +62,16 @@ export function Plans() {
   }, [picked, pages, pageIndex, pagesLabel]);
 
   const partnerNote = tier
-    ? `Partner: up to ${tier.hours} hours a month (${gbp(tier.price)}/month).`
+    ? `Partner: up to ${tier.hours} hours a month (${eur(tier.price)}/month).`
     : "Partner: more than 25 hours a month — let’s talk.";
   const partnerHref = `/contact?plan=partner&note=${encodeURIComponent(partnerNote)}`;
 
   const mixNote = mix.lines.length
     ? `My pick and mix: ${mix.lines.map((l) => l.label).join(", ")}. Estimate: ${
-        mix.quote ? "to be quoted" : `from ${gbp(mix.oneOff)}`
-      }${mix.monthly ? ` + ${gbp(mix.monthly)}/month` : ""}.`
+        mix.quote ? "to be quoted" : `from ${eur(mix.oneOff)}`
+      }${mix.monthly ? ` + ${eur(mix.monthly)}/month` : ""}.`
     : "";
-  const mixPlan = pages === "1" ? "launch" : "site";
+  const mixPlan = "site";
   const mixHref = `/contact?plan=${mixPlan}${mixNote ? `&note=${encodeURIComponent(mixNote)}` : ""}`;
   const nudge = picked.has("hosting") || picked.has("seo");
 
@@ -170,7 +170,7 @@ export function Plans() {
                 step={1}
                 value={stop}
                 onChange={(event) => setStop(Number(event.target.value))}
-                aria-valuetext={tier ? `${tier.hours} hours, ${gbp(tier.price)} a month` : "More than 25 hours, let’s talk"}
+                aria-valuetext={tier ? `${tier.hours} hours, ${eur(tier.price)} a month` : "More than 25 hours, let’s talk"}
                 style={{ "--fill": `${(stop / BEYOND) * 100}%` } as React.CSSProperties}
               />
               <div className={styles.stops} aria-hidden="true">
@@ -188,12 +188,12 @@ export function Plans() {
                 {tier ? (
                   <>
                     <p className={styles.price}>
-                      {gbp(tier.price)}
+                      {eur(tier.price)}
                       <span>/month</span>
                     </p>
                     <p className={styles.priceNote}>
                       Up to {tier.hours} hours, never a minimum. Works out at{" "}
-                      {gbp(Math.round(tier.price / tier.hours))} an hour, with hosting, SEO and upkeep included.
+                      {eur(Math.round(tier.price / tier.hours))} an hour, with hosting, SEO and upkeep included.
                     </p>
                   </>
                 ) : (
@@ -240,10 +240,10 @@ export function Plans() {
                   const price = item.byPages
                     ? pages === "more"
                       ? "Quoted"
-                      : gbp(item.byPages[pageIndex])
+                      : eur(item.byPages[pageIndex])
                     : item.monthly
-                      ? `${gbp(item.monthly)}/mo`
-                      : gbp(item.price ?? 0);
+                      ? `${eur(item.monthly)}/mo`
+                      : eur(item.price ?? 0);
                   const needs = item.needs ? pricing.items.find((x) => x.id === item.needs)?.name : null;
                   return (
                     <li key={item.id}>
@@ -275,8 +275,8 @@ export function Plans() {
               <span className={styles.barTotal}>
                 <span>{mix.lines.length} picked</span>
                 <strong>
-                  {mix.quote ? "Quoted" : gbp(mix.oneOff)}
-                  {mix.monthly ? ` + ${gbp(mix.monthly)}/mo` : ""}
+                  {mix.quote ? "Quoted" : eur(mix.oneOff)}
+                  {mix.monthly ? ` + ${eur(mix.monthly)}/mo` : ""}
                 </strong>
               </span>
               <a href="#mix-receipt" className={styles.barBtn} tabIndex={-1}>
@@ -295,8 +295,8 @@ export function Plans() {
                         {line.oneOff === null
                           ? "Quoted"
                           : line.monthly
-                            ? `${gbp(line.monthly)}/mo`
-                            : gbp(line.oneOff)}
+                            ? `${eur(line.monthly)}/mo`
+                            : eur(line.oneOff)}
                       </span>
                     </li>
                   ))}
@@ -306,12 +306,12 @@ export function Plans() {
               )}
               <div className={styles.total}>
                 <span>One-off, from</span>
-                <strong>{mix.quote ? "Quoted" : gbp(mix.oneOff)}</strong>
+                <strong>{mix.quote ? "Quoted" : eur(mix.oneOff)}</strong>
               </div>
               {mix.monthly ? (
                 <div className={styles.total}>
                   <span>Monthly</span>
-                  <strong>{gbp(mix.monthly)}/mo</strong>
+                  <strong>{eur(mix.monthly)}/mo</strong>
                 </div>
               ) : null}
 
