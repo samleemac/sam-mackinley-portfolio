@@ -22,16 +22,6 @@ export const hero = {
     "One designer, first sketch to launch. 8+ years, 20+ projects.",
 };
 
-export const craftMarks = [
-  "Type",
-  "Motion",
-  "Interface",
-  "Narrative",
-  "Code",
-  "Launch",
-  "Care",
-];
-
 export const services: {
   id: string;
   title: string;
@@ -349,7 +339,7 @@ export const faqs = [
   },
   {
     q: "How do we start?",
-    a: "Email samleemac@outlook.com with a short brief. If it looks like a fit, we book a call, agree the package, and I send a simple proposal.",
+    a: "Tap through the short brief on the Start a project page — it takes a minute — or email samleemac@outlook.com. If it looks like a fit, we book a call, agree the package, and I send a simple proposal.",
   },
   {
     q: "Who owns the site when we finish?",
@@ -414,10 +404,10 @@ export const brief = {
 
 export const nav = [
   { label: "Work", href: "#work" },
-  { label: "Templates", href: "/templates" },
   { label: "Services", href: "#services" },
   { label: "Plans", href: "#plans" },
   { label: "Process", href: "#process" },
+  { label: "Templates", href: "/templates" },
   { label: "Portfolio", href: site.portfolioUrl },
 ];
 

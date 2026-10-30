@@ -32,6 +32,7 @@ export function Hero() {
             {hero.cta}
           </Button>
         </div>
+        <p className={styles.proof}>{hero.proof}</p>
       </div>
     </section>
   );

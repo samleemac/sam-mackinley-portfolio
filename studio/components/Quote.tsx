@@ -82,24 +82,6 @@ export function Quote() {
           </figure>
         </div>
       </section>
-      <section className="global-section">
-        <div className="container">
-          <div className={styles.content}>
-            <h2 className={styles.text}>
-              “Always shipping. Always learning. Always finishing what I start.”
-            </h2>
-            <p className={styles.meta}>
-              <span className={styles.avatar} aria-hidden="true">
-                S
-              </span>
-              <span className={styles.who}>
-                <span className={styles.name}>Sam MacKinley</span>
-                <span className={styles.role}>Designer & builder</span>
-              </span>
-            </p>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }
