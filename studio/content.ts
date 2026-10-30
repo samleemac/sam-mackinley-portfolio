@@ -294,41 +294,60 @@ export const audiences: {
   },
 ];
 
-export const work = [
+// Client work. `live` sites are embedded and usable in the Work section;
+// `for` is the audience id the "I want one like this" button pre-picks
+// in the brief (omit for a plain /contact).
+export const work: {
+  title: string;
+  meta: string;
+  image: string;
+  href: string;
+  live: boolean;
+  for?: string;
+  note: string;
+}[] = [
   {
     title: "Elle Vie",
     meta: "Hair & beauty salon",
     image: "/work/ellevie.jpg",
     href: "https://www.elleviebelper.co.uk",
-    ratio: "wide" as const,
-  },
-  {
-    title: "Gijs Running",
-    meta: "Running coach",
-    image: "/work/gijs.jpg",
-    href: "https://sammackinley.com",
-    ratio: "wide" as const,
+    live: true,
+    for: "hair",
+    note: "A calm, premium front door for a local salon. Make a reservation is the first thing you can do.",
   },
   {
     title: "James Agro",
     meta: "Earthworks & transport",
     image: "/work/james.jpg",
     href: "https://james-agro-website.vercel.app",
-    ratio: "wide" as const,
+    live: true,
+    for: "trades",
+    note: "Services, areas and a quote button within one scroll, in two languages.",
   },
   {
-    title: "Recipy",
-    meta: "Recipe app",
-    image: "/work/recipy.jpg",
-    href: "https://recipy-henna.vercel.app",
-    ratio: "wide" as const,
+    title: "Gijs Running",
+    meta: "Running coach",
+    image: "/work/gijs.jpg",
+    href: "https://sammackinley.com",
+    live: false,
+    for: "athletic",
+    note: "A scroll-driven site that feels like a run, built to bring new runners on board.",
   },
   {
     title: "Routes2Change",
     meta: "Community wellbeing",
     image: "/work/routes2change.jpg",
     href: "https://www.routes2change.co.uk",
-    ratio: "wide" as const,
+    live: true,
+    note: "A warm, clear multi-page site for a community interest company, built from two reference sites and a few ideas.",
+  },
+  {
+    title: "Recipy",
+    meta: "Recipe app",
+    image: "/work/recipy.jpg",
+    href: "https://recipy-henna.vercel.app",
+    live: true,
+    note: "A recipe library you can search, filter and cook from, designed like a magazine.",
   },
 ];
 
