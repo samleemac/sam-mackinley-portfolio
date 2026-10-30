@@ -17,14 +17,18 @@ export function Hero() {
   const [front, setFront] = useState(0);
   const [paused, setPaused] = useState(false);
 
+  // Auto-advance. Keyed on `front` so a manual flick restarts the clock.
   useEffect(() => {
     if (paused || sites.length < 2) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const timer = window.setInterval(() => {
+    const timer = window.setTimeout(() => {
       setFront((index) => (index + 1) % sites.length);
     }, CYCLE_MS);
-    return () => window.clearInterval(timer);
-  }, [paused]);
+    return () => window.clearTimeout(timer);
+  }, [front, paused]);
+
+  const step = (by: number) =>
+    setFront((index) => (index + by + sites.length) % sites.length);
 
   return (
     <section className={styles.hero}>
@@ -68,53 +72,78 @@ export function Hero() {
           </p>
         </div>
 
-        <div
-          className={styles.stack}
-          role="group"
-          aria-label="Recent client sites"
-          onPointerEnter={() => setPaused(true)}
-          onPointerLeave={() => setPaused(false)}
-          onFocus={() => setPaused(true)}
-          onBlur={() => setPaused(false)}
-        >
-          {sites.map((site, index) => {
-            const depth = (index - front + sites.length) % sites.length;
-            return (
+        <div className={styles.showcase}>
+          <div
+            className={styles.stack}
+            role="group"
+            aria-label="Recent client sites"
+            onPointerEnter={() => setPaused(true)}
+            onPointerLeave={() => setPaused(false)}
+            onFocus={() => setPaused(true)}
+            onBlur={() => setPaused(false)}
+          >
+            <div className={styles.flick}>
               <button
-                key={site.title}
                 type="button"
-                className={cx(styles.card, styles[`depth${depth}`])}
-                aria-label={`${site.title}, ${site.meta}${depth === 0 ? " (showing)" : " — bring to front"}`}
-                aria-pressed={depth === 0}
-                onClick={() => setFront(index)}
+                className={styles.arrow}
+                aria-label="Previous site"
+                onClick={() => step(-1)}
               >
-                <span className={styles.chrome} aria-hidden="true">
-                  <span className={styles.lights}>
-                    <i />
-                    <i />
-                    <i />
-                  </span>
-                  <span className={styles.url}>
-                    {site.href.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "")}
-                  </span>
-                </span>
-                <span className={styles.shot}>
-                  <Image
-                    src={site.image}
-                    alt=""
-                    fill
-                    sizes="(max-width: 1024px) 86vw, 44vw"
-                    className={styles.img}
-                    priority={index === 0}
-                  />
-                </span>
-                <span className={styles.label} aria-hidden="true">
-                  <strong>{site.title}</strong> {site.meta}
-                </span>
+                <span aria-hidden="true">←</span>
               </button>
-            );
-          })}
-        </div>
+              <span className={styles.count}>
+                <span className="visually-hidden">Showing </span>
+                {front + 1} / {sites.length}
+                <span className="visually-hidden">: {sites[front]?.title}</span>
+              </span>
+              <button
+                type="button"
+                className={styles.arrow}
+                aria-label="Next site"
+                onClick={() => step(1)}
+              >
+                <span aria-hidden="true">→</span>
+              </button>
+            </div>
+            {sites.map((site, index) => {
+              const depth = (index - front + sites.length) % sites.length;
+              return (
+                <button
+                  key={site.title}
+                  type="button"
+                  className={cx(styles.card, styles[`depth${depth}`])}
+                  aria-label={`${site.title}, ${site.meta}${depth === 0 ? " (showing)" : " — bring to front"}`}
+                  aria-pressed={depth === 0}
+                  onClick={() => setFront(index)}
+                >
+                  <span className={styles.chrome} aria-hidden="true">
+                    <span className={styles.lights}>
+                      <i />
+                      <i />
+                      <i />
+                    </span>
+                    <span className={styles.url}>
+                      {site.href.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "")}
+                    </span>
+                  </span>
+                  <span className={styles.shot}>
+                    <Image
+                      src={site.image}
+                      alt=""
+                      fill
+                      sizes="(max-width: 1024px) 86vw, 44vw"
+                      className={styles.img}
+                      priority={index === 0}
+                    />
+                  </span>
+                  <span className={styles.label} aria-hidden="true">
+                    <strong>{site.title}</strong> {site.meta}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+          </div>
       </div>
     </section>
   );

@@ -113,13 +113,67 @@
 
 /* ---------- Stack of real sites ---------- */
 
+.showcase {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  opacity: 0;
+  animation: fadeUp 0.9s var(--ease-expo) 0.35s forwards;
+}
+
+.flick {
+  position: absolute;
+  top: -5.6rem;
+  right: 0;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem;
+  border-radius: 5rem;
+  background: var(--color-neutral);
+}
+
+.arrow {
+  appearance: none;
+  display: grid;
+  place-items: center;
+  width: 4rem;
+  height: 4rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--color-surface);
+  color: var(--color-primary);
+  font: 600 1.8rem / 1 var(--font-display), sans-serif;
+  cursor: pointer;
+  transition:
+    transform 0.35s var(--ease-spring),
+    background 0.2s var(--ease-standard);
+}
+
+.arrow:focus-visible {
+  outline: 0.2rem solid var(--color-tertiary);
+  outline-offset: 0.2rem;
+}
+
+.arrow:active {
+  transform: scale(0.9);
+}
+
+.count {
+  min-width: 5.2rem;
+  text-align: center;
+  font: 600 1.4rem / 1 var(--font-display), sans-serif;
+  color: var(--color-primary);
+  font-variant-numeric: tabular-nums;
+}
+
 .stack {
   position: relative;
   aspect-ratio: 1280 / 760;
   width: 100%;
-  margin-top: 1.6rem;
-  opacity: 0;
-  animation: fadeUp 0.9s var(--ease-expo) 0.35s forwards;
+  margin-top: 6.4rem;
 }
 
 .card {
@@ -312,7 +366,14 @@
   }
 
   .stack {
-    margin-top: 6rem;
+    margin-top: 0;
+  }
+
+  /* Sit in the empty corner above the front card; the fan rises on the right. */
+  .flick {
+    top: 0.8rem;
+    right: auto;
+    left: 0;
   }
 }
 
@@ -326,6 +387,11 @@
   .chip:hover {
     transform: translateY(-0.2rem);
     background: var(--color-violet-300);
+  }
+
+  .arrow:hover {
+    background: var(--color-lime-400);
+    transform: scale(1.06);
   }
 
   .chipOther:hover {
@@ -350,7 +416,7 @@
   .lede,
   .start,
   .proof,
-  .stack {
+  .showcase {
     opacity: 1;
     transform: none;
     animation: none;
@@ -358,7 +424,8 @@
 
   .card,
   .label,
-  .chip {
+  .chip,
+  .arrow {
     transition: none;
   }
 }
