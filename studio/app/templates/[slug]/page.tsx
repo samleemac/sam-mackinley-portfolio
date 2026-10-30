@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { TemplatePreview } from "@/components/TemplatePreview";
-import { site } from "@/content";
+import { site, templateLooks } from "@/content";
 import { getTemplate, getTemplates } from "@/lib/templates";
 import styles from "./page.module.css";
 
@@ -28,12 +28,22 @@ export async function generateMetadata({
   };
 }
 
+function first(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
 export default async function TemplateDemoPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const { slug } = await params;
+  const query = await searchParams;
+  const look = templateLooks.find((item) => item.id === first(query.look));
+  const name = (first(query.name) ?? "").slice(0, 28);
+  const skin = look || name ? { look: look ?? templateLooks[0], name } : undefined;
   const template = getTemplate(slug);
 
   if (!template) {
@@ -63,6 +73,7 @@ export default async function TemplateDemoPage({
         src={template.previewSrc}
         title={template.title}
         fill
+        skin={skin}
       />
     </main>
   );

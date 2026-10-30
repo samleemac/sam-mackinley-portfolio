@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { cx } from "@/lib/cx";
+import { applySkin, type Skin } from "@/lib/skin";
 import styles from "./TemplatePreview.module.css";
 
 const widths = [
@@ -22,9 +23,16 @@ type TemplatePreviewProps = {
   src: string;
   title: string;
   fill?: boolean;
+  /** Live re-skin applied inside the template iframe. */
+  skin?: Skin;
 };
 
-export function TemplatePreview({ src, title, fill }: TemplatePreviewProps) {
+export function TemplatePreview({
+  src,
+  title,
+  fill,
+  skin,
+}: TemplatePreviewProps) {
   const [width, setWidth] = useState<WidthId>("desktop");
   const [ready, setReady] = useState(false);
   const [full, setFull] = useState(false);
@@ -33,6 +41,16 @@ export function TemplatePreview({ src, title, fill }: TemplatePreviewProps) {
   const screenRef = useRef<HTMLDivElement>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
+  const frameRef = useRef<HTMLIFrameElement>(null);
+  const fullFrameRef = useRef<HTMLIFrameElement>(null);
+  const skinRef = useRef(skin);
+
+  // Re-skin both frames whenever the skin changes; onLoad covers fresh frames.
+  useEffect(() => {
+    skinRef.current = skin;
+    applySkin(frameRef.current?.contentDocument, skin);
+    applySkin(fullFrameRef.current?.contentDocument, skin);
+  }, [skin]);
   const size = native[width];
 
   useEffect(() => {
@@ -126,7 +144,11 @@ export function TemplatePreview({ src, title, fill }: TemplatePreviewProps) {
                   className={styles.iframe}
                   width={size.width}
                   height={size.height}
-                  onLoad={() => setReady(true)}
+                  ref={frameRef}
+                  onLoad={(event) => {
+                    applySkin(event.currentTarget.contentDocument, skinRef.current);
+                    setReady(true);
+                  }}
                 />
               </div>
             </div>
@@ -167,7 +189,11 @@ export function TemplatePreview({ src, title, fill }: TemplatePreviewProps) {
             src={src}
             title={`${title} full screen`}
             className={styles.fullFrame}
-            onLoad={() => setFullReady(true)}
+            ref={fullFrameRef}
+            onLoad={(event) => {
+              applySkin(event.currentTarget.contentDocument, skinRef.current);
+              setFullReady(true);
+            }}
           />
         </dialog>
       ) : null}

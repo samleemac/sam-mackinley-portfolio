@@ -369,6 +369,178 @@ export const templateNotes: Record<
   },
 };
 
+// "Make it yours" on /templates: each look re-skins the live template via its
+// CSS variables and rewrites the nav in that trade's voice. `for` matches an
+// audience id so "Build my site from this" pre-fills the brief.
+export type TemplateLook = {
+  id: string;
+  label: string;
+  for?: string;
+  sample: string;
+  swatch: [string, string, string];
+  vars: Record<string, string>;
+  fonts?: string; // Google Fonts css2 family query
+  logoFont?: string;
+  nav?: [string, string, string, string];
+  announce?: [string, string, string];
+  action?: string;
+  hero?: string; // CSS background for the demo hero (kept dark: the nav sits light over it)
+  headline?: string;
+};
+
+export const templateLooks: TemplateLook[] = [
+  {
+    id: "original",
+    label: "Original",
+    sample: "Brand",
+    swatch: ["#ffffff", "#f4f2ee", "#1c1c1a"],
+    vars: {},
+  },
+  {
+    id: "salon",
+    label: "Salon",
+    for: "hair",
+    sample: "Lumen Hair",
+    swatch: ["#fbf6f3", "#f1e2da", "#2b1d1a"],
+    vars: {
+      "--c-ink": "#2b1d1a",
+      "--c-ink-soft": "#7d655d",
+      "--c-paper": "#fbf6f3",
+      "--c-cream": "#f1e2da",
+      "--c-bar": "#2b1d1a",
+      "--c-bar-text": "#f1e2da",
+      "--c-rule": "rgba(43,29,26,0.12)",
+      "--c-placeholder": "#e6d1c6",
+      "--font-sans": '"DM Sans", system-ui, sans-serif',
+    },
+    fonts: "family=Fraunces:opsz,wght@9..144,500&family=DM+Sans:wght@400;500",
+    logoFont: '"Fraunces", Georgia, serif',
+    nav: ["Book.", "Treatments.", "Our team.", "About."],
+    announce: [
+      "New clients: 20% off your first cut.",
+      "Late opening Thursdays until 8pm.",
+      "Gift vouchers, sent by email.",
+    ],
+    action: "Book a chair",
+    hero: "radial-gradient(120% 90% at 80% 10%, #9a6553 0%, #4a2c25 48%, #2b1d1a 100%)",
+    headline: "Hair that still looks good on Monday morning.",
+  },
+  {
+    id: "trades",
+    label: "Trades",
+    for: "trades",
+    sample: "Hartley & Sons",
+    swatch: ["#ffffff", "#ffcc00", "#0f1b2d"],
+    vars: {
+      "--c-ink": "#0f1b2d",
+      "--c-ink-soft": "#566274",
+      "--c-paper": "#ffffff",
+      "--c-cream": "#eef1f5",
+      "--c-bar": "#ffcc00",
+      "--c-bar-text": "#0f1b2d",
+      "--c-rule": "rgba(15,27,45,0.14)",
+      "--c-placeholder": "#dde3ea",
+      "--font-sans": '"Archivo", system-ui, sans-serif',
+    },
+    fonts: "family=Archivo:wght@400;500;800",
+    logoFont: '"Archivo", system-ui, sans-serif',
+    nav: ["Services.", "Areas.", "Reviews.", "About."],
+    announce: [
+      "Free quotes within 24 hours.",
+      "Fully insured. Every job guaranteed.",
+      "Emergency call-outs, 7 days a week.",
+    ],
+    action: "Get a quote",
+    hero: "radial-gradient(110% 90% at 85% 10%, #2c4a74 0%, #0f1b2d 60%)",
+    headline: "Fixed right, first time. Quoted before we start.",
+  },
+  {
+    id: "cafe",
+    label: "Café",
+    for: "coffee",
+    sample: "Ember Coffee",
+    swatch: ["#f7f1e8", "#ede3d3", "#2a1a12"],
+    vars: {
+      "--c-ink": "#2a1a12",
+      "--c-ink-soft": "#7a6250",
+      "--c-paper": "#f7f1e8",
+      "--c-cream": "#ede3d3",
+      "--c-bar": "#b4552d",
+      "--c-bar-text": "#f7f1e8",
+      "--c-rule": "rgba(42,26,18,0.14)",
+      "--c-placeholder": "#e0d2bd",
+    },
+    fonts: "family=DM+Serif+Display",
+    logoFont: '"DM Serif Display", Georgia, serif',
+    nav: ["Menu.", "Beans.", "Visit us.", "Story."],
+    announce: [
+      "This week's single origin: Huila, Colombia.",
+      "Open from 7am, every day.",
+      "Subscriptions ship on Mondays.",
+    ],
+    action: "Order ahead",
+    hero: "radial-gradient(120% 90% at 15% 10%, #b4552d 0%, #5a2e1b 50%, #2a1a12 100%)",
+    headline: "Slow mornings, served fast.",
+  },
+  {
+    id: "coach",
+    label: "Coach",
+    for: "athletic",
+    sample: "Northline Coaching",
+    swatch: ["#ffffff", "#d7ff3a", "#0b0b0b"],
+    vars: {
+      "--c-ink": "#0b0b0b",
+      "--c-ink-soft": "#5c5c5c",
+      "--c-paper": "#ffffff",
+      "--c-cream": "#f2f2ee",
+      "--c-bar": "#0b0b0b",
+      "--c-bar-text": "#d7ff3a",
+      "--c-rule": "rgba(11,11,11,0.12)",
+      "--c-placeholder": "#e4e4de",
+      "--font-sans": '"Space Grotesk", system-ui, sans-serif',
+    },
+    fonts: "family=Space+Grotesk:wght@400;500;700",
+    logoFont: '"Space Grotesk", system-ui, sans-serif',
+    nav: ["Programmes.", "Results.", "Coaches.", "About."],
+    announce: [
+      "Spring 10k block starts 3 March.",
+      "First session free, no catch.",
+      "Small groups. Max eight per coach.",
+    ],
+    action: "Book a session",
+    hero: "radial-gradient(90% 70% at 85% 15%, #5f7012 0%, #1a1a1a 55%, #0b0b0b 100%)",
+    headline: "Run further than you think you can.",
+  },
+  {
+    id: "advisor",
+    label: "Advisor",
+    for: "finance",
+    sample: "Calder Advisory",
+    swatch: ["#fbfaf6", "#e7ece5", "#13322b"],
+    vars: {
+      "--c-ink": "#13322b",
+      "--c-ink-soft": "#5d6f69",
+      "--c-paper": "#fbfaf6",
+      "--c-cream": "#e7ece5",
+      "--c-bar": "#13322b",
+      "--c-bar-text": "#e7ece5",
+      "--c-rule": "rgba(19,50,43,0.12)",
+      "--c-placeholder": "#d9e1d8",
+    },
+    fonts: "family=Newsreader:opsz,wght@6..72,500",
+    logoFont: '"Newsreader", Georgia, serif',
+    nav: ["Services.", "Who we help.", "Insights.", "About."],
+    announce: [
+      "Self-assessment deadline: 31 January.",
+      "Fixed fees, agreed up front.",
+      "Chartered and regulated.",
+    ],
+    action: "Book a call",
+    hero: "radial-gradient(120% 90% at 80% 0%, #2d5a4e 0%, #13322b 60%, #0c211c 100%)",
+    headline: "Your numbers, made calm.",
+  },
+];
+
 export const notFound = {
   ledeLine1: "This URL took a wrong turn.",
   ledeLine2: "The studio did not.",

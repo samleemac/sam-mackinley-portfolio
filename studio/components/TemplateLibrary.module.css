@@ -1,5 +1,6 @@
 .section {
-  padding-top: 8rem;
+  margin-top: 0;
+  padding-top: 12rem;
 }
 
 .heading {
@@ -107,9 +108,205 @@
   align-items: center;
   justify-content: center;
   min-height: 6rem;
-  padding: 0.8rem 5rem;
+  padding: 0.8rem 3.6rem;
   background: var(--color-violet-400);
   text-decoration: none;
+}
+
+/* ---------- Make it yours ---------- */
+
+.studio {
+  display: grid;
+  gap: 2.4rem;
+  padding: 2.4rem;
+  border-radius: 2.4rem;
+  background: var(--color-neutral);
+}
+
+.control {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  min-width: 0;
+}
+
+.step {
+  font: 600 1.5rem / 1 var(--font-display), sans-serif;
+  letter-spacing: -0.02rem;
+  color: var(--color-primary);
+}
+
+.step b {
+  margin-right: 0.6rem;
+  font-weight: 600;
+  color: var(--color-grey-500);
+  font-variant-numeric: tabular-nums;
+}
+
+.name {
+  width: 100%;
+  min-height: 5.6rem;
+  padding: 1.2rem 2rem;
+  border: 0.15rem solid var(--color-grey-300);
+  border-radius: 5rem;
+  background: var(--color-surface);
+  color: var(--color-primary);
+  font: 700 2rem / 1.2 var(--font-display), sans-serif;
+  letter-spacing: -0.05rem;
+}
+
+.name::placeholder {
+  color: var(--color-grey-500);
+  font-weight: 600;
+}
+
+.name:focus {
+  outline: 0.2rem solid var(--color-primary);
+  outline-offset: 0.2rem;
+  border-color: var(--color-primary);
+}
+
+.looks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+.look {
+  appearance: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  min-height: 5.2rem;
+  padding: 0.8rem 2rem 0.8rem 1rem;
+  border-radius: 5rem;
+  border: 0.15rem solid transparent;
+  background: var(--color-surface);
+  color: var(--color-primary);
+  font: 600 1.6rem / 1 var(--font-display), sans-serif;
+  letter-spacing: -0.03rem;
+  transition:
+    transform 0.35s var(--ease-spring),
+    border-color 0.2s var(--ease-standard);
+}
+
+.lookOn {
+  border-color: var(--color-primary);
+}
+
+.look:focus-visible {
+  outline: 0.2rem solid var(--color-tertiary);
+  outline-offset: 0.3rem;
+}
+
+.look:active {
+  transform: scale(0.96);
+}
+
+.swatch {
+  display: inline-flex;
+}
+
+.swatch i {
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 0.1rem #19171c26;
+}
+
+.swatch i + i {
+  margin-left: -0.9rem;
+}
+
+.touring {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin: 0;
+  font-size: 1.4rem;
+  color: var(--color-secondary);
+}
+
+.dot {
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 50%;
+  background: var(--color-tertiary);
+  animation: pulse 1.3s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.build {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  min-height: 6rem;
+  padding: 0.8rem 3.6rem;
+  border-radius: 4rem;
+  background: var(--color-primary);
+  color: var(--color-surface);
+  font: 600 1.6rem / 1.2 var(--font-display), sans-serif;
+  letter-spacing: -0.032rem;
+  text-decoration: none;
+  transition: transform 0.3s var(--ease-overshoot-linear);
+}
+
+.build:focus-visible {
+  outline: 0.2rem solid var(--color-primary);
+  outline-offset: 0.3rem;
+}
+
+@media screen and (width >= 1025px) {
+  .studio {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    align-items: end;
+    gap: 2.4rem 4rem;
+    padding: 3.2rem 4rem;
+  }
+
+  .touring {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .look:not(.lookOn):hover {
+    border-color: var(--color-grey-300);
+    transform: translateY(-0.2rem);
+  }
+
+  .build:hover {
+    transform: scale(1.04);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .look,
+  .build {
+    transition: none;
+  }
+
+  .look:hover,
+  .build:hover {
+    transform: none;
+  }
+
+  .dot {
+    animation: none;
+  }
 }
 
 .empty {
@@ -132,7 +329,7 @@
 
 @media screen and (width >= 1025px) {
   .section {
-    padding-top: 10rem;
+    padding-top: 13rem;
   }
 
   .filters {
