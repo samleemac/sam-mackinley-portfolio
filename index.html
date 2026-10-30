@@ -643,10 +643,35 @@ section{position:relative;z-index:5}
 .polaroid .cap .nm{display:block;font-size:13px;font-weight:700;color:#23211c;letter-spacing:-.01em}
 .polaroid .cap .role{display:block;font-family:var(--font-mono);font-size:9.5px;letter-spacing:.04em;
   color:#6b6356;margin-top:3px}
-/* placeholder polaroid */
-.polaroid.ph .photo .lbl{position:relative;z-index:2;font-family:var(--font-mono);font-size:10px;
-  letter-spacing:.16em;color:rgba(255,255,255,.9);text-transform:uppercase}
-.polaroid.ph .cap .nm{color:#8a8478}
+/* "yours next" polaroid — an empty frame the visitor names */
+.polaroid.yours .photo{background:repeating-linear-gradient(135deg,#efe8d8 0 10px,#f4eee2 10px 20px);
+  flex-direction:column;align-items:stretch;justify-content:space-between;gap:8px;padding:12px;
+  outline:2px dashed #c9bda4;outline-offset:-7px}
+.yours-tag{align-self:flex-start;font-family:var(--font-mono);font-size:8.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:#8a7d62;background:#fffaf0;padding:4px 8px;border-radius:20px}
+.yours-title{margin:0;text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px}
+.yours-name{font-family:var(--font-script);font-weight:700;font-size:34px;line-height:.95;color:#2b2720;
+  max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:transform .35s cubic-bezier(.3,1.6,.5,1)}
+.polaroid.yours.named .yours-name{color:#1b1b18;transform:rotate(-3deg) scale(1.06)}
+.yours-sub{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.04em;color:#8a7d62}
+.yours-form{display:flex;gap:6px;background:#fff;border-radius:22px;padding:4px 4px 4px 12px;
+  box-shadow:0 6px 16px -10px rgba(40,30,10,.5)}
+.yours-form input{flex:1;min-width:0;border:none;outline:none;background:none;font:500 12.5px/1 var(--font-body);color:var(--ink);cursor:none}
+.yours-form input::placeholder{color:#a39b8a}
+.yours-form button{flex:none;border:none;border-radius:18px;background:var(--ink);color:#fff;cursor:none;
+  font-family:var(--font-mono);font-size:10.5px;letter-spacing:.02em;padding:8px 12px;transition:transform .2s,background .2s}
+.yours-form button:hover{transform:translateY(-1px);background:#000}
+.yours-form:focus-within{box-shadow:0 0 0 2px var(--ink),0 6px 16px -10px rgba(40,30,10,.5)}
+.polaroid.yours .cap .role a{color:#6b6356;text-decoration:underline;text-underline-offset:2px;cursor:none}
+.polaroid.yours:hover{transform:rotate(0deg) translateY(-6px) scale(1.03)}
+/* header: the way to hire */
+header nav a.hire{opacity:1;background:var(--ink);color:#fff;padding:6px 14px;border-radius:20px;margin:-6px 0;cursor:none}
+header nav a.hire::after{display:none}
+header nav a.hire:hover{background:#000}
+/* a lone last card hangs in the middle of its line */
+.line-row > .polaroid:only-of-type{grid-column:2}
+@media (max-width:900px){.line-row > .polaroid:only-of-type{grid-column:auto}}
+@media (max-width:420px){header nav{gap:14px;font-size:13px}header nav a.hire{padding:6px 11px}}
 
 /* ===================== PLAYGROUND LIGHTBOX (click to enlarge) ===================== */
 body.lb-lock{overflow:hidden}
@@ -882,6 +907,7 @@ footer .made svg{width:14px;height:14px}
     <a href="#about">About</a>
     <a href="#work">Work</a>
     <a href="#play">Playground</a>
+    <a class="hire" href="/studio" data-link="/studio">Hire me</a>
   </nav>
 </header>
 
@@ -1082,7 +1108,7 @@ footer .made svg{width:14px;height:14px}
   <div class="work-head">
     <div class="eyebrow">PLAYGROUND</div>
     <h2>Sites I've designed &amp; built</h2>
-    <p>A clothesline of recent work — hover any photo to watch it scroll.</p>
+    <p>A clothesline of client sites and new builds — hover any photo to watch it scroll. The last peg’s free.</p>
   </div>
   <div class="clothesline" id="siteGallery"></div>
 </section>
@@ -2356,11 +2382,13 @@ const PROJECTS = [
   { name: 'recipy',  title: 'Recipy',   role: 'Recipe App',             link: 'https://recipy-henna.vercel.app/index.html' },
   { name: 'ellevie', title: 'Elle Vie', role: 'Hair & Beauty Salon',    link: 'https://www.elleviebelper.co.uk' },
   { name: 'routes2change', title: 'Routes2Change', role: 'Community Wellbeing', link: 'https://routes2change.co.uk' },
+  { name: 'yoyogi',  title: 'Yoyogi',   role: 'Matcha House · New build', link: 'https://yoyogimadrid.vercel.app' },
+  { name: 'torc',    title: 'TORC',     role: 'Outdoor Trips · New build', link: 'https://torc-website-umber.vercel.app' },
+  { name: 'wrangle', title: 'Wrangle & Bloom', role: 'Equine Coaching · New build', link: 'https://wrangle-and-bloom-website.vercel.app/index.html' },
+  { name: 'faye',    title: 'Faye Ranch', role: 'Equine Sanctuary · New build', link: 'https://fayeranch.com' },
 ];
-// empty slots to fill out the board until more work is added
-const PLACEHOLDERS = [
-  { lbl: 'Coming soon', g: 'linear-gradient(135deg,#b9a7d6,#8f7cc0)' },
-];
+// the last peg on the line is left for the visitor's own site
+const STUDIO_BRIEF = '/studio/contact';
 const gallery = document.getElementById('siteGallery');
 const rot = () => (Math.random() * 6 - 3).toFixed(2) + 'deg';
 if (gallery) {
@@ -2431,7 +2459,7 @@ if (gallery) {
 
   const ITEMS = [
     ...PROJECTS.map(p => ({ kind: 'project', data: p })),
-    ...PLACEHOLDERS.map(ph => ({ kind: 'ph', data: ph })),
+    { kind: 'yours' },
   ];
   const ropeSVG = `<svg class="rope" viewBox="0 0 1000 54" preserveAspectRatio="none" aria-hidden="true">
       <path d="M0,12 Q500,46 1000,12" fill="none" stroke="#b49a6f" stroke-width="3.5" stroke-linecap="round"/>
@@ -2475,15 +2503,39 @@ if (gallery) {
     return card;
   }
 
-  function buildPlaceholderCard(ph, i) {
+  // An empty polaroid on the last peg: type your business and it's written on the photo.
+  function buildYoursCard(i) {
     const card = document.createElement('article');
-    card.className = 'polaroid ph';
+    card.className = 'polaroid yours';
     card.style.setProperty('--rot', rot());
     card.style.setProperty('--drop', DROP[i] + 'px');
     card.innerHTML = `
       <span class="peg" style="--peg:${PEG[i]}deg"></span>
-      <div class="photo" style="background:${ph.g}"><span class="lbl">${ph.lbl}</span></div>
-      <div class="cap"><span class="nm">New project</span><span class="role">in the works</span></div>`;
+      <div class="photo">
+        <span class="yours-tag">This peg’s free</span>
+        <p class="yours-title"><span class="yours-name">Your site</span><span class="yours-sub">could hang here next</span></p>
+        <form class="yours-form" novalidate>
+          <label class="visually-hidden" for="yoursInput">Your business name</label>
+          <input id="yoursInput" type="text" maxlength="32" placeholder="Your business name" autocomplete="organization" spellcheck="false" />
+          <button type="submit">Start yours <span aria-hidden="true">→</span></button>
+        </form>
+      </div>
+      <div class="cap"><span class="nm">Yours next</span><span class="role"><a href="/studio#plans">See prices ↗</a></span></div>`;
+    const input = card.querySelector('input');
+    const name = card.querySelector('.yours-name');
+    const sub = card.querySelector('.yours-sub');
+    input.addEventListener('input', () => {
+      const v = input.value.trim();
+      name.textContent = v || 'Your site';
+      sub.textContent = v ? 'next on the line' : 'could hang here next';
+      card.classList.toggle('named', !!v);
+    });
+    card.querySelector('form').addEventListener('submit', e => {
+      e.preventDefault();
+      const v = input.value.trim();
+      const note = v ? `Found you on the portfolio. I’d like a site for ${v}.` : 'Found you on the portfolio.';
+      location.href = `${STUDIO_BRIEF}?note=${encodeURIComponent(note)}`;
+    });
     return card;
   }
 
@@ -2492,7 +2544,7 @@ if (gallery) {
     row.className = 'line-row';
     row.innerHTML = ropeSVG;
     ITEMS.slice(r, r + 3).forEach((it, i) => {
-      row.appendChild(it.kind === 'project' ? buildProjectCard(it.data, i) : buildPlaceholderCard(it.data, i));
+      row.appendChild(it.kind === 'project' ? buildProjectCard(it.data, i) : buildYoursCard(i));
     });
     gallery.appendChild(row);
   }
