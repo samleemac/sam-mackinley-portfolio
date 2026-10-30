@@ -32,27 +32,70 @@ export const craftMarks = [
   "Care",
 ];
 
-export const manifesto =
-  "I think, then I build. Websites with clear messaging, motion that earns its place, and a finish line you can actually reach. Always shipping. Always learning. Always finishing what I start.";
-
-export const services = [
+export const services: {
+  id: string;
+  title: string;
+  promise: string;
+  includes: string[];
+  plans: string[];
+  work: string;
+  proof: string;
+}[] = [
   {
-    title: "Design the story",
-    description:
-      "Positioning, structure, and a visual system with a point of view — not a template with your logo dropped in.",
-    tone: "neutral" as const,
+    id: "found",
+    title: "Gets you found",
+    promise:
+      "Pages built around what your clients actually search for, fast enough that nobody gives up waiting.",
+    includes: [
+      "Page structure planned around real search terms",
+      "Fast, accessible build that holds up on a phone signal",
+      "Analytics in place from launch day",
+    ],
+    plans: ["Launch", "Site"],
+    work: "James Agro",
+    proof: "Services, areas and a quote button within one scroll.",
   },
   {
-    title: "Build the site",
-    description:
-      "Fast, accessible pages that hold up in the real world. Type, layout, and interaction treated as one craft.",
-    tone: "cyan" as const,
+    id: "booked",
+    title: "Turns visits into bookings",
+    promise:
+      "Every page leads somewhere. One clear next step — book, call, ask for a quote — never buried under the brochure.",
+    includes: [
+      "Messaging pass so the first screen says the thing",
+      "One obvious action per page",
+      "Booking, enquiry or quote path that works on the first tap",
+    ],
+    plans: ["Launch", "Site"],
+    work: "Elle Vie",
+    proof: "Make a reservation is the first thing you can do.",
   },
   {
-    title: "Keep it moving",
-    description:
-      "New pages, campaigns, and care after launch — so the site stays as sharp as the day it shipped.",
-    tone: "violet" as const,
+    id: "you",
+    title: "Looks like you, not a template",
+    promise:
+      "Type, colour and layout drawn from your business, so the site feels like walking through your door.",
+    includes: [
+      "A visual system built for your brand",
+      "Motion only where it helps",
+      "Photography and copy direction",
+    ],
+    plans: ["Site"],
+    work: "Gijs Running",
+    proof: "Built to feel like a run, not a page about running.",
+  },
+  {
+    id: "lasts",
+    title: "Keeps working after launch",
+    promise:
+      "You own it, you can run it, and when you need a new page or a campaign, it slots in without starting over.",
+    includes: [
+      "Domain and hosting in your name",
+      "A handover so you can make edits yourself",
+      "New pages and campaigns on the Partner plan",
+    ],
+    plans: ["Site", "Partner"],
+    work: "Routes2Change",
+    proof: "“Nothing ever seemed too much trouble.” — Paula Dawson",
   },
 ];
 
