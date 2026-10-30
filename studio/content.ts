@@ -323,11 +323,23 @@ export const quote = {
   text: "The scroll-driven site genuinely feels alive — it has become my best tool for bringing new runners on board.",
   name: "Gijs de Jong",
   role: "Running Coach · Gijs Running",
+  site: "Gijs Running", // title in `work`
 };
 
 export const testimonial = {
   name: "Paula Dawson",
   role: "Routes 2 Change CIC",
+  site: "Routes2Change", // title in `work`
+  // Each phrase must appear word-for-word in the paragraphs below; the
+  // review is never edited, only highlighted.
+  themes: [
+    { id: "brand", label: "Got our brand fast", phrase: "He understood our brand so quickly, even though we only had a few ideas to start with." },
+    { id: "spot", label: "Spot on first time", phrase: "he was able to create a template that was pretty much spot on straight away." },
+    { id: "trouble", label: "Nothing too much trouble", phrase: "He was really responsive to our ideas and changes, and nothing ever seemed too much trouble." },
+    { id: "advice", label: "Helpful advice", phrase: "He was also able to give us helpful advice about current website practices" },
+    { id: "calm", label: "Calm and patient", phrase: "What we appreciated most was Sam’s calm and patient approach." },
+    { id: "recommend", label: "Would recommend", phrase: "I would happily recommend Sam to anyone looking for a website" },
+  ],
   paragraphs: [
     "We absolutely loved working with Sam to create our website. He understood our brand so quickly, even though we only had a few ideas to start with. I showed him two websites that we liked the style of, and from those minimal ideas he was able to create a template that was pretty much spot on straight away.",
     "Sam was brilliant throughout the whole process. He was really responsive to our ideas and changes, and nothing ever seemed too much trouble. He was also able to give us helpful advice about current website practices, which was particularly useful as we didn’t always know what we should be asking for.",
