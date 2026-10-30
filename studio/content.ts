@@ -99,28 +99,46 @@ export const services: {
   },
 ];
 
-export const process = [
-  {
-    step: "01",
-    title: "Discover",
-    body: "What the site has to do, who it is for, and what success looks like. Constraints first, decoration last.",
+// #process — a planner, not a list. Durations match the FAQ: Launch is
+// typically 3–4 weeks, Site 6–10. `weeks` per stage drive the timeline bar
+// (a typical project); `range` drives the "live between" dates.
+export const process = {
+  stages: [
+    {
+      id: "discover",
+      title: "Discover",
+      sam: "Learn the business, the customers and what the site has to win.",
+      you: "One kickoff call, and any logins, logos or photos you already have.",
+      get: "A one-page plan: pages, the one action each asks for, and the date.",
+    },
+    {
+      id: "design",
+      title: "Design",
+      sam: "Design the key pages so you see the real thing, not a mood board.",
+      you: "Look at the designs and send your notes.",
+      get: "Designs you have signed off before any building starts.",
+    },
+    {
+      id: "build",
+      title: "Build",
+      sam: "Build it for real: fast, works on phones, ready for search.",
+      you: "Send final words and photos. Click around the preview link.",
+      get: "A working site on a private link you can share with anyone.",
+    },
+    {
+      id: "launch",
+      title: "Launch",
+      sam: "Put it live on your domain and check every page and form.",
+      you: "Say go.",
+      get: "Your site live, in your name, with a walkthrough of how to edit it.",
+    },
+  ],
+  plans: {
+    launch: { label: "Launch", weeks: [0.5, 1, 1.5, 0.5], range: [3, 4] },
+    site: { label: "Site", weeks: [1, 2, 4, 1], range: [6, 10] },
   },
-  {
-    step: "02",
-    title: "Design",
-    body: "A direction you can defend. Type, colour, and layout locked before a single component is built.",
-  },
-  {
-    step: "03",
-    title: "Build",
-    body: "Production-quality front-end. Motion with a reason. Performance and accessibility as defaults.",
-  },
-  {
-    step: "04",
-    title: "Launch",
-    body: "Ship it, measure it, and leave you with a site you can actually run — not a file you are afraid to touch.",
-  },
-];
+  partnerNote: "On Partner? It’s 12 hours a month, scoped as we go — no start line to wait for.",
+};
 
 export const plans: {
   id: string;
