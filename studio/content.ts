@@ -227,72 +227,181 @@ export const testimonial = {
   ],
 };
 
-// Drop concept images in /public/concepts and set `image: "/concepts/plumber.jpg"`.
+// "Who I'm good for": pick a line of business, the section takes on that
+// trade's colours and shows sites built for businesses like it.
+// `brief` is the /contact?for= id (omit to open the brief blank).
+// `kind`: "Client site" for live client work, "New build" for concepts and
+// sites waiting to launch.
 export const audiences: {
-  id: "trades" | "creatives" | "finance" | "athletic" | "coffee" | "hair";
+  id: string;
+  label: string;
   title: string;
   fit: string;
-  body: string;
-  tone: "grey" | "lime" | "blue" | "cyan" | "violetSoft" | "violet";
-  concepts: { label: string; image?: string }[];
+  brief?: string;
+  cta: string;
+  theme: { bg: string; ink: string; accent: string; accentInk: string };
+  needs: [string, string, string];
+  examples: {
+    title: string;
+    meta: string;
+    kind: "Client site" | "New build";
+    image: string;
+    href: string;
+  }[];
 }[] = [
   {
-    id: "trades",
-    title: "Trades",
-    fit: "Plumbers, electricians, window cleaners",
-    body: "A site that books the next job, not a template with a van photo.",
-    tone: "grey",
-    concepts: [
-      { label: "Plumber" },
-      { label: "Electrician" },
-      { label: "Window cleaner" },
+    id: "hair",
+    label: "Salons",
+    title: "Salons & beauty",
+    fit: "Hairdressers, barbers, beauty rooms",
+    brief: "hair",
+    cta: "Start a salon brief",
+    theme: { bg: "#f1e8dd", ink: "#2b1d1a", accent: "#a8834a", accentInk: "#ffffff" },
+    needs: [
+      "Booking is the first thing anyone can do",
+      "Treatments and prices that are easy to find",
+      "Photos that look like your chair, not stock",
+    ],
+    examples: [
+      {
+        title: "Elle Vie",
+        meta: "Hair & beauty salon",
+        kind: "Client site",
+        image: "/work/ellevie.jpg",
+        href: "https://www.elleviebelper.co.uk",
+      },
     ],
   },
   {
-    id: "creatives",
-    title: "Fun creatives",
-    fit: "Studios, makers, photographers",
-    body: "A site with the same energy as the work.",
-    tone: "lime",
-    concepts: [{ label: "Studio" }],
+    id: "trades",
+    label: "Trades",
+    title: "Trades & contractors",
+    fit: "Builders, plumbers, groundworks, transport",
+    brief: "trades",
+    cta: "Start a trades brief",
+    theme: { bg: "#16191d", ink: "#f4f2ee", accent: "#f2b705", accentInk: "#16191d" },
+    needs: [
+      "A quote button on every screen",
+      "Services and the areas you cover, clearly",
+      "Proof up front: projects, years, reviews",
+    ],
+    examples: [
+      {
+        title: "James Agro",
+        meta: "Earthworks & transport",
+        kind: "Client site",
+        image: "/work/james.jpg",
+        href: "https://james-agro-website.vercel.app",
+      },
+    ],
   },
   {
-    id: "finance",
-    title: "Finance and business",
-    fit: "Accountants, consultants, advisors",
-    body: "Clear, calm, and easy to trust before the first call.",
-    tone: "blue",
-    concepts: [
-      { label: "Accountant" },
-      { label: "Consultant" },
-      { label: "Advisor" },
+    id: "coffee",
+    label: "Cafés",
+    title: "Cafés & food",
+    fit: "Coffee shops, matcha bars, roasters",
+    brief: "coffee",
+    cta: "Start a café brief",
+    theme: { bg: "#2c4426", ink: "#f3f1e4", accent: "#b9d36a", accentInk: "#1c2b18" },
+    needs: [
+      "Menu, hours and map in one tap",
+      "Order ahead or shop beans online",
+      "A look as distinctive as the counter",
+    ],
+    examples: [
+      {
+        title: "Yoyogi",
+        meta: "Matcha house, Madrid",
+        kind: "New build",
+        image: "/work/yoyogi.jpg",
+        href: "https://yoyogimadrid.vercel.app",
+      },
     ],
   },
   {
     id: "athletic",
-    title: "Athletic",
-    fit: "Coaches, clubs, gyms",
-    body: "A site that fills the next session, not a brochure.",
-    tone: "cyan",
-    concepts: [{ label: "Coach" }],
+    label: "Coaches",
+    title: "Coaches, clubs & trips",
+    fit: "Running coaches, gyms, outdoor guides",
+    brief: "athletic",
+    cta: "Start a coaching brief",
+    theme: { bg: "#111311", ink: "#f2f0ea", accent: "#ff5a36", accentInk: "#111311" },
+    needs: [
+      "Sessions and dates people can book",
+      "Stories that sell the feeling, not the kit",
+      "A first session that’s easy to claim",
+    ],
+    examples: [
+      {
+        title: "Gijs Running",
+        meta: "Running coach",
+        kind: "Client site",
+        image: "/work/gijs.jpg",
+        href: "https://sammackinley.com",
+      },
+      {
+        title: "TORC",
+        meta: "Small-group hiking & trail trips",
+        kind: "New build",
+        image: "/work/torc.jpg",
+        href: "https://torc-website-umber.vercel.app",
+      },
+    ],
   },
   {
-    id: "coffee",
-    title: "Coffee",
-    fit: "Cafes, roasters, bars",
-    body: "The shop already has a point of view. So should the site.",
-    tone: "violetSoft",
-    concepts: [{ label: "Cafe" }],
+    id: "creatives",
+    label: "Creatives",
+    title: "Creatives & freelancers",
+    fit: "Photographers, coaches, makers",
+    brief: "creatives",
+    cta: "Start a creative brief",
+    theme: { bg: "#f4ede4", ink: "#1e1b18", accent: "#1e1b18", accentInk: "#f4ede4" },
+    needs: [
+      "Work that loads fast and looks huge",
+      "A clear route for each thing you offer",
+      "Commissions without the back-and-forth",
+    ],
+    examples: [
+      {
+        title: "Wrangle & Bloom",
+        meta: "Equine coaching & photography",
+        kind: "New build",
+        image: "/work/wrangle.jpg",
+        href: "https://wrangle-and-bloom-website.vercel.app/index.html",
+      },
+    ],
   },
   {
-    id: "hair",
-    title: "Hairdressers",
-    fit: "Salons, barbers, beauty",
-    body: "The look is the product. The site has to keep up.",
-    tone: "violet",
-    concepts: [{ label: "Salon" }],
+    id: "community",
+    label: "Charities",
+    title: "Charities & community",
+    fit: "CICs, sanctuaries, support services",
+    cta: "Start a community brief",
+    theme: { bg: "#e9ede3", ink: "#173a2a", accent: "#173a2a", accentInk: "#e9ede3" },
+    needs: [
+      "Your mission understood in one screen",
+      "Donate, volunteer or get support, clearly signposted",
+      "Easy for your team to keep up to date",
+    ],
+    examples: [
+      {
+        title: "Routes2Change",
+        meta: "Community wellbeing CIC",
+        kind: "Client site",
+        image: "/work/routes2change.jpg",
+        href: "https://www.routes2change.co.uk",
+      },
+      {
+        title: "Faye Ranch",
+        meta: "Equine sanctuary & hoof care",
+        kind: "New build",
+        image: "/work/faye.jpg",
+        href: "https://fayeranch.com",
+      },
+    ],
   },
 ];
+
 
 // Client work. `live` sites are embedded and usable in the Work section;
 // `for` is the audience id the "I want one like this" button pre-picks
