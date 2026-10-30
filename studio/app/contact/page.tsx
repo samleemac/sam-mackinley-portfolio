@@ -26,6 +26,7 @@ export default async function ContactPage({
         <Brief
           initialPlan={first(params.plan)}
           initialBusiness={first(params.for)}
+          initialNote={first(params.note)?.slice(0, 600)}
         />
       </main>
       <Footer />

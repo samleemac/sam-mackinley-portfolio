@@ -33,9 +33,12 @@ function Blank({ value, hint }: { value?: string; hint: string }) {
 export function Brief({
   initialPlan,
   initialBusiness,
+  initialNote,
 }: {
   initialPlan?: string;
   initialBusiness?: string;
+  /** Pre-fills "Anything else?", e.g. the mix picked on the Plans section. */
+  initialNote?: string;
 }) {
   const [answers, setAnswers] = useState<Answers>(() => ({
     plan: find("plan", initialPlan)?.id,
@@ -43,7 +46,7 @@ export function Brief({
   }));
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [note, setNote] = useState("");
+  const [note, setNote] = useState(initialNote ?? "");
   const [status, setStatus] = useState("");
 
   const business = find("business", answers.business);

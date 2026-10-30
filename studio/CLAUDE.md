@@ -10,4 +10,5 @@ fine; anything bigger needs Sam's explicit go-ahead.
   `components/Brief.module.css`, `brief` in `content.ts`). Four tap questions,
   the dark "Your brief" card that fills in as a sentence, the price/timeline
   estimate, Send + Copy brief. Plan cards link in with `?plan=<id>` and
-  audience cards with `?for=<id>` — keep those deep links working.
+  audience cards with `?for=<id>`, and the Plans section pre-fills the
+  notes box with `?note=` — keep those deep links working.

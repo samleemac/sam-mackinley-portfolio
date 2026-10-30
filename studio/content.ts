@@ -145,71 +145,96 @@ export const process = {
       what: "A full site: several pages, a look built for your brand, and room to add more later. Right for most businesses.",
     },
   },
-  partnerNote: "On Partner? It’s 12 hours a month, scoped as we go — no start line to wait for.",
+  partnerNote: "On Partner? It’s 10 to 25 hours a month, scoped as we go — no start line to wait for.",
 };
 
-export const plans: {
-  id: string;
-  name: string;
-  price: string;
-  cadence: string;
-  summary: string;
-  featured: boolean;
-  tag?: string;
-  cta: string;
-  includes: string[];
-}[] = [
-  {
-    id: "launch",
-    name: "Launch",
-    price: "£2,500",
-    cadence: "starting from",
-    summary: "A single page that says the thing, then asks for the action.",
-    featured: false,
-    cta: "Start with Launch",
-    includes: [
-      "One-page site, designed and built",
-      "Messaging pass and information architecture",
-      "Responsive layout and core motion",
-      "Contact / enquiry path",
-      "Launch support",
-    ],
-  },
-  {
-    id: "site",
-    name: "Site",
-    price: "£6,500",
-    cadence: "starting from",
-    summary: "A full marketing site with room to grow — the default for most clients.",
-    featured: true,
-    cta: "Start with Site",
-    includes: [
-      "Multi-page marketing site",
-      "Everything in Launch",
-      "Custom design system",
-      "CMS-ready content structure",
-      "Motion and interaction design",
-      "Two rounds of revisions",
-    ],
-  },
-  {
-    id: "partner",
-    name: "Partner",
-    price: "£1,500",
-    cadence: "per month",
-    summary:
-      "12 hours a month to iterate, launch pages, and keep the product looking considered.",
-    featured: false,
-    cta: "Talk about Partner",
-    includes: [
-      "12 hours of design and build each month",
-      "New pages and campaigns",
-      "Design and front-end in one place",
-      "Priority turnaround",
-      "Pause or cancel with 30 days’ notice",
-    ],
-  },
+// Starting prices for Launch and Site — read by the Process planner.
+export const plans = [
+  { id: "launch", name: "Launch", price: "£2,500" },
+  { id: "site", name: "Site", price: "£6,500" },
 ];
+
+// #plans — Partner (monthly, recommended) or pick and mix (one-off).
+// ALL PRICES HERE ARE STARTING POINTS: set your own. Pick and mix is
+// calibrated so design + build + copy advice for one page = the £2,500
+// Launch price; Partner keeps the old £1,500/12h anchor (£125/h) with a
+// small discount as hours go up.
+export const pricing = {
+  partner: {
+    tiers: [
+      { hours: 10, price: 1250, example: "A new page plus a round of changes each month" },
+      { hours: 15, price: 1800, example: "A campaign or offer page every month, with room for tweaks" },
+      { hours: 20, price: 2300, example: "A whole new section of the site over a month or two" },
+      { hours: 25, price: 2750, example: "A steady stream of new pages, features and campaigns" },
+    ],
+    beyond: "More than 25 hours? Let’s talk.",
+    includes: [
+      { title: "Hosting", body: "Fast, secure hosting on your own domain. Nothing for you to set up or renew." },
+      { title: "SEO, every month", body: "Search terms checked, pages tuned, Google Business kept current." },
+      { title: "All the technical stuff", body: "Updates, security, backups, forms and analytics. If it breaks, I fix it." },
+      { title: "Design and build hours", body: "Up to your monthly hours for new pages, changes and campaigns." },
+    ],
+  },
+  pages: [
+    { id: "1", label: "1 page" },
+    { id: "5", label: "Up to 5 pages" },
+    { id: "10", label: "Up to 10 pages" },
+    { id: "more", label: "10+ pages" },
+  ],
+  items: [
+    {
+      id: "design",
+      name: "Web design",
+      what: "How your site looks and reads: layout, type, colour and every page designed before it’s built.",
+      byPages: [1000, 2500, 3800],
+    },
+    {
+      id: "build",
+      name: "Website build",
+      what: "Your design turned into a fast, working site that’s great on phones and easy to find.",
+      byPages: [1000, 2500, 3800],
+    },
+    {
+      id: "copy",
+      name: "Website copy advice",
+      what: "Help with the words: headlines, page structure and what to say so visitors take the next step.",
+      price: 500,
+    },
+    {
+      id: "seo",
+      name: "SEO setup",
+      what: "Set up to be found: search terms, page titles, Google Business profile and analytics.",
+      price: 450,
+    },
+    {
+      id: "cms",
+      name: "Database / CMS",
+      what: "Your services, products, team or posts stored as content, not hard-coded, so the site can grow without a rebuild.",
+      price: 900,
+    },
+    {
+      id: "admin",
+      name: "Admin backend",
+      what: "Your own private login to edit what’s in the CMS: add a treatment, change a price, post news. No code, no waiting for me.",
+      price: 700,
+      needs: "cms",
+    },
+    {
+      id: "hosting",
+      name: "Website hosting",
+      what: "Fast, secure hosting on your domain, kept running for you.",
+      monthly: 30,
+    },
+  ] as {
+    id: string;
+    name: string;
+    what: string;
+    price?: number;
+    byPages?: [number, number, number];
+    monthly?: number;
+    needs?: string;
+  }[],
+};
 
 // "Built as a practice" — the same request played out three ways.
 // Sam's replies must stay true to the FAQ: revisions are included in the
@@ -606,7 +631,7 @@ export const work: {
 export const faqs = [
   {
     q: "How long does a project take?",
-    a: "Launch is typically 3–4 weeks. Site is 6–10, depending on pages and content. Partner is 12 hours a month, scoped as we go.",
+    a: "Launch is typically 3–4 weeks. Site is 6–10, depending on pages and content. Partner is 10 to 25 hours a month, scoped as we go.",
   },
   {
     q: "What’s included in revisions?",
@@ -653,7 +678,7 @@ export const brief = {
       options: [
         { id: "launch", label: "One sharp page", phrase: "one sharp page that asks for the action", price: "£2,500", time: "typically 3–4 weeks" },
         { id: "site", label: "A full site", phrase: "a full marketing site with room to grow", price: "£6,500", time: "typically 6–10 weeks" },
-        { id: "partner", label: "Ongoing help", phrase: "ongoing design and build each month", price: "£1,500/mo", time: "12 hours a month" },
+        { id: "partner", label: "Ongoing help", phrase: "ongoing design and build each month", price: "£1,250/mo", time: "10–25 hours a month" },
         { id: "unsure", label: "Not sure yet", phrase: "help working out what I need", price: "", time: "" },
       ],
     },
