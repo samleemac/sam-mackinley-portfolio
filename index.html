@@ -380,15 +380,45 @@ section{position:relative;z-index:5}
   box-shadow:0 2px 4px rgba(0,0,0,.08)}
 .sticky .dots{display:flex;gap:8px;margin-bottom:14px}
 .sticky .dots i{width:9px;height:9px;border-radius:3px;background:rgba(94,79,35,.18)}
-.about-copy{max-width:680px;margin:74px auto 0;font-family:var(--font-mono);
-  font-size:18px;line-height:2.2;color:var(--ink)}
-.about-copy .hl{background:linear-gradient(transparent 55%,#cde89a 55%);padding:0 2px}
-.about-copy .box{border:1px solid var(--ink);padding:1px 7px;border-radius:3px}
-.about-copy .ic{display:inline-block;width:18px;height:18px;vertical-align:-3px;margin:0 2px}
 .tw-cursor{display:inline-block;width:8px;height:18px;background:var(--ink);vertical-align:-3px;
   animation:blink 1s step-end infinite}
 @keyframes blink{50%{opacity:0}}
 
+/* "What's bugging you?" board */
+.bug-board{max-width:860px;margin:78px auto 0}
+.bug-q{font-family:var(--font-mono);font-size:20px;font-weight:500;color:var(--ink);letter-spacing:-.01em}
+.bug-notes{display:grid;grid-template-columns:repeat(3,1fr);gap:22px 26px;margin-top:38px;padding:0 10px}
+.bug{position:relative;min-height:112px;padding:22px 16px 18px;border:none;border-radius:2px;cursor:none;
+  background:linear-gradient(170deg,color-mix(in srgb,var(--bg) 100%,#fff 20%),var(--bg));color:#3a3326;
+  font:600 17px/1.25 var(--font-script),cursive;font-size:24px;text-align:left;
+  box-shadow:0 14px 24px -14px rgba(60,50,20,.45);transform:rotate(var(--r));
+  transition:transform .35s cubic-bezier(.3,1.5,.5,1),box-shadow .35s,opacity .3s,filter .3s}
+.bug::before{content:"";position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:62px;height:16px;
+  background:rgba(255,255,255,.5);border-radius:2px;box-shadow:0 2px 4px rgba(0,0,0,.08)}
+.bug:hover{transform:rotate(0deg) translateY(-6px) scale(1.03);box-shadow:0 26px 34px -18px rgba(60,50,20,.5)}
+.bug:focus-visible{outline:2px solid var(--ink);outline-offset:4px}
+.bug-notes.picked .bug{opacity:.45;filter:saturate(.6)}
+.bug-notes.picked .bug.on{opacity:1;filter:none;transform:rotate(0deg) translateY(-10px) scale(1.06);
+  box-shadow:0 30px 40px -18px rgba(60,50,20,.55);z-index:2}
+.bug.on::after{content:"✓";position:absolute;right:10px;bottom:8px;width:22px;height:22px;border-radius:50%;
+  background:var(--ink);color:#fff;font:700 12px/22px var(--font-mono);text-align:center}
+.bug-answer{min-height:150px;max-width:680px;margin:46px auto 0;display:flex;flex-direction:column;align-items:center;gap:22px}
+.bug-hint{font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.bug-text{font-family:var(--font-mono);font-size:18px;line-height:2;color:var(--ink)}
+.bug-text[hidden],.bug-acts[hidden],.bug-hint[hidden]{display:none}
+.bug-acts{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:16px 22px;animation:fileIn .4s cubic-bezier(.3,1.5,.5,1)}
+.bug-fix{border:none;border-radius:26px;background:var(--ink);color:#fff;cursor:none;font-family:var(--font-mono);
+  font-size:13px;padding:13px 22px;transition:transform .2s,background .2s}
+.bug-fix:hover{transform:translateY(-2px);background:#000}
+.bug-more{font-family:var(--font-mono);font-size:12.5px;color:var(--muted);text-decoration:underline;text-underline-offset:3px;cursor:none}
+.bug-more:hover{color:var(--ink)}
+@media (max-width:900px){
+  .bug-notes{grid-template-columns:repeat(2,1fr);gap:18px}
+  .bug{font-size:21px;min-height:96px;cursor:pointer}
+  .bug-text{font-size:15px}
+  .bug-fix,.bug-more{cursor:pointer}
+}
+@media (prefers-reduced-motion:reduce){.bug,.bug-acts{transition:none;animation:none}}
 /* ===================== WORK / FINDER ===================== */
 #work{padding:60px 20px 120px;display:flex;justify-content:center}
 .finder{width:min(1040px,94vw);background:#f4f3f0;border-radius:13px;overflow:hidden;
@@ -876,7 +906,6 @@ footer .made svg{width:14px;height:14px}
   header .brand .b-full{display:none}
   header .brand .b-short{display:inline}
   header nav{gap:13px}
-  .about-copy{font-size:15px;line-height:2}
   .polaroid{max-width:280px}
   .lb-card{width:92vw}
   .lb-media{max-height:48vh}
@@ -911,14 +940,18 @@ footer .made svg{width:14px;height:14px}
 .cta-try button{border:1px dashed #cfcabd;background:rgba(251,250,247,.7);color:#4a473f;border-radius:20px;
   padding:5px 11px;font:inherit;cursor:none;transition:background .2s,border-color .2s,transform .2s}
 .cta-try button:hover{background:#fff;border-color:var(--ink);color:var(--ink);transform:translateY(-1px)}
-.sketch{position:absolute;left:69%;top:min(56%,calc(100% - 358px));width:330px;z-index:9;margin:0;
-  transform-origin:20% 0;animation:skIn .55s cubic-bezier(.3,1.5,.5,1)}
+.sketch{width:330px;margin:2px 0 0;zoom:.78;transform-origin:50% 0;animation:skIn .55s cubic-bezier(.3,1.5,.5,1)}
 .sketch[hidden]{display:none}
-@keyframes skIn{from{opacity:0;transform:translateY(14px) rotate(-3deg) scale(.86)}}
-#hero.sketching .term{opacity:0;visibility:hidden;transition:opacity .3s,visibility 0s .3s}
-body:has(#hero.sketching) .drag-tip{opacity:0 !important}
-.sk-win{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 30px 60px -26px rgba(40,38,30,.6),0 0 0 1px #e4e1d8;
-  transform:rotate(1.2deg)}
+@keyframes skIn{from{opacity:0;transform:translateY(-10px) scale(.94)}}
+@media (max-height:820px){.sketch{zoom:.62}}
+#hero.sketching .cue{opacity:0}
+/* once their idea is sketched, the recap only needs Edit and the attach link */
+#hero.sketching .cta-recap .lbl,#hero.sketching .cta-recap .txt{display:none}
+#hero.sketching .cta-recap .cta-files{margin-top:0;padding-top:0;border-top:none}
+#hero.sketching .cta-recap{align-items:center;padding:7px 14px}
+.hero-cta:has(.cta-form[data-step="email"]) .sk-cap,.hero-cta:has(.cta-form[data-step="sending"]) .sk-cap{display:none}
+#hero.sketching .hero-cta:has(.cta-form[data-step="sent"]) .cta-recap{display:none}
+.sk-win{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 30px 60px -26px rgba(40,38,30,.6),0 0 0 1px #e4e1d8}
 .sk-bar{display:flex;align-items:center;gap:5px;padding:8px 10px;background:#ededea}
 .sk-bar i{width:8px;height:8px;border-radius:50%;background:#d4d0c6}
 .sk-url{margin:0 auto;padding:2px 12px;border-radius:6px;background:#f8f7f3;font-family:var(--font-mono);font-size:9.5px;
@@ -944,11 +977,11 @@ body:has(#hero.sketching) .drag-tip{opacity:0 !important}
 .sk-card{background:var(--soft);border-radius:6px;padding:6px;font-size:7.5px;font-weight:600;min-height:34px;
   display:flex;flex-direction:column;justify-content:flex-end}
 .sk-card small{display:block;font-weight:400;color:color-mix(in srgb,var(--ink) 50%,transparent);margin-top:2px}
-.sk-cap{margin-top:9px;font-family:var(--font-script);font-size:17px;color:#5d5a52;text-align:center;transform:rotate(-1.5deg)}
+.sk-cap{margin-top:8px;font-family:var(--font-script);font-size:19px;color:#5d5a52;text-align:center}
 .sketch.sent .sk-cap{color:#3d6b22}
 @media (prefers-reduced-motion:reduce){.sketch,.sk-page.redraw > *{animation:none}}
 @media (max-width:640px),(max-height:520px) and (max-width:1024px){
-  .sketch{position:static;width:100%;max-width:360px;margin-top:4px}
+  .sketch{width:100%;max-width:360px;zoom:1}
   .cta-try button{cursor:pointer}
 }
 /* Phone hero — portrait phones, and any viewport too short for the collage
@@ -1059,6 +1092,14 @@ body:has(#hero.sketching) .drag-tip{opacity:0 !important}
         <button type="button" data-idea="A website for my plumbing business">a plumber</button>
         <button type="button" data-idea="An online shop for my candles">a shop</button>
       </div>
+      <!-- live sketch: their idea, wireframed as they type -->
+      <figure class="sketch" id="sketch" aria-live="polite" aria-label="A rough sketch of your site" hidden>
+        <div class="sk-win">
+          <div class="sk-bar"><i></i><i></i><i></i><span class="sk-url" id="skUrl">your-site.com</span></div>
+          <div class="sk-page" id="skPage"></div>
+        </div>
+        <figcaption class="sk-cap" id="skCap">Sketched from your idea. I’ll build the real one.</figcaption>
+      </figure>
       <div class="cta-recap" id="ideaRecap" hidden>
         <div class="body">
           <span class="lbl">Your idea</span>
@@ -1077,15 +1118,6 @@ body:has(#hero.sketching) .drag-tip{opacity:0 !important}
         <button type="button" class="cta-back" id="ideaBack">Edit</button>
       </div>
     </div>
-
-    <!-- live sketch: their idea, wireframed as they type -->
-    <figure class="sketch" id="sketch" aria-live="polite" aria-label="A rough sketch of your site" hidden>
-      <div class="sk-win">
-        <div class="sk-bar"><i></i><i></i><i></i><span class="sk-url" id="skUrl">your-site.com</span></div>
-        <div class="sk-page" id="skPage"></div>
-      </div>
-      <figcaption class="sk-cap" id="skCap">Sketched from your idea. I’ll build the real one.</figcaption>
-    </figure>
 
     <!-- profile device -> linkedin -->
     <a class="sticker device link-sticker parallax" data-depth="22" data-link="https://www.linkedin.com/in/sam-mackinley-955166b3" href="https://www.linkedin.com/in/sam-mackinley-955166b3" target="_blank" rel="noopener" style="text-decoration:none">
@@ -1196,10 +1228,24 @@ body:has(#hero.sketching) .drag-tip{opacity:0 !important}
     I design and build websites that look sharp and work hard — clear messaging, smooth experiences, and results you can measure. Always shipping, always learning, always finishing what I start.
   </div>
 
-  <div class="about-copy">
-    <span id="tw1"></span><span class="tw-cursor" id="cur1" style="display:none"></span>
-    <div style="height:26px"></div>
-    <span id="tw2"></span><span class="tw-cursor" id="cur2" style="display:none"></span>
+  <div class="bug-board">
+    <h2 class="bug-q">What’s bugging you about your website?</h2>
+    <div class="bug-notes" role="group" aria-label="Pick what sounds like you">
+      <button type="button" class="bug" data-bug="0" style="--bg:#ffc8d4;--r:-4deg">It looks dated</button>
+      <button type="button" class="bug" data-bug="1" style="--bg:#bfe0ff;--r:3deg">Nobody finds me on Google</button>
+      <button type="button" class="bug" data-bug="2" style="--bg:#d8f2b6;--r:-2deg">I don’t have one yet</button>
+      <button type="button" class="bug" data-bug="3" style="--bg:#e3d4ff;--r:4deg">I can’t update it myself</button>
+      <button type="button" class="bug" data-bug="4" style="--bg:#ffdcae;--r:-3deg">It’s a pain on phones</button>
+      <button type="button" class="bug" data-bug="5" style="--bg:#fbe79b;--r:2deg">It doesn’t bring in customers</button>
+    </div>
+    <div class="bug-answer" id="bugAnswer" aria-live="polite">
+      <p class="bug-hint">Tap the one that sounds like you.</p>
+      <p class="bug-text" hidden><span id="bugText"></span><span class="tw-cursor" id="bugCur"></span></p>
+      <div class="bug-acts" hidden>
+        <button type="button" class="bug-fix" id="bugFix">Fix this for me <span aria-hidden="true">→</span></button>
+        <a class="bug-more" href="/studio#plans" data-link="/studio#plans">See prices ↗</a>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -1704,35 +1750,65 @@ document.querySelectorAll('[data-link]').forEach(el => {
   }, 3600);
 })();
 
-/* ---------- typewriter (about) ---------- */
-const TW1 = 'I turn ambiguity into clear product design direction and ship with cross-functional teams at speed.';
-const TW2 = 'I build with AI, prototyping ideas and exploring the edge of design and technology.';
-const STAR_IC = '<svg class="ic" viewBox="0 0 24 24"><path d="M12 1l2 7 7 2-7 2-2 7-2-7-7-2 7-2z" fill="#1B1B18"/></svg>';
-const TW1_HTML = 'I turn ambiguity into <span class="hl">clear product design direction</span> and ship with cross-functional teams <span class="box">at speed.</span>';
-const TW2_HTML = STAR_IC + ' I build with AI, prototyping ideas and exploring the edge of design and technology.';
-function typeInto(elId, curId, text, speed, finalHTML) {
-  return new Promise(res => {
-    const el = document.getElementById(elId), cur = document.getElementById(curId);
+/* ---------- "what's bugging you?" notes ---------- */
+(function bugBoard() {
+  const notes = document.querySelector('.bug-notes');
+  if (!notes) return;
+  const ANSWERS = [
+    { a: 'First impressions happen in seconds. I’ll redesign it around your business as it is today: a fresh look, clear words and faster pages.',
+      idea: 'My website looks dated — I’d like a fresh redesign' },
+    { a: 'I’ll set it up to be found: the words your customers actually search for, proper page titles, your Google Business profile, and analytics so you can see it working.',
+      idea: 'I need my website to show up on Google' },
+    { a: 'Start small. One sharp page that says what you do and asks for the booking, live in a few weeks. Grow it when you’re ready.',
+      idea: 'I don’t have a website yet — I’d like my first one' },
+    { a: 'You get your own admin login. Change a price, add a service, post some news. No code, and no waiting for me.',
+      idea: 'I want to be able to update my own website' },
+    { a: 'Most people will meet your site on a phone. I build for thumbs first: fast to load, easy to read, and the button they need right where they need it.',
+      idea: 'My website is a pain to use on phones' },
+    { a: 'Pretty isn’t enough. I’ll make every page lead somewhere, with one clear next step: book, call or get a quote.',
+      idea: 'My website doesn’t bring in customers' },
+  ];
+  const hint = document.querySelector('.bug-hint');
+  const textWrap = document.querySelector('.bug-text');
+  const text = document.getElementById('bugText');
+  const cur = document.getElementById('bugCur');
+  const acts = document.querySelector('.bug-acts');
+  let pick = -1, token = 0;
+
+  function type(str) {
+    const my = ++token;
+    if (reduced) { text.textContent = str; cur.style.display = 'none'; acts.hidden = false; return; }
     cur.style.display = 'inline-block';
     let i = 0;
     const tick = () => {
-      el.textContent = text.slice(0, i++);
-      if (i <= text.length) setTimeout(tick, speed + Math.random() * 26);
-      else { cur.style.display = 'none'; if (finalHTML) el.innerHTML = finalHTML; res(); }
+      if (my !== token) return;
+      text.textContent = str.slice(0, i++);
+      if (i <= str.length) setTimeout(tick, 18 + Math.random() * 18);
+      else { cur.style.display = 'none'; acts.hidden = false; }
     };
     tick();
-  });
-}
-let typed = false;
-ScrollTrigger.create({
-  trigger: '#about', start: 'top 55%',
-  onEnter: () => {
-    if (typed) return;
-    if (reduced) { document.getElementById('tw1').innerHTML = TW1_HTML; document.getElementById('tw2').innerHTML = TW2_HTML; typed = true; return; }
-    typed = true;
-    typeInto('tw1', 'cur1', TW1, 26, TW1_HTML).then(() => typeInto('tw2', 'cur2', TW2, 26, TW2_HTML));
   }
-});
+  notes.querySelectorAll('.bug').forEach(btn => btn.addEventListener('click', () => {
+    pick = +btn.dataset.bug;
+    notes.classList.add('picked');
+    notes.querySelectorAll('.bug').forEach(b => { b.classList.toggle('on', b === btn); b.setAttribute('aria-pressed', b === btn); });
+    hint.hidden = true;
+    textWrap.hidden = false;
+    acts.hidden = true;
+    type(ANSWERS[pick].a);
+  }));
+  document.getElementById('bugFix').addEventListener('click', () => {
+    if (pick < 0) return;
+    const input = document.getElementById('ideaInput');
+    const form = document.getElementById('ideaForm');
+    if (form && form.dataset.step === 'sent') { document.getElementById('hero').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' }); return; }
+    if (form && form.dataset.step !== 'idea') document.getElementById('ideaBack')?.click();
+    input.value = ANSWERS[pick].idea;
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    document.getElementById('hero').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' });
+    setTimeout(() => input.focus({ preventScroll: true }), reduced ? 0 : 700);
+  });
+})();
 
 /* ---------- hero entrance ---------- */
 if (!reduced) {
@@ -2179,6 +2255,10 @@ if (ideaForm) {
 })();
 
 /* ---------- about reveal ---------- */
+if (!reduced) gsap.from('.bug', {
+  scrollTrigger: { trigger: '.bug-notes', start: 'top 85%' },
+  opacity: 0, y: 40, rotation: () => gsap.utils.random(-12, 12), stagger: 0.07, duration: 0.7, ease: 'back.out(1.6)', clearProps: 'transform,opacity'
+});
 gsap.from('.sticky', {
   scrollTrigger: { trigger: '#about', start: 'top 70%' },
   opacity: 0, y: 30, rotation: -8, duration: 0.8, ease: 'power3.out'
