@@ -904,6 +904,53 @@ footer .made svg{width:14px;height:14px}
   .fold .lbl{font-size:11px}
   .ach-stat .big{font-size:22px}
 }
+/* ---------- live sketch of the visitor's idea ---------- */
+.cta-try{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px;font-family:var(--font-mono);
+  font-size:10.5px;color:var(--muted)}
+.cta-try[hidden]{display:none}
+.cta-try button{border:1px dashed #cfcabd;background:rgba(251,250,247,.7);color:#4a473f;border-radius:20px;
+  padding:5px 11px;font:inherit;cursor:none;transition:background .2s,border-color .2s,transform .2s}
+.cta-try button:hover{background:#fff;border-color:var(--ink);color:var(--ink);transform:translateY(-1px)}
+.sketch{position:absolute;left:69%;top:min(56%,calc(100% - 358px));width:330px;z-index:9;margin:0;
+  transform-origin:20% 0;animation:skIn .55s cubic-bezier(.3,1.5,.5,1)}
+.sketch[hidden]{display:none}
+@keyframes skIn{from{opacity:0;transform:translateY(14px) rotate(-3deg) scale(.86)}}
+#hero.sketching .term{opacity:0;visibility:hidden;transition:opacity .3s,visibility 0s .3s}
+body:has(#hero.sketching) .drag-tip{opacity:0 !important}
+.sk-win{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 30px 60px -26px rgba(40,38,30,.6),0 0 0 1px #e4e1d8;
+  transform:rotate(1.2deg)}
+.sk-bar{display:flex;align-items:center;gap:5px;padding:8px 10px;background:#ededea}
+.sk-bar i{width:8px;height:8px;border-radius:50%;background:#d4d0c6}
+.sk-url{margin:0 auto;padding:2px 12px;border-radius:6px;background:#f8f7f3;font-family:var(--font-mono);font-size:9.5px;
+  color:#7c7973;max-width:70%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sk-page{--a:#1b1b18;--bg:#fff;--soft:#f1efe9;--ink:#1b1b18;background:var(--bg);color:var(--ink);padding:10px 12px 14px;
+  display:flex;flex-direction:column;gap:9px;min-height:186px;transition:background .4s}
+.sk-page.redraw > *{animation:skDraw .45s ease both}
+.sk-page.redraw > *:nth-child(2){animation-delay:.06s}
+.sk-page.redraw > *:nth-child(3){animation-delay:.12s}
+@keyframes skDraw{from{opacity:0;transform:translateY(5px)}}
+.sk-nav{display:flex;align-items:center;gap:8px;font-size:8.5px;color:color-mix(in srgb,var(--ink) 60%,transparent)}
+.sk-logo{font-family:var(--font-script);font-weight:700;font-size:16px;color:var(--ink);margin-right:auto;
+  max-width:55%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sk-hero{display:grid;grid-template-columns:1.25fr 1fr;gap:10px;align-items:center}
+.sk-h{font-size:14px;line-height:1.1;font-weight:700;letter-spacing:-.02em;margin:0}
+.sk-p{font-size:8px;line-height:1.4;color:color-mix(in srgb,var(--ink) 55%,transparent);margin:4px 0 7px}
+.sk-btn{display:inline-block;background:var(--a);color:var(--bg);font-size:8px;font-weight:600;padding:5px 9px;border-radius:12px}
+.sk-img{aspect-ratio:1/1;border-radius:8px;background:var(--soft);position:relative;overflow:hidden}
+.sk-img::before,.sk-img::after{content:"";position:absolute;inset:0;background:linear-gradient(to top right,transparent calc(50% - .6px),
+  color-mix(in srgb,var(--ink) 18%,transparent),transparent calc(50% + .6px))}
+.sk-img::after{transform:scaleX(-1)}
+.sk-row{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.sk-card{background:var(--soft);border-radius:6px;padding:6px;font-size:7.5px;font-weight:600;min-height:34px;
+  display:flex;flex-direction:column;justify-content:flex-end}
+.sk-card small{display:block;font-weight:400;color:color-mix(in srgb,var(--ink) 50%,transparent);margin-top:2px}
+.sk-cap{margin-top:9px;font-family:var(--font-script);font-size:17px;color:#5d5a52;text-align:center;transform:rotate(-1.5deg)}
+.sketch.sent .sk-cap{color:#3d6b22}
+@media (prefers-reduced-motion:reduce){.sketch,.sk-page.redraw > *{animation:none}}
+@media (max-width:640px),(max-height:520px) and (max-width:1024px){
+  .sketch{position:static;width:100%;max-width:360px;margin-top:4px}
+  .cta-try button{cursor:pointer}
+}
 /* Phone hero — portrait phones, and any viewport too short for the collage
    (landscape phones). The stickers are unreadable at these sizes, so the hero
    drops to the name and the idea prompt, stacked and centred. */
@@ -1005,6 +1052,13 @@ footer .made svg{width:14px;height:14px}
         <span class="cta-done" hidden>Got it — I'll reply within a day.</span>
         <button type="submit" aria-label="Send"><span class="cta-send">Send</span><span class="cta-send-in">Send in</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
       </form>
+      <div class="cta-try" id="ideaTry">
+        <span>Try</span>
+        <button type="button" data-idea="A site for my bakery called Rosa’s">a bakery</button>
+        <button type="button" data-idea="A booking site for my hair salon">a salon</button>
+        <button type="button" data-idea="A website for my plumbing business">a plumber</button>
+        <button type="button" data-idea="An online shop for my candles">a shop</button>
+      </div>
       <div class="cta-recap" id="ideaRecap" hidden>
         <div class="body">
           <span class="lbl">Your idea</span>
@@ -1023,6 +1077,15 @@ footer .made svg{width:14px;height:14px}
         <button type="button" class="cta-back" id="ideaBack">Edit</button>
       </div>
     </div>
+
+    <!-- live sketch: their idea, wireframed as they type -->
+    <figure class="sketch" id="sketch" aria-live="polite" aria-label="A rough sketch of your site" hidden>
+      <div class="sk-win">
+        <div class="sk-bar"><i></i><i></i><i></i><span class="sk-url" id="skUrl">your-site.com</span></div>
+        <div class="sk-page" id="skPage"></div>
+      </div>
+      <figcaption class="sk-cap" id="skCap">Sketched from your idea. I’ll build the real one.</figcaption>
+    </figure>
 
     <!-- profile device -> linkedin -->
     <a class="sticker device link-sticker parallax" data-depth="22" data-link="https://www.linkedin.com/in/sam-mackinley-955166b3" href="https://www.linkedin.com/in/sam-mackinley-955166b3" target="_blank" rel="noopener" style="text-decoration:none">
@@ -1833,6 +1896,116 @@ if (ideaForm) {
     }
   });
 }
+
+/* ---------- live sketch: type an idea, watch a site wireframe itself ---------- */
+(function liveSketch() {
+  const hero = document.getElementById('hero');
+  const input = document.getElementById('ideaInput');
+  const form = document.getElementById('ideaForm');
+  const sk = document.getElementById('sketch');
+  const page = document.getElementById('skPage');
+  const url = document.getElementById('skUrl');
+  const cap = document.getElementById('skCap');
+  const tryBox = document.getElementById('ideaTry');
+  if (!hero || !input || !sk) return;
+
+  // Each kind of business gets its own palette, words and page shape.
+  const KINDS = [
+    { re: /bak|cake|bread|patisser|pastr|donut/i, noun: 'bakery', bg: '#fbf5ec', a: '#9a5b2e', soft: '#f1e2cf', ink: '#3b2414',
+      nav: ['Menu', 'Order', 'Visit'], h: 'Baked fresh every morning.', p: 'Order ahead and pick it up still warm.', cta: 'Order for pickup',
+      cards: [['Sourdough', '€4.50'], ['Croissants', '€2.20'], ['Celebration cakes', 'from €28']] },
+    { re: /caf[eé]|coffee|matcha|\btea\b|restaurant|bistro|\bbar\b|brunch|food|pizza|kitchen/i, noun: 'café', bg: '#f6f1e7', a: '#3c5a33', soft: '#e6e0cf', ink: '#1f2a1b',
+      nav: ['Menu', 'Book', 'Find us'], h: 'Slow mornings, served fast.', p: 'Seasonal menu, good coffee and a table waiting.', cta: 'Book a table',
+      cards: [['Breakfast', 'till 12'], ['Lunch', '12–4'], ['Coffee', 'all day']] },
+    { re: /salon|hair|barber|beauty|nail|lash|brow|\bspa\b|massage|tattoo/i, noun: 'salon', bg: '#fbf6f3', a: '#2b1d1a', soft: '#efe0d8', ink: '#2b1d1a',
+      nav: ['Treatments', 'Team', 'Book'], h: 'The look you came in for.', p: 'See prices, pick a time, book in seconds.', cta: 'Book an appointment',
+      cards: [['Cut & finish', '€35'], ['Colour', 'from €60'], ['Treatments', 'from €20']] },
+    { re: /plumb|electric|builder|building|roof|clean|garden|landscap|handyman|joiner|carpent|paint|decorat|window|trade|mechanic|garage|removal|transport|earthwork/i, noun: 'business', bg: '#ffffff', a: '#f2b705', soft: '#eef1f5', ink: '#0f1b2d',
+      nav: ['Services', 'Areas', 'Reviews'], h: 'Fixed right, first time.', p: 'Free quotes within 24 hours. Fully insured.', cta: 'Get a free quote',
+      cards: [['Repairs', 'same week'], ['Installs', 'fixed price'], ['Emergencies', '7 days']] },
+    { re: /coach|gym|fitness|yoga|pilates|\brun|personal train|\bpt\b|sport|martial|swim|climb|trip|hik|tour/i, noun: 'coaching', bg: '#0f0f0f', a: '#d7ff3a', soft: '#1e1e1e', ink: '#f2f2ee',
+      nav: ['Programmes', 'Results', 'Join'], h: 'Go further than you think.', p: 'Small groups, real plans, first session free.', cta: 'Book a free session',
+      cards: [['Beginners', 'Mon · Wed'], ['Improvers', 'Tue · Thu'], ['1-to-1', 'any time']] },
+    { re: /shop|store|\bsell|e-?commerce|product|boutique|cloth|jewel|candle|print|merch/i, noun: 'shop', bg: '#ffffff', a: '#1b1b18', soft: '#f3f1ec', ink: '#1b1b18',
+      nav: ['Shop', 'About', 'Cart (0)'], h: 'Made in small batches.', p: 'Free delivery over €50. Wrapped with care.', cta: 'Shop the collection',
+      cards: [['Bestseller', '€24'], ['New in', '€32'], ['Gift set', '€55']] },
+    { re: /\bapp\b|booking system|dashboard|saas|platform|portal|software|startup|\bai\b/i, noun: 'app', bg: '#f7f6ff', a: '#7a40ed', soft: '#ece8ff', ink: '#17082c',
+      nav: ['Features', 'Pricing', 'Log in'], h: 'The easy way to get it done.', p: 'Sign up free. Set up in two minutes.', cta: 'Start free',
+      cards: [['Fast', 'set up today'], ['Simple', 'no training'], ['Secure', 'your data']] },
+    { re: /portfolio|photo|artist|illustrat|design|music|band|writer|author|freelanc|creative|wedding/i, noun: 'portfolio', bg: '#f4ede4', a: '#1e1b18', soft: '#e6dccd', ink: '#1e1b18',
+      nav: ['Work', 'About', 'Contact'], h: 'Work worth a closer look.', p: 'Selected projects, commissions open.', cta: 'See the work',
+      cards: [['Series one', '2026'], ['Commissions', 'open'], ['Prints', 'shop']] },
+    { re: /charit|community|\bcic\b|non-?profit|church|school|nursery|sanctuar|rescue|foundation/i, noun: 'organisation', bg: '#eef2ea', a: '#173a2a', soft: '#dde6d6', ink: '#173a2a',
+      nav: ['About', 'Get help', 'Donate'], h: 'Here when it matters.', p: 'Find support, volunteer, or give what you can.', cta: 'Get involved',
+      cards: [['Support', 'free'], ['Volunteer', 'join us'], ['Donate', 'any amount']] },
+  ];
+  const BASE = { noun: 'business', bg: '#ffffff', a: '#1b1b18', soft: '#f1efe9', ink: '#1b1b18',
+    nav: ['About', 'Services', 'Contact'], h: 'Your business, front and centre.', p: 'Clear words, one obvious next step.', cta: 'Get in touch',
+    cards: [['What you do', ''], ['Who it’s for', ''], ['Why you', '']] };
+
+  const clean = v => v.replace(/[^\p{L}\p{N}'’&. -]/gu, '').replace(/\s+/g, ' ').trim();
+  function nameFrom(idea, kind) {
+    const m = idea.match(/(?:called|named)\s+([\p{L}\p{N}'’&. -]{2,28})/iu);
+    if (m) return clean(m[1]).replace(/[. ]+$/, '');
+    return `Your ${kind.noun}`;
+  }
+  const slug = n => n.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '') || 'yoursite';
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+
+  let lastKey = '';
+  function draw(idea) {
+    const kind = KINDS.find(k => k.re.test(idea)) || BASE;
+    const name = nameFrom(idea, kind);
+    const key = kind.noun + '|' + kind.h + '|' + name;
+    if (key === lastKey) return;
+    const kindChanged = lastKey.split('|')[1] !== kind.h;
+    lastKey = key;
+    page.style.setProperty('--bg', kind.bg);
+    page.style.setProperty('--a', kind.a);
+    page.style.setProperty('--soft', kind.soft);
+    page.style.setProperty('--ink', kind.ink);
+    url.textContent = `${slug(name)}.com`;
+    const nav = el('div', 'sk-nav');
+    nav.append(el('span', 'sk-logo', name), ...kind.nav.map(t => el('span', '', t)));
+    const heroBlock = el('div', 'sk-hero');
+    const copy = el('div');
+    copy.append(el('p', 'sk-h', kind.h), el('p', 'sk-p', kind.p), el('span', 'sk-btn', kind.cta));
+    heroBlock.append(copy, el('div', 'sk-img'));
+    const row = el('div', 'sk-row');
+    kind.cards.forEach(([title, sub]) => { const c = el('div', 'sk-card', title); if (sub) c.append(el('small', '', sub)); row.append(c); });
+    page.replaceChildren(nav, heroBlock, row);
+    if (kindChanged && !reduced) { page.classList.remove('redraw'); void page.offsetWidth; page.classList.add('redraw'); }
+  }
+
+  let timer = 0;
+  function update() {
+    const idea = input.value.trim();
+    const step = form.dataset.step;
+    tryBox.hidden = step !== 'idea' || !!idea;
+    if (step === 'idea' && idea.length < 3) {
+      sk.hidden = true;
+      hero.classList.remove('sketching');
+      lastKey = '';
+      return;
+    }
+    if (sk.hidden) { sk.hidden = false; hero.classList.add('sketching'); }
+    draw(idea);
+    sk.classList.toggle('sent', step === 'sent');
+    cap.textContent = step === 'sent'
+      ? 'Got it. Now I’ll build the real one.'
+      : step === 'email' || step === 'sending'
+        ? 'Like where this is going? Tell me where to reply.'
+        : 'Sketched from your idea. I’ll build the real one.';
+  }
+  input.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(update, 120); });
+  new MutationObserver(update).observe(form, { attributes: true, attributeFilter: ['data-step'] });
+  tryBox.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+    input.value = b.dataset.idea;
+    input.focus();
+    update();
+  }));
+  update();
+})();
 
 /* ---------- hero walker: wanders the collage, jumps & winks on click ---------- */
 (function heroWalker() {
