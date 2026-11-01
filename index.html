@@ -258,19 +258,13 @@ section{position:relative;z-index:5}
   appearance:none;border:0;background:#fff;padding:5px 5px 16px;border-radius:3px;
   box-shadow:0 6px 14px -6px rgba(0,0,0,.4);cursor:none;transform:rotate(var(--rot));
   touch-action:manipulation;transition:transform .38s cubic-bezier(.2,.7,.2,1),box-shadow .3s,filter .3s}
-.board .pho:not(.expanded):hover{transform:rotate(var(--rot)) translateY(-5px) scale(1.04);box-shadow:0 14px 20px -8px rgba(0,0,0,.4)}
+.board .pho:hover{transform:rotate(var(--rot)) translateY(-5px) scale(1.04);box-shadow:0 14px 20px -8px rgba(0,0,0,.4)}
 /* two stacked layers per slot so one photo can cross-fade into the next */
 .board .pho .win{position:relative;display:block;width:100%;height:100%;
   border-radius:2px;overflow:hidden;background:#efece4}
 .board .pho .win img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
   opacity:0;transition:opacity .9s ease}
 .board .pho .win img.on{opacity:1}
-.board.photo-open{z-index:100}
-.board .pho.expanded{z-index:15;transform:translate(var(--expand-x,0px),var(--expand-y,0px)) rotate(0deg) scale(4);box-shadow:0 22px 32px -10px rgba(0,0,0,.48)}
-.board .pho.expanded .win img{transform:scale(1.01)}
-/* measuring state: read resting geometry without a transition part-way through */
-.board.settling .kraft{transition:none!important}
-.board.settling .pho{transition:none!important;transform:none!important}
 .board .pho:focus-visible{outline:2px dashed var(--ink);outline-offset:4px}
 
 /* vinyl playlist */
@@ -367,6 +361,83 @@ section{position:relative;z-index:5}
 .walker .walker-wink{width:46px}
 .walker .walker-prompt{width:72px;bottom:calc(100% + 2px)}
 
+/* ---------- postcards (open a photo from the board) ---------- */
+.board .label::after{content:"tap a photo ✉";display:block;margin-top:6px;font-family:var(--font-mono);font-size:8.5px;
+  letter-spacing:.06em;color:#6e5c40;transform:rotate(4deg);opacity:0;transition:opacity .3s}
+.board:hover .label::after{opacity:.9}
+body.pc-lock{overflow:hidden}
+.pc{position:fixed;inset:0;z-index:420;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+  padding:20px;background:rgba(22,19,16,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  opacity:0;pointer-events:none;transition:opacity .3s}
+.pc.open{opacity:1;pointer-events:auto}
+.pc-stage{width:min(780px,92vw);aspect-ratio:3/2;perspective:1800px}
+.pc-card{position:relative;width:100%;height:100%;transform-style:preserve-3d;
+  transition:transform .8s cubic-bezier(.2,.75,.2,1);transform:rotateX(6deg) rotateZ(-1.5deg) scale(.92)}
+.pc.open .pc-card{transform:rotateZ(-1deg)}
+.pc.open .pc-card.back{transform:rotateY(180deg) rotateZ(1deg)}
+.pc-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:6px;overflow:hidden;
+  background:#f8f3e8;box-shadow:0 40px 90px -30px rgba(0,0,0,.7)}
+.pc-front{padding:12px;cursor:none;background:#fbf8f1}
+.pc-photo{position:absolute;inset:12px;border-radius:3px;overflow:hidden;background:#e8e1d2}
+.pc-photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 45%,rgba(0,0,0,.55))}
+.pc-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.pc-greet{position:absolute;left:12px;right:12px;bottom:12px;top:12px;display:flex;flex-direction:column;justify-content:flex-end;padding:28px 34px;color:#fff;pointer-events:none}
+.pc-greet .g{font-family:var(--font-script);font-size:clamp(26px,3.6vw,42px);line-height:1;color:#fff;transform:rotate(-4deg);transform-origin:left;text-shadow:0 2px 10px rgba(0,0,0,.4)}
+.pc-greet .city{font-family:var(--font-body);font-weight:800;font-size:clamp(44px,8.6vw,96px);line-height:.88;letter-spacing:-.045em;
+  margin:6px 0 8px;text-transform:uppercase;color:#fff4d6;text-shadow:3px 3px 0 #c2552f,6px 6px 0 rgba(0,0,0,.25);overflow-wrap:anywhere}
+.pc-greet .country{font-family:var(--font-mono);font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:rgba(255,255,255,.85)}
+.pc-turn{position:absolute;top:22px;right:24px;font-family:var(--font-mono);font-size:11px;color:#1b1b18;
+  border-radius:20px;padding:7px 13px;background:rgba(255,255,255,.88)}
+.pc-back{transform:rotateY(180deg);display:grid;grid-template-columns:1fr 1fr;padding:22px 24px;gap:22px;
+  background:repeating-linear-gradient(0deg,transparent 0 27px,rgba(140,120,80,.06) 27px 28px),#f8f3e8}
+.pc-back::before{content:"";position:absolute;top:22px;bottom:22px;left:50%;width:1px;background:#d8ccb3}
+.pc-msg{display:flex;flex-direction:column;font-family:var(--font-script);font-size:clamp(21px,2.7vw,30px);line-height:1.3;color:#2f3a63;padding-right:6px;overflow:auto;margin:0}
+.pc-msg .ps{margin-top:auto;font-size:.82em;color:#7a5b2a}
+.pc-msg .sig{display:block;margin-top:10px;font-size:1.25em}
+.pc-side{display:flex;flex-direction:column;gap:10px;min-width:0;position:relative}
+.pc-stamp{align-self:flex-end;width:80px;height:98px;padding:7px;position:relative;transform:rotate(3deg);
+  background:radial-gradient(circle at 4px 4px,transparent 2.6px,#fff 3px) -4px -4px/8px 8px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.18))}
+.pc-stamp img{display:block;width:100%;height:100%;object-fit:cover;outline:3px solid #fff}
+.pc-stamp span{position:absolute;left:8px;bottom:7px;font-family:var(--font-mono);font-size:7px;color:#fff;letter-spacing:.06em;text-shadow:0 1px 2px #000}
+.pc-mark{position:absolute;right:62px;top:22px;width:78px;height:78px;border-radius:50%;border:2px solid rgba(47,58,99,.45);
+  display:grid;place-items:center;text-align:center;font-family:var(--font-mono);font-size:8px;line-height:1.3;letter-spacing:.08em;
+  color:rgba(47,58,99,.55);transform:rotate(-14deg);pointer-events:none}
+.pc-to{font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#8a7d62;margin-top:12px}
+.pc-form{display:flex;flex-direction:column;gap:8px;flex:1}
+.pc-form textarea,.pc-form input{width:100%;border:none;border-bottom:1px solid #cdbf9f;background:transparent;outline:none;resize:none;
+  font-family:var(--font-script);font-size:21px;line-height:28px;color:#2f3a63;padding:0 2px;cursor:none}
+.pc-form textarea{flex:1;min-height:84px;background:repeating-linear-gradient(0deg,transparent 0 27px,#cdbf9f 27px 28px);border:none}
+.pc-form input{font-size:19px}
+.pc-form textarea::placeholder,.pc-form input::placeholder{color:#a99b7d}
+.pc-form .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+.pc-post{align-self:flex-end;border:none;border-radius:20px;background:#2f3a63;color:#fff;font-family:var(--font-mono);font-size:12px;
+  padding:9px 16px;cursor:none;transition:transform .2s,background .2s}
+.pc-post:hover{transform:translateY(-1px);background:#232c4d}
+.pc-post:disabled{opacity:.6}
+.pc-note{font-family:var(--font-mono);font-size:10.5px;color:#a8433f;min-height:1em;margin:0}
+.pc-note a{color:inherit}
+.pc-posted{position:absolute;inset:auto 10px 40% auto;padding:8px 14px;border:3px double #3d7a3a;border-radius:6px;color:#3d7a3a;
+  font-family:var(--font-mono);font-weight:700;font-size:15px;letter-spacing:.18em;transform:rotate(-12deg) scale(1.4);opacity:0;
+  pointer-events:none;transition:transform .4s cubic-bezier(.3,1.6,.5,1),opacity .2s}
+.pc-card.posted .pc-posted{opacity:.9;transform:rotate(-12deg) scale(1)}
+.pc-card.posted .pc-form{opacity:.45;pointer-events:none}
+.pc-bar{display:flex;align-items:center;gap:12px;color:#fff;font-family:var(--font-mono);font-size:12px}
+.pc-bar button{border:none;background:rgba(255,255,255,.14);color:#fff;border-radius:22px;padding:10px 16px;font:inherit;cursor:none;
+  transition:background .2s,transform .2s}
+.pc-bar button:hover{background:rgba(255,255,255,.26);transform:translateY(-1px)}
+.pc-bar .pc-flip{background:#fff;color:#1b1b18}
+.pc-bar .pc-flip:hover{background:#f1efe9}
+.pc-count{min-width:44px;text-align:center;opacity:.8}
+.pc-close{position:absolute;top:18px;right:20px;width:38px;height:38px;border-radius:50%;border:none;background:rgba(255,255,255,.9);
+  color:#1b1b18;font-size:20px;line-height:1;cursor:none}
+@media (max-width:700px){
+  .pc-stage{aspect-ratio:auto;height:min(78vh,620px)}
+  .pc-back{grid-template-columns:1fr;grid-template-rows:auto 1fr;padding:16px}
+  .pc-back::before{display:none}
+  .pc-mark{right:96px;top:auto;bottom:40%}
+  .pc-front,.pc-turn,.pc-form textarea,.pc-form input,.pc-post,.pc-bar button,.pc-close{cursor:pointer}
+}
+@media (prefers-reduced-motion:reduce){.pc,.pc-card,.pc-posted{transition:none}}
 /* ===================== ABOUT ===================== */
 #about{padding:140px 24px 130px;position:relative;text-align:center}
 .crosshair{position:absolute;width:14px;height:14px;color:var(--faint);font-size:14px;
@@ -840,11 +911,11 @@ footer .made svg{width:14px;height:14px}
 
 /* photo board — straighten & fan the photos out */
 .board .kraft{transition:transform .45s cubic-bezier(.2,.7,.2,1),box-shadow .45s}
-.board:not(.photo-open):hover .kraft{transform:rotate(-3deg) scale(1.03);box-shadow:0 30px 54px -20px rgba(40,38,30,.5)}
+.board:hover .kraft{transform:rotate(-3deg) scale(1.03);box-shadow:0 30px 54px -20px rgba(40,38,30,.5)}
 .board .pho{transition:transform .5s cubic-bezier(.2,.7,.2,1)}
-.board:not(.photo-open):hover .pho:nth-child(1){transform:translate(-16px,-12px) rotate(-15deg)!important}
-.board:not(.photo-open):hover .pho:nth-child(2){transform:translate(14px,-9px) rotate(12deg)!important}
-.board:not(.photo-open):hover .pho:nth-child(3){transform:translate(-12px,12px) rotate(10deg)!important}
+.board:hover .pho:nth-child(1){transform:translate(-16px,-12px) rotate(-15deg)!important}
+.board:hover .pho:nth-child(2){transform:translate(14px,-9px) rotate(12deg)!important}
+.board:hover .pho:nth-child(3){transform:translate(-12px,12px) rotate(10deg)!important}
 
 /* profile device — avatar warms up & lifts */
 .device:hover .avatar{transform:scale(1.06) rotate(-2deg)}
@@ -1147,10 +1218,10 @@ footer .made svg{width:14px;height:14px}
     <div class="sticker board" data-depth="9">
       <div class="kraft">
         <div class="pile">
-          <button class="pho" type="button" style="--x:8px;--y:0;--rot:-5deg" aria-expanded="false"><span class="win"><img alt="" /><img alt="" /></span></button>
-          <button class="pho" type="button" style="--x:126px;--y:0;--rot:5deg" aria-expanded="false"><span class="win"><img alt="" /><img alt="" /></span></button>
-          <button class="pho" type="button" style="--x:8px;--y:94px;--rot:4deg" aria-expanded="false"><span class="win"><img alt="" /><img alt="" /></span></button>
-          <button class="pho" type="button" style="--x:126px;--y:94px;--rot:-4deg" aria-expanded="false"><span class="win"><img alt="" /><img alt="" /></span></button>
+          <button class="pho" type="button" style="--x:8px;--y:0;--rot:-5deg" aria-haspopup="dialog"><span class="win"><img alt="" /><img alt="" /></span></button>
+          <button class="pho" type="button" style="--x:126px;--y:0;--rot:5deg" aria-haspopup="dialog"><span class="win"><img alt="" /><img alt="" /></span></button>
+          <button class="pho" type="button" style="--x:8px;--y:94px;--rot:4deg" aria-haspopup="dialog"><span class="win"><img alt="" /><img alt="" /></span></button>
+          <button class="pho" type="button" style="--x:126px;--y:94px;--rot:-4deg" aria-haspopup="dialog"><span class="win"><img alt="" /><img alt="" /></span></button>
         </div>
         <div class="label">capture<br>moments</div>
       </div>
@@ -1659,7 +1730,6 @@ document.querySelectorAll('[data-link]').forEach(el => {
   if (!board || slots.length !== 4) return;
   let nextPhoto = slots.length;
   let nextSlot = 0;
-  let expanded = null;
 
   // cross-fade into the slot's spare layer, but only once the new photo has
   // decoded, otherwise the fade reveals a blank frame
@@ -1669,66 +1739,173 @@ document.querySelectorAll('[data-link]').forEach(el => {
     const front = Number(slot.dataset.front || 0);
     const loader = new Image();
     loader.onload = loader.onerror = () => {
-      if (slot === expanded) return;
       layers[1 - front].src = photo.src;
+      slot.dataset.photo = String(photos.indexOf(photo));
       layers[1 - front].classList.add('on');
       layers[front].classList.remove('on');
       slot.dataset.front = String(1 - front);
-      slot.setAttribute('aria-label', `Expand photo from ${photo.alt}`);
+      slot.setAttribute('aria-label', `Open postcard from ${photo.alt}`);
     };
     loader.src = photo.src;
   }
 
-  function closePhoto() {
-    if (!expanded) return;
-    expanded.classList.remove('expanded');
-    expanded.setAttribute('aria-expanded', 'false');
-    board.classList.remove('photo-open');
-    expanded = null;
-  }
+  /* Each photo is a postcard: front = the photo, back = a note from Sam and a
+     "write back" form that sends through /api/idea like the hero idea box.
+     Notes are Sam's to rewrite — only Lisbon's marathon is a stated fact. */
+  const CARDS = {
+    'Photos/Copenhagen1.jpeg': { city: 'Copenhagen', country: 'Denmark', note: 'Every bridge, bike lane and bench here feels designed on purpose. Taking notes for the next site.' },
+    'Photos/Copenhagen2.jpeg': { city: 'Copenhagen', country: 'Denmark', note: 'Back again. The colours here make the case for a bold palette — as long as you commit to it.' },
+    'Photos/Geneva.jpeg': { city: 'Geneva', country: 'Switzerland', note: 'A city that runs like clockwork. That’s the standard I hold my launches to.' },
+    'Photos/Lisboa.jpeg': { city: 'Lisboa', country: 'Portugal', note: 'Ran the Lisboa Marathon here in 2025. Steep hills, great pastries, slow legs.' },
+    'Photos/NYC.jpeg': { city: 'New York', country: 'USA', note: 'Everything here shouts for attention. Good websites don’t need to — one clear message wins.' },
+    'Photos/Paris.jpeg': { city: 'Paris', country: 'France', note: 'A lesson in typography on every shopfront. I could walk these streets all day.' },
+    'Photos/Sofia.jpeg': { city: 'Sofia', country: 'Bulgaria', note: 'Old domes, new cafés. Proof that old and new can share the same page.' },
+    'Photos/Valencia.jpeg': { city: 'Valencia', country: 'Spain', note: 'Sun, oranges and that light. Some places just look finished.' },
+  };
+  const MAIL = 'samleemac@outlook.com';
+  const EMAIL_OK = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  const pc = document.createElement('div');
+  pc.className = 'pc';
+  pc.setAttribute('role', 'dialog');
+  pc.setAttribute('aria-modal', 'true');
+  pc.setAttribute('aria-label', 'Postcard');
+  pc.setAttribute('aria-hidden', 'true');
+  pc.innerHTML = `
+    <button class="pc-close" type="button" aria-label="Close postcard">×</button>
+    <div class="pc-stage">
+      <div class="pc-card">
+        <div class="pc-face pc-front">
+          <div class="pc-photo"><img alt=""></div>
+          <div class="pc-greet">
+            <span class="g">Greetings from</span>
+            <span class="city"></span>
+            <span class="country"></span>
+            <span class="pc-turn" aria-hidden="true">turn over ↻</span>
+          </div>
+        </div>
+        <div class="pc-face pc-back">
+          <p class="pc-msg"><span class="txt"></span><span class="sig">Wish you were here. — Sam</span><span class="ps">P.S. Got a project? Write back — I read every one. →</span></p>
+          <div class="pc-side">
+            <div class="pc-stamp"><img alt=""><span></span></div>
+            <div class="pc-mark"><span class="mk"></span></div>
+            <p class="pc-to">Write back</p>
+            <form class="pc-form" novalidate>
+              <label class="visually-hidden" for="pcMsg">Your message</label>
+              <textarea id="pcMsg" name="idea" maxlength="1000" placeholder="Tell me about your project…"></textarea>
+              <label class="visually-hidden" for="pcEmail">Your email</label>
+              <input id="pcEmail" name="email" type="email" maxlength="200" placeholder="your@email.com" autocomplete="email">
+              <input type="text" name="company" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+              <p class="pc-note" aria-live="polite"></p>
+              <button class="pc-post" type="submit">Post it →</button>
+            </form>
+            <span class="pc-posted" aria-hidden="true">POSTED</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pc-bar">
+      <button class="pc-prev" type="button" aria-label="Previous postcard">←</button>
+      <button class="pc-flip" type="button">Turn over ↻</button>
+      <span class="pc-count" aria-live="polite"></span>
+      <button class="pc-next" type="button" aria-label="Next postcard">→</button>
+    </div>`;
+  document.body.appendChild(pc);
+  const card = pc.querySelector('.pc-card');
+  const flipBtn = pc.querySelector('.pc-flip');
+  const pcForm = pc.querySelector('.pc-form');
+  const pcNote = pc.querySelector('.pc-note');
+  const pcPost = pc.querySelector('.pc-post');
+  let current = 0, opener = null;
 
-  // the board is tilted (and scaled on small screens), so a screen-space offset has
-  // to be converted into the photo's own coordinate space before it can be applied
-  function toLocal(slot, dx, dy) {
-    let matrix = new DOMMatrix();
-    for (let node = slot.parentElement; node && node !== document.documentElement; node = node.parentElement) {
-      const value = getComputedStyle(node).transform;
-      if (value && value !== 'none') matrix = new DOMMatrix(value).multiply(matrix);
+  function render() {
+    const ph = photos[current];
+    const c = CARDS[ph.src] || { city: ph.alt, country: '', note: 'Wish you were here.' };
+    pc.querySelector('.pc-photo img').src = ph.src;
+    pc.querySelector('.pc-photo img').alt = `Photo from ${ph.alt}`;
+    pc.querySelector('.pc-stamp img').src = ph.src;
+    pc.querySelector('.pc-stamp span').textContent = c.city.toUpperCase();
+    pc.querySelector('.city').textContent = c.city;
+    pc.querySelector('.country').textContent = c.country;
+    pc.querySelector('.pc-msg .txt').textContent = c.note;
+    pc.querySelector('.mk').innerHTML = `${c.city.toUpperCase()}<br>· S.M. ·`;
+    pc.querySelector('.pc-count').textContent = `${current + 1} / ${photos.length}`;
+    pc.setAttribute('aria-label', `Postcard from ${c.city}`);
+  }
+  function setSide(back) {
+    card.classList.toggle('back', back);
+    flipBtn.textContent = back ? 'Back to the photo ↻' : 'Turn over ↻';
+    pc.querySelector('.pc-front').setAttribute('aria-hidden', back);
+    pc.querySelector('.pc-back').setAttribute('aria-hidden', !back);
+  }
+  function openCard(index, from) {
+    current = index;
+    opener = from || null;
+    render();
+    setSide(false);
+    pc.classList.add('open');
+    pc.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('pc-lock');
+    flipBtn.focus({ preventScroll: true });
+  }
+  function closeCard() {
+    if (!pc.classList.contains('open')) return;
+    pc.classList.remove('open');
+    pc.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('pc-lock');
+    opener?.focus({ preventScroll: true });
+  }
+  const step = by => { current = (current + by + photos.length) % photos.length; render(); };
+  flipBtn.addEventListener('click', () => setSide(!card.classList.contains('back')));
+  pc.querySelector('.pc-front').addEventListener('click', () => setSide(true));
+  pc.querySelector('.pc-prev').addEventListener('click', () => step(-1));
+  pc.querySelector('.pc-next').addEventListener('click', () => step(1));
+  pc.querySelector('.pc-close').addEventListener('click', closeCard);
+  pc.addEventListener('click', e => { if (e.target === pc) closeCard(); });
+  document.addEventListener('keydown', e => {
+    if (!pc.classList.contains('open')) return;
+    if (e.key === 'Escape') closeCard();
+    if (e.target.closest('.pc-form')) return;
+    if (e.key === 'ArrowRight') step(1);
+    if (e.key === 'ArrowLeft') step(-1);
+  });
+
+  pcForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    const msg = pcForm.elements.idea.value.trim();
+    const email = pcForm.elements.email.value.trim();
+    if (!msg) { pcNote.textContent = 'Write a line or two first.'; pcForm.elements.idea.focus(); return; }
+    if (!EMAIL_OK.test(email)) { pcNote.textContent = 'That email doesn’t look right.'; pcForm.elements.email.focus(); return; }
+    const city = (CARDS[photos[current].src] || {}).city || photos[current].alt;
+    pcPost.disabled = true;
+    pcPost.textContent = 'Posting…';
+    pcNote.textContent = '';
+    try {
+      const body = new FormData();
+      body.append('idea', `Postcard reply (from the ${city} card): ${msg}`);
+      body.append('email', email);
+      body.append('company', pcForm.elements.company.value);
+      const res = await fetch('/api/idea', { method: 'POST', body });
+      if (!res.ok) throw new Error(`postcard: ${res.status}`);
+      card.classList.add('posted');
+      pcNote.style.color = '#3d7a3a';
+      pcNote.textContent = 'Delivered. I’ll reply within a day.';
+      pcPost.textContent = 'Posted ✓';
+      if (!reduced) { const r = card.getBoundingClientRect(); burst(r.left + r.width * 0.75, r.top + r.height * 0.5); }
+    } catch (err) {
+      pcPost.disabled = false;
+      pcPost.textContent = 'Post it →';
+      const subject = encodeURIComponent(`A postcard back from ${city}`);
+      const text = encodeURIComponent(`Hi Sam,\n\n${msg}\n\n`);
+      pcNote.innerHTML = `That didn’t post. <a href="mailto:${MAIL}?subject=${subject}&body=${text}">Email me instead</a>.`;
     }
-    const inverse = matrix.inverse();
-    const origin = inverse.transformPoint(new DOMPoint(0, 0));
-    const point = inverse.transformPoint(new DOMPoint(dx, dy));
-    return [point.x - origin.x, point.y - origin.y];
-  }
-
-  function openPhoto(slot) {
-    board.classList.add('photo-open', 'settling');
-    const rect = slot.getBoundingClientRect();
-    const [x, y] = toLocal(slot,
-      window.innerWidth / 2 - (rect.left + rect.width / 2),
-      window.innerHeight * 0.48 - (rect.top + rect.height / 2));
-    board.classList.remove('settling');
-    slot.style.setProperty('--expand-x', `${x}px`);
-    slot.style.setProperty('--expand-y', `${y}px`);
-    slot.classList.add('expanded');
-    slot.setAttribute('aria-expanded', 'true');
-    expanded = slot;
-  }
+  });
 
   slots.forEach(slot => {
     slot.addEventListener('pointerdown', event => event.stopPropagation());
     slot.addEventListener('click', event => {
       event.stopPropagation();
-      if (slot === expanded) closePhoto();
-      else {
-        closePhoto();
-        openPhoto(slot);
-      }
+      openCard(Number(slot.dataset.photo || slots.indexOf(slot)), slot);
     });
-  });
-
-  document.addEventListener('pointerdown', event => {
-    if (expanded && !event.target.closest('.board .pho')) closePhoto();
   });
 
   // the board is hidden on phones, so hold the downloads back until it is on screen
@@ -1743,7 +1920,7 @@ document.querySelectorAll('[data-link]').forEach(el => {
   window.addEventListener('resize', fill);
 
   if (!reduced) setInterval(() => {
-    if (expanded || document.hidden || !filled) return;
+    if (pc.classList.contains('open') || document.hidden || !filled) return;
     showPhoto(slots[nextSlot], photos[nextPhoto]);
     nextSlot = (nextSlot + 1) % slots.length;
     nextPhoto = (nextPhoto + 1) % photos.length;
