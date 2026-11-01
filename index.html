@@ -758,27 +758,71 @@ body.pc-lock{overflow:hidden}
 @media (prefers-reduced-motion:reduce){.gc-badge,.gc-xp i,.gc-toast{transition:none}.gc-badge.pop .gc-medal,.gc-badge.pop .gc-medal::after{animation:none}}
 
 /* ----- Testimonials view ----- */
-.view-test{display:none;flex-direction:column;padding:26px 30px;overflow-y:auto}
+.view-test{display:none;padding:0;min-height:0}
 .view-test.active{display:flex}
-.test-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:6px}
-.test-card{position:relative;background:#fbfaf8;border:1px solid #ecebe4;border-radius:14px;
-  padding:20px 20px 18px;display:flex;flex-direction:column;gap:14px;
-  transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s,border-color .25s}
-.test-card:hover{transform:translateY(-3px);box-shadow:0 18px 36px -22px rgba(40,38,30,.5);border-color:#e1ded4}
-.test-card .quote-mark{font-family:Georgia,serif;font-size:46px;line-height:.6;color:#e4e1d6;
-  height:20px;user-select:none}
-.test-card .stars{display:flex;gap:3px;margin-top:-4px}
-.test-card .stars svg{width:14px;height:14px;fill:var(--yellow);stroke:none}
-.test-card .quote{font-size:13.5px;line-height:1.65;color:#3c3a34;flex:1}
-.test-card .quote p{margin:0}
-.test-card .quote p + p{margin-top:.85em}
-.test-card.wide{grid-column:1 / -1}
-.test-card .who{display:flex;align-items:center;gap:12px;margin-top:2px}
-.test-card .avatar{width:38px;height:38px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;
-  justify-content:center;font-weight:700;font-size:14px;color:#fff;letter-spacing:.02em}
-.test-card .who .nm{font-size:13px;font-weight:700;color:#1b1b18;display:block}
-.test-card .who .role{font-family:var(--font-mono);font-size:9px;letter-spacing:.06em;text-transform:uppercase;
-  color:#a7a399;margin-top:3px;display:block}
+/* Messages app */
+.msg-list{width:250px;flex:none;border-right:1px solid #e6e4dc;background:#f1efea;overflow-y:auto;padding:10px 8px}
+.msg-search{margin:2px 4px 10px;padding:7px 10px;border-radius:8px;background:#e4e2db;font-size:12px;color:#97938a}
+.msg-row{display:flex;align-items:center;gap:10px;width:100%;padding:9px 8px;border:none;border-radius:10px;background:none;
+  text-align:left;font:inherit;color:inherit;cursor:none;transition:background .15s}
+.msg-row:hover{background:#e7e5df}
+.msg-row.on{background:#2f7cf6;color:#fff}
+.msg-row:focus-visible{outline:2px solid #2f7cf6;outline-offset:1px}
+.msg-av{flex:none;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:15px;color:#fff;
+  background:linear-gradient(160deg,color-mix(in srgb,var(--c) 70%,#fff),var(--c))}
+.msg-av.sam{background:linear-gradient(160deg,#6aa6ff,#2f7cf6)}
+.msg-av.sam svg{width:17px;height:17px}
+.msg-row .txt{flex:1;min-width:0}
+.msg-row .nm{display:flex;justify-content:space-between;gap:6px;font-size:13px;font-weight:600}
+.msg-row .nm em{font-style:normal;font-weight:400;font-size:10.5px;opacity:.6}
+.msg-row .pv{display:block;font-size:11.5px;line-height:1.35;opacity:.7;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.msg-pane{flex:1;min-width:0;display:flex;flex-direction:column;background:#fff}
+.msg-head{display:flex;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid #eeece6}
+.msg-head .msg-av{width:32px;height:32px;font-size:13px}
+.msg-head .nm{font-size:13.5px;font-weight:600;color:#1b1b18}
+.msg-head .role{font-size:11px;color:#8c897f}
+.msg-head .site{margin-left:auto;font-family:var(--font-mono);font-size:10.5px;color:#2f7cf6;text-decoration:none;cursor:none;
+  border:1px solid #cfe0fd;border-radius:14px;padding:5px 10px}
+.msg-head .site:hover{background:#eef4ff}
+.msg-body{flex:1;overflow-y:auto;padding:18px 18px 10px;display:flex;flex-direction:column;gap:6px}
+.msg-stamp{align-self:center;font-size:10.5px;color:#a7a399;margin-bottom:6px}
+.bub{max-width:78%;padding:9px 13px;border-radius:18px;font-size:13.5px;line-height:1.45;animation:bubIn .32s cubic-bezier(.3,1.4,.5,1) both}
+.bub.them{align-self:flex-start;background:#e9e9eb;color:#1b1b18;border-bottom-left-radius:6px}
+.bub.me{align-self:flex-end;background:#2f7cf6;color:#fff;border-bottom-right-radius:6px}
+.bub.them + .bub.them{border-top-left-radius:6px}
+.bub.me + .bub.me{border-top-right-radius:6px}
+.bub a{color:inherit}
+@keyframes bubIn{from{opacity:0;transform:translateY(8px) scale(.94)}}
+.typing{align-self:flex-start;display:flex;gap:4px;padding:12px 14px;border-radius:18px;background:#e9e9eb}
+.typing i{width:7px;height:7px;border-radius:50%;background:#9a9aa0;animation:dot 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes dot{0%,60%,100%{transform:none;opacity:.5}30%{transform:translateY(-3px);opacity:1}}
+.msg-meta{align-self:flex-end;font-size:10.5px;color:#a7a399;margin-top:-2px}
+.msg-stars{align-self:flex-start;font-size:12px;letter-spacing:2px;color:#f0b429;margin:2px 0 0 6px}
+.msg-cta{align-self:center;margin-top:14px;border:1px dashed #cfe0fd;background:#f6f9ff;color:#2f7cf6;border-radius:16px;
+  padding:8px 14px;font:inherit;font-size:12px;cursor:none;animation:bubIn .4s ease both}
+.msg-cta:hover{background:#eef4ff}
+.msg-compose{display:flex;align-items:center;gap:8px;padding:10px 14px 14px}
+.msg-compose[hidden]{display:none}
+.msg-compose input{flex:1;min-width:0;border:1px solid #dcdad3;border-radius:18px;padding:9px 14px;font:inherit;font-size:13.5px;
+  outline:none;background:#fff;color:#1b1b18;cursor:none}
+.msg-compose input:focus{border-color:#2f7cf6}
+.msg-compose button{flex:none;width:32px;height:32px;border-radius:50%;border:none;background:#2f7cf6;color:#fff;display:grid;place-items:center;cursor:none;
+  transition:transform .2s,opacity .2s}
+.msg-compose button:disabled{opacity:.35}
+.msg-compose button svg{width:16px;height:16px}
+.msg-compose .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+@media (max-width:900px){
+  .view-test.active{flex-direction:column}
+  .msg-list{width:auto;border-right:none;border-bottom:1px solid #e6e4dc;display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;padding:8px}
+  .msg-search{display:none}
+  .msg-row{flex:none;width:auto;padding:6px 10px 6px 6px}
+  .msg-row .pv,.msg-row .nm em{display:none}
+  .msg-pane{min-height:460px}
+  .bub{max-width:88%}
+  .msg-row,.msg-head .site,.msg-cta,.msg-compose input,.msg-compose button{cursor:pointer}
+}
+@media (prefers-reduced-motion:reduce){.bub,.msg-cta{animation:none}.typing i{animation:none}}
 
 /* ----- CV view ----- */
 .view-cv{display:none;flex-direction:column;padding:26px 30px;overflow-y:auto}
@@ -1023,11 +1067,10 @@ footer .made svg{width:14px;height:14px}
   .finder .grid{grid-template-columns:repeat(2,1fr);padding:18px 14px;gap:18px 10px;min-height:0}
   .finder.open .grid{grid-template-columns:repeat(2,1fr)}
   .finder.open .detail,.detail .inner{min-height:0}
-  .view-snapshot,.view-ach,.view-test,.view-cv{padding:14px 12px 18px;overflow-y:auto}
+  .view-snapshot,.view-ach,.view-cv{padding:14px 12px 18px;overflow-y:auto}
   .facts{grid-template-columns:repeat(2,1fr)}
   .fact.hint .fact-inner{animation:none}
   .facts-ch .ch-hint{display:block;margin-top:4px}
-  .test-grid{grid-template-columns:1fr}
   .fold .lbl{font-size:11px}
 }
 /* ---------- live sketch of the visitor's idea ---------- */
@@ -3107,45 +3150,189 @@ function countUp(v) {
 const TESTIMONIALS = [
   {
     quote: 'Sam took our old website and made it much more professional and sleek. It looks great and our clients find it easy to use.',
-    nm: 'Lyndi', role: 'Owner · Elle Vie', initials: 'L', color: 'var(--f-purple)', stars: 5,
+    nm: 'Lyndi', role: 'Owner · Elle Vie', initials: 'L', color: 'var(--f-purple)', stars: 5, biz: 'Elle Vie', site: 'https://www.elleviebelper.co.uk',
   },
   {
     quote: 'We handed over a rough idea and Sam turned it into a fast, beautiful app. The little design details are exactly what makes our home cooks keep coming back.',
-    nm: 'Sara', role: 'Founder · Recipy', initials: 'S', color: 'var(--f-red)', stars: 5,
+    nm: 'Sara', role: 'Founder · Recipy', initials: 'S', color: 'var(--f-red)', stars: 5, biz: 'Recipy', site: 'https://recipy-henna.vercel.app',
   },
   {
     quote: 'The scroll-driven site genuinely feels alive — it captures the energy of my coaching perfectly. It has become my best tool for bringing new runners on board.',
-    nm: 'Gijs de Jong', role: 'Running Coach · Gijs Running', initials: 'G', color: 'var(--f-green)', stars: 5,
+    nm: 'Gijs de Jong', role: 'Running Coach · Gijs Running', initials: 'G', color: 'var(--f-green)', stars: 5, biz: 'Gijs Running', site: '',
   },
   {
     quote: 'Professional from the first call to launch. Sam delivered a clean, trustworthy website that finally matches the quality of the work we do out in the field.',
-    nm: 'James', role: 'Owner · James Agro BV', initials: 'J', color: 'var(--f-tan)', stars: 5,
+    nm: 'James', role: 'Owner · James Agro BV', initials: 'J', color: 'var(--f-tan)', stars: 5, biz: 'James Agro', site: 'https://james-agro-website.vercel.app',
   },
   {
     quote: 'We absolutely loved working with Sam to create our website. He understood our brand so quickly, even though we only had a few ideas to start with. I showed him two websites that we liked the style of, and from those minimal ideas he was able to create a template that was pretty much spot on straight away.\n\nSam was brilliant throughout the whole process. He was really responsive to our ideas and changes, and nothing ever seemed too much trouble. He was also able to give us helpful advice about current website practices, which was particularly useful as we didn’t always know what we should be asking for.\n\nWhat we appreciated most was Sam’s calm and patient approach. He made the whole process feel easy and never made us feel like we needed to know more than we did. I would happily recommend Sam to anyone looking for a website, especially if you’re someone who needs a bit of extra guidance and reassurance along the way. He really took the time to understand what we wanted and brought our ideas to life better than we could have done ourselves.',
-    nm: 'Paula Dawson', role: 'Routes 2 Change CIC', initials: 'P', color: 'var(--f-blue)', stars: 5, wide: true,
+    nm: 'Paula Dawson', role: 'Routes 2 Change CIC', initials: 'P', color: 'var(--f-blue)', stars: 5, biz: 'Routes2Change', site: 'https://routes2change.co.uk',
   },
 ];
 
+/* Testimonials as a Messages app: each review arrives as bubbles (text kept
+   word for word, only split into sentences/paragraphs), and a pinned
+   "Message Sam" thread sends through /api/idea like the hero idea box. */
 function renderTest() {
   const v = document.getElementById('viewTest');
   if (v.dataset.built) return;
   v.dataset.built = '1';
-  const star = '<svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .5-5.5 4.5 2 7L12 17l-6.5 4 2-7L2 9.5 9 9z"/></svg>';
+  const PEN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>';
+  const SEND = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
+  const MAIL = 'samleemac@outlook.com';
+  const EMAIL_OK = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  const host = u => u.replace(/^https?:\/\/(www\.)?/, '').replace(/\/.*$/, '');
+  // Sentences become bubbles; paragraphs stay separate. Rejoined, the text is unchanged.
+  const bubbles = q => q.split(/\n\n+/).flatMap(par => par.match(/[^.!?]+[.!?]+["”’]?\s*|[^.!?]+$/g).map(x => x.trim()).filter(Boolean));
+
   v.innerHTML = `
-    <div class="ach-h" style="margin-top:0">What clients say</div>
-    <div class="test-grid">
-      ${TESTIMONIALS.map(t => `
-        <div class="test-card${t.wide ? ' wide' : ''}">
-          <div class="quote-mark">&ldquo;</div>
-          <div class="stars">${star.repeat(t.stars)}</div>
-          <div class="quote">${t.quote.split(/\n\n+/).map(p => `<p>${p}</p>`).join('')}</div>
-          <div class="who">
-            <div class="avatar" style="background:${t.color}">${t.initials}</div>
-            <div><span class="nm">${t.nm}</span><span class="role">${t.role}</span></div>
-          </div>
-        </div>`).join('')}
+    <div class="msg-list" role="tablist" aria-label="Conversations">
+      <div class="msg-search">Search</div>
+      <button type="button" class="msg-row" role="tab" data-t="sam">
+        <span class="msg-av sam">${PEN}</span>
+        <span class="txt"><span class="nm">Message Sam <em>Pinned</em></span><span class="pv">Start a conversation about your site.</span></span>
+      </button>
+      ${TESTIMONIALS.map((t, i) => `
+      <button type="button" class="msg-row" role="tab" data-t="${i}">
+        <span class="msg-av" style="--c:${t.color}">${t.initials}</span>
+        <span class="txt"><span class="nm">${t.nm} <em>${t.biz}</em></span><span class="pv"></span></span>
+      </button>`).join('')}
+    </div>
+    <div class="msg-pane" role="tabpanel">
+      <div class="msg-head"></div>
+      <div class="msg-body" aria-live="polite"></div>
+      <form class="msg-compose" novalidate hidden>
+        <label class="visually-hidden" for="msgInput">Message</label>
+        <input id="msgInput" type="text" maxlength="1000" autocomplete="off" placeholder="iMessage to Sam">
+        <input type="text" name="company" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <button type="submit" aria-label="Send" disabled>${SEND}</button>
+      </form>
     </div>`;
+
+  const rows = [...v.querySelectorAll('.msg-row')];
+  const head = v.querySelector('.msg-head');
+  const body = v.querySelector('.msg-body');
+  const form = v.querySelector('.msg-compose');
+  const input = form.querySelector('#msgInput');
+  const sendBtn = form.querySelector('button');
+  rows.slice(1).forEach((r, i) => { r.querySelector('.pv').textContent = bubbles(TESTIMONIALS[i].quote)[0]; });
+
+  let token = 0;
+  // compose-thread state survives switching away and back
+  const chat = { step: 'idea', idea: '', log: [] };
+  const wait = ms => new Promise(r => setTimeout(r, reduced ? 0 : ms));
+  const add = (cls, text, html) => {
+    const el = document.createElement('div');
+    el.className = cls;
+    if (html) el.innerHTML = html; else el.textContent = text;
+    body.append(el);
+    body.scrollTop = body.scrollHeight;
+    return el;
+  };
+  async function typeIn(my, ms) {
+    const t = add('typing', null, '<i></i><i></i><i></i>');
+    await wait(ms);
+    t.remove();
+    return my === token;
+  }
+
+  function select(key) {
+    const my = ++token;
+    rows.forEach(r => { const on = r.dataset.t === String(key); r.classList.toggle('on', on); r.setAttribute('aria-selected', on); });
+    body.replaceChildren();
+    if (key === 'sam') return openSam(my);
+    const t = TESTIMONIALS[key];
+    form.hidden = true;
+    head.innerHTML = `<span class="msg-av" style="--c:${t.color}">${t.initials}</span>
+      <span><span class="nm">${t.nm}</span><br><span class="role">${t.role}</span></span>
+      ${t.site ? `<a class="site" href="${t.site}" target="_blank" rel="noopener">View their site ↗</a>` : ''}`;
+    add('msg-stamp', `Review · ${t.biz}`);
+    (async () => {
+      for (const line of bubbles(t.quote)) {
+        if (!(await typeIn(my, Math.min(900, 250 + line.length * 6)))) return;
+        add('bub them', line);
+      }
+      if (my !== token) return;
+      add('msg-stars', '★'.repeat(t.stars)).setAttribute('aria-label', `${t.stars} out of 5 stars`);
+      const cta = add('msg-cta', `Want a site like ${t.biz}’s? Message Sam →`);
+      cta.setAttribute('role', 'button');
+      cta.tabIndex = 0;
+      const go = () => { if (chat.step === 'idea' && !input.value) input.value = `Hi Sam, I’d like a site like ${t.biz}’s.`; select('sam'); };
+      cta.addEventListener('click', go);
+      cta.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+    })();
+  }
+
+  function samSays(text, html) { chat.log.push(['bub them', text, html]); add('bub them', text, html); }
+  function meSays(text) { chat.log.push(['bub me', text]); add('bub me', text); }
+  async function openSam(my) {
+    head.innerHTML = `<span class="msg-av sam">${PEN}</span><span><span class="nm">Sam MacKinley</span><br><span class="role">Usually replies within a day</span></span>`;
+    form.hidden = false;
+    if (!chat.log.length) {
+      add('msg-stamp', 'New conversation');
+      if (!(await typeIn(my, 700))) return;
+      samSays('Hey 👋 Tell me a bit about your business and what you’d like your site to do.');
+    } else {
+      add('msg-stamp', 'New conversation');
+      chat.log.forEach(([cls, text, html]) => add(cls, text, html));
+    }
+    input.placeholder = chat.step === 'email' ? 'your@email.com' : 'iMessage to Sam';
+    input.type = chat.step === 'email' ? 'email' : 'text';
+    form.hidden = chat.step === 'sent';
+    sendBtn.disabled = !input.value.trim();
+    if (my === token) input.focus({ preventScroll: true });
+  }
+
+  input.addEventListener('input', () => { sendBtn.disabled = !input.value.trim(); });
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const my = token;
+    const val = input.value.trim();
+    if (!val) return;
+    if (chat.step === 'idea') {
+      chat.idea = val;
+      meSays(val);
+      input.value = '';
+      sendBtn.disabled = true;
+      chat.step = 'email';
+      input.type = 'email';
+      input.placeholder = 'your@email.com';
+      if (await typeIn(my, 900)) samSays('Sounds good. What’s the best email to reply to?');
+      return;
+    }
+    if (chat.step === 'email') {
+      if (!EMAIL_OK.test(val)) {
+        if (await typeIn(my, 500)) samSays('Hmm, that email doesn’t look quite right. Try again?');
+        return;
+      }
+      meSays(val);
+      input.value = '';
+      sendBtn.disabled = true;
+      chat.step = 'sending';
+      form.hidden = true;
+      try {
+        const fd = new FormData();
+        fd.append('idea', `Messages (Testimonials tab): ${chat.idea}`);
+        fd.append('email', val);
+        fd.append('company', form.elements.company.value);
+        const res = await fetch('/api/idea', { method: 'POST', body: fd });
+        if (!res.ok) throw new Error(`messages: ${res.status}`);
+        chat.step = 'sent';
+        if (my === token) add('msg-meta', 'Delivered');
+        if (await typeIn(my, 900)) samSays('Got it, thank you! I’ll reply to you by email within a day.');
+        if (!reduced && my === token) { const r = body.getBoundingClientRect(); burst(r.left + r.width * 0.7, r.bottom - 60); }
+      } catch (err) {
+        chat.step = 'email';
+        form.hidden = false;
+        const subject = encodeURIComponent('Hello from your Messages tab');
+        const text = encodeURIComponent(`Hi Sam,\n\n${chat.idea}\n\n`);
+        if (await typeIn(my, 500)) samSays(null, `That didn’t go through, sorry. <a href="mailto:${MAIL}?subject=${subject}&body=${text}">Email me instead</a>?`);
+      }
+    }
+  });
+
+  rows.forEach(r => r.addEventListener('click', () => select(r.dataset.t === 'sam' ? 'sam' : +r.dataset.t)));
+  select(0);
 }
 
 const CV_FILE = 'media/cv.pdf';
