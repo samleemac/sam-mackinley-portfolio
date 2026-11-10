@@ -360,6 +360,34 @@ section{position:relative;z-index:5}
   filter:drop-shadow(0 6px 10px rgba(40,38,30,.25))}
 .walker .walker-wink{width:46px}
 .walker .walker-prompt{width:72px;bottom:calc(100% + 2px)}
+.walker:focus-visible{outline:2px solid var(--ink);outline-offset:4px;border-radius:10px}
+/* Sam talks: a speech bubble that follows him and offers the next step */
+.walker-say{position:absolute;left:0;top:0;z-index:210;width:max-content;max-width:264px;
+  background:#FBF1DC;border:2px solid var(--ink);border-radius:20px;padding:11px 14px 12px;
+  box-shadow:0 14px 26px -14px rgba(40,38,30,.5);opacity:0;--tail:50%}
+.walker-say[hidden]{display:none}
+.walker-say::after{content:"";position:absolute;left:var(--tail);bottom:-8px;width:13px;height:13px;
+  margin-left:-7px;background:#FBF1DC;border:solid var(--ink);border-width:0 2px 2px 0;transform:rotate(45deg)}
+.walker-say.below::after{bottom:auto;top:-8px;border-width:2px 0 0 2px}
+.walker-say .say-line{margin:0;font-family:var(--font-script);font-weight:700;font-size:23px;line-height:1.05;
+  color:var(--ink);text-align:center}
+.walker-say .say-opts{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.walker-say .say-opts:empty{display:none}
+.walker-say .say-opts button{cursor:none;border:1.5px solid var(--ink);background:#fffaf0;color:var(--ink);
+  border-radius:20px;padding:7px 14px;font-family:var(--font-body);font-size:13px;font-weight:500;
+  text-align:left;display:flex;align-items:center;justify-content:space-between;gap:14px;
+  transition:transform .2s,background .2s,color .2s}
+.walker-say .say-opts button::after{content:"→";font-family:var(--font-mono);font-size:12px;opacity:.55}
+.walker-say .say-opts button:hover,.walker-say .say-opts button:focus-visible{transform:translateX(3px);
+  background:var(--ink);color:#fff;outline:none}
+.walker-say .say-opts button.main{background:var(--ink);color:#fff}
+.walker-say .say-opts button.main:hover,.walker-say .say-opts button.main:focus-visible{background:#000}
+.walker-say .say-opts button.quiet{border-color:transparent;background:none;justify-content:center;
+  padding:3px 14px 0;font-family:var(--font-mono);font-size:11px;color:var(--muted)}
+.walker-say .say-opts button.quiet::after{content:none}
+.walker-say .say-opts button.quiet:hover,.walker-say .say-opts button.quiet:focus-visible{background:none;
+  color:var(--ink);transform:none;text-decoration:underline;text-underline-offset:3px}
+body.touch .walker-say .say-opts button{cursor:pointer}
 
 /* ---------- postcards (open a photo from the board) ---------- */
 .board .label::after{content:"tap a photo";display:block;margin-top:6px;font-family:var(--font-mono);font-size:8.5px;
@@ -1135,7 +1163,7 @@ footer .made svg{width:14px;height:14px}
   .hero-stage{position:static;display:flex;flex-direction:column;align-items:center;
     gap:clamp(22px,5vh,40px);width:100%}
   .hero-stage .sticker:not(.signature){display:none}
-  .hero-stage .walker{display:none}
+  .hero-stage .walker,.hero-stage .walker-say{display:none}
   .hero-stage .sticker{touch-action:auto}
   .sticker.draggable::after{display:none}
   .layout-tools{display:none}
@@ -1348,10 +1376,15 @@ footer .made svg{width:14px;height:14px}
     </div>
 
     <!-- wandering character -->
-    <div class="walker" id="walker" aria-hidden="true">
+    <div class="walker" id="walker" role="button" tabindex="0" aria-label="Ask Sam where to start" aria-expanded="false" aria-controls="walkerSay">
       <img class="walker-prompt" id="walkerPrompt" src="media/walker/click-me.png" alt="" draggable="false" />
       <img class="walker-wink" id="walkerWink" src="media/walker/wink-head.png" alt="" draggable="false" />
       <img class="walker-frame" id="walkerFrame" src="media/walker/idle-front.png" alt="" draggable="false" />
+    </div>
+    <!-- what he says: a line plus, when he is asked, the next steps to pick from -->
+    <div class="walker-say" id="walkerSay" hidden>
+      <p class="say-line" id="walkerLine" aria-live="polite"></p>
+      <div class="say-opts" id="walkerOpts"></div>
     </div>
 
   </div>
@@ -2282,7 +2315,11 @@ if (ideaForm) {
   update();
 })();
 
-/* ---------- hero walker: wanders the collage, jumps & winks on click ---------- */
+/* ---------- hero walker: wanders the collage and, when asked, guides you to the next step ----------
+   Click him and he stops, hops and asks what brings you here. Each answer is
+   something he does: walk you over to the idea form, lead the way down to the
+   built sites, send you to the prices, or just wink. He also strolls over to
+   the form once on his own, and reacts as an idea moves through its steps. */
 (function heroWalker() {
   const walker = document.getElementById('walker');
   if (!walker || !window.gsap) return;
@@ -2290,6 +2327,11 @@ if (ideaForm) {
   const frame = document.getElementById('walkerFrame');
   const winkEl = document.getElementById('walkerWink');
   const promptEl = document.getElementById('walkerPrompt');
+  const sayEl = document.getElementById('walkerSay');
+  const lineEl = document.getElementById('walkerLine');
+  const optsEl = document.getElementById('walkerOpts');
+  const form = document.getElementById('ideaForm');
+  const ideaField = document.getElementById('ideaInput');
   const phone = window.matchMedia(PHONE_HERO);
   const DIR = 'media/walker/';
   const cycle = d => [1, 2, 3, 4].map(i => `walk-${d}-${i}`);
@@ -2300,19 +2342,24 @@ if (ideaForm) {
   const setFrame = n => { frame.src = `${DIR}${n}.png`; };
 
   const SPEED = 70;                 // px/s — one 4-frame stride ≈ 0.64s
+  const BRISK = 190;                // px/s when he is leading someone somewhere
   const FRAME_MS = 160;
   let walkTween = null, frameTimer = null, idleTimers = [], promptTimer = null, busy = false;
-  let walkFrames = null, heroVisible = true;
+  let walkFrames = null, walkMs = FRAME_MS, heroVisible = true;
+  // talking: his bubble is up or he is leading the way · menuOpen: the choices are showing
+  // locked: mid-hop, mid-wink or on his way out — clicks wait until he is done
+  let talking = false, menuOpen = false, leading = false, locked = false, stayTimer = null, sideBias = 0;
 
   const clearIdle = () => { idleTimers.forEach(clearTimeout); idleTimers = []; };
   const later = (fn, ms) => idleTimers.push(setTimeout(fn, ms));
 
-  function startWalkFrames(frames) {
+  function startWalkFrames(frames, ms = FRAME_MS) {
     let i = 0;
     walkFrames = frames;
+    walkMs = ms;
     setFrame(frames[0]);
     clearInterval(frameTimer);
-    frameTimer = setInterval(() => { i = (i + 1) % frames.length; setFrame(frames[i]); }, FRAME_MS);
+    frameTimer = setInterval(() => { i = (i + 1) % frames.length; setFrame(frames[i]); }, ms);
   }
   function stopWalkFrames() { clearInterval(frameTimer); frameTimer = null; }
 
@@ -2321,7 +2368,7 @@ if (ideaForm) {
   new IntersectionObserver(([e]) => {
     heroVisible = e.isIntersecting;
     if (!walkTween || !walkTween.isActive() && !walkTween.paused()) return;
-    if (heroVisible) { walkTween.resume(); if (walkFrames) startWalkFrames(walkFrames); }
+    if (heroVisible) { walkTween.resume(); if (walkFrames) startWalkFrames(walkFrames, walkMs); }
     else { walkTween.pause(); stopWalkFrames(); }
   }).observe(stage);
 
@@ -2329,6 +2376,63 @@ if (ideaForm) {
     gsap.killTweensOf(promptEl);
     gsap.to(promptEl, { scale: 0, opacity: 0, duration: 0.18, ease: 'power2.in' });
   }
+
+  /* ----- speech bubble ----- */
+  // Sits over his head, kept inside the stage; drops below him when there is no headroom.
+  function placeSay() {
+    if (sayEl.hidden) return;
+    const W = stage.clientWidth;
+    const bw = sayEl.offsetWidth, bh = sayEl.offsetHeight;
+    const cx = walker.offsetLeft + walker.offsetWidth / 2;
+    const left = Math.max(12, Math.min(cx - bw / 2 + sideBias, W - bw - 12));
+    const above = walker.offsetTop - bh - 14 >= 64;
+    const top = above ? walker.offsetTop - bh - 14 : walker.offsetTop + walker.offsetHeight + 14;
+    const tail = Math.max(20, Math.min(cx - left, bw - 20));
+    sayEl.classList.toggle('below', !above);
+    sayEl.style.left = left + 'px';
+    sayEl.style.top = top + 'px';
+    sayEl.style.setProperty('--tail', tail + 'px');
+    sayEl.style.transformOrigin = `${tail}px ${above ? '100%' : '0%'}`;
+  }
+
+  function say(text, opts) {
+    lineEl.textContent = text;
+    optsEl.replaceChildren(...(opts || []).map(o => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = o.label;
+      if (o.kind) b.className = o.kind;
+      b.addEventListener('click', o.go);
+      return b;
+    }));
+    menuOpen = !!opts;
+    walker.setAttribute('aria-expanded', String(menuOpen));
+    sayEl.hidden = false;
+    placeSay();
+    gsap.killTweensOf(sayEl);
+    if (reduced) gsap.set(sayEl, { opacity: 1, scale: 1 });
+    else gsap.fromTo(sayEl, { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.3, ease: 'back.out(2)' });
+  }
+
+  function hush() {
+    menuOpen = false;
+    walker.setAttribute('aria-expanded', 'false');
+    if (sayEl.hidden) return;
+    gsap.killTweensOf(sayEl);
+    if (reduced) { sayEl.hidden = true; return; }
+    gsap.to(sayEl, { opacity: 0, scale: 0.6, duration: 0.16, ease: 'power2.in', onComplete() { sayEl.hidden = true; } });
+  }
+
+  // Done talking: put the bubble away and go back to wandering.
+  function release(ms = 500) {
+    clearTimeout(stayTimer);
+    talking = false; leading = false; locked = false; busy = false; sideBias = 0;
+    hush();
+    setFrame('idle-front');
+    clearIdle();
+    later(wander, ms);
+  }
+  const stay = ms => { clearTimeout(stayTimer); stayTimer = setTimeout(release, ms); };
 
   function keepouts() {
     const sr = stage.getBoundingClientRect();
@@ -2373,6 +2477,8 @@ if (ideaForm) {
     }
   }
 
+  const dirOf = (dx, dy) => Math.abs(dx) >= Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'front' : 'back');
+
   function wander() {
     clearIdle();
     hidePrompt();
@@ -2383,7 +2489,7 @@ if (ideaForm) {
     const dist = Math.hypot(dx, dy);
     if (dist < 50) { later(wander, 1200); return; }
     // pick the cycle that matches the dominant travel direction
-    const dir = Math.abs(dx) >= Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'front' : 'back');
+    const dir = dirOf(dx, dy);
     startWalkFrames(WALK[dir]);
     walkTween = gsap.to(walker, {
       left: target.x, top: target.y, duration: dist / SPEED, ease: 'none',
@@ -2391,10 +2497,99 @@ if (ideaForm) {
     });
   }
 
+  /* ----- leading the way ----- */
+  // A brisk, purposeful walk to a spot; his bubble travels with him.
+  function walkTo(target, done) {
+    if (walkTween) walkTween.kill();
+    stopWalkFrames();
+    const dx = target.x - walker.offsetLeft, dy = target.y - walker.offsetTop;
+    const dist = Math.hypot(dx, dy);
+    if (reduced || dist < 10) { done(); return; }   // reduced motion: he stays put and just points you there
+    leading = true;
+    startWalkFrames(WALK[dirOf(dx, dy)], 110);
+    walkTween = gsap.to(walker, {
+      left: target.x, top: target.y, duration: Math.min(dist / BRISK, 2.6), ease: 'none',
+      onUpdate: placeSay,
+      onComplete() { stopWalkFrames(); leading = false; done(); }
+    });
+  }
+
+  // Standing spot beside the idea form: just to its left, feet level with the pill.
+  function formSpot() {
+    const sr = stage.getBoundingClientRect(), fr = form.getBoundingClientRect();
+    const bw = walker.offsetWidth, bh = walker.offsetHeight;
+    let x = fr.left - sr.left - bw - 12, side = -1;
+    if (x < 8) { x = fr.right - sr.left + 12; side = 1; }
+    return { x, y: Math.max(8, fr.bottom - sr.top - bh + 16), side };
+  }
+
+  function toForm(line, { focus = false, hold = 9000 } = {}) {
+    if (!form) return;
+    clearIdle();
+    clearTimeout(stayTimer);
+    hidePrompt();
+    talking = true; busy = true;
+    const spot = formSpot();
+    const far = Math.hypot(spot.x - walker.offsetLeft, spot.y - walker.offsetTop) > 60;
+    sideBias = 0;
+    if (far && !reduced) say('Follow me.'); else hush();
+    walkTo(spot, () => {
+      setFrame('wave');
+      sideBias = reduced ? 0 : spot.side * 62;      // lean the bubble away from the form he is standing by
+      say(line);
+      if (focus) {
+        const field = form.querySelector('input:not([hidden]):not(.hp)');
+        if (field) field.focus({ preventScroll: true });
+        if (!reduced) form.classList.add('nudge');
+      }
+      stay(hold);
+    });
+  }
+
+  function toSites() {
+    const sites = document.getElementById('play');
+    if (!sites) { release(); return; }
+    talking = true; busy = true;
+    say('This way.');
+    walkTo({ x: walker.offsetLeft, y: stage.clientHeight - walker.offsetHeight - 6 }, () => {
+      sites.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+      release(1500);
+    });
+  }
+
+  function toPrices() {
+    talking = true; busy = true; locked = true;
+    setFrame('wave');
+    say('Prices are in the studio.');
+    stayTimer = setTimeout(() => { release(); window.location.href = '/studio#plans'; }, reduced ? 500 : 900);
+  }
+
   function showWink(done) {
     gsap.timeline({ onComplete: done })
       .to(winkEl, { scale: 1, opacity: 1, duration: 0.28, ease: 'back.out(2)' })
       .to(winkEl, { scale: 0, opacity: 0, duration: 0.22, ease: 'power2.in' }, '+=0.75');
+  }
+
+  function justHi() {
+    hush();
+    talking = true; busy = true; locked = true;
+    setFrame('wave');
+    if (reduced) { stay(1100); return; }
+    showWink(() => release(200));
+  }
+
+  function openMenu(fromKeys) {
+    clearTimeout(stayTimer);
+    talking = true; busy = true; sideBias = 0;
+    setFrame('idle-front');
+    const sent = form && form.dataset.step === 'sent';
+    say(sent ? 'Got your idea. What else?' : 'Hey, I’m Sam. What brings you here?', [
+      ...(form && !sent ? [{ label: 'I’ve got an idea', kind: 'main', go: () => toForm('Tell me here. I’ll sketch it as you type.', { focus: true }) }] : []),
+      { label: 'Show me sites you’ve built', go: toSites },
+      { label: 'What does it cost?', go: toPrices },
+      { label: 'Just saying hi', kind: 'quiet', go: justHi },
+    ]);
+    if (fromKeys) optsEl.querySelector('button').focus({ preventScroll: true });
   }
 
   function showClickMe() {
@@ -2414,34 +2609,93 @@ if (ideaForm) {
     }, gsap.utils.random(8000, 15000));
   }
 
-  walker.addEventListener('click', e => {
+  function poke(e, fromKeys) {
+    if (leading || locked) return;               // mid-stride or mid-hop: let him finish
+    if (menuOpen) { release(); return; }         // second click puts the choices away
+    if (talking) { openMenu(fromKeys); return; } // standing by the form: straight to the choices
     if (busy) return;
-    busy = true;
+    busy = true; talking = true;
     if (walkTween) walkTween.kill();
     stopWalkFrames();
     clearIdle();
     hidePrompt();
-    if (!reduced) burst(e.clientX, e.clientY);
-    if (reduced) {
-      winkEl.style.opacity = 1;
-      winkEl.style.transform = 'translateX(-50%) scale(1)';
-      setTimeout(() => {
-        winkEl.style.opacity = 0;
-        winkEl.style.transform = 'translateX(-50%) scale(0)';
-        busy = false;
-      }, 900);
-      return;
-    }
+    if (reduced) { openMenu(fromKeys); return; }
+    const r = walker.getBoundingClientRect();
+    burst(fromKeys ? r.left + r.width / 2 : e.clientX, fromKeys ? r.top + r.height / 2 : e.clientY);
+    locked = true;
     setFrame('wave-both');           // arms up for the hop
     gsap.to(walker, {
-      y: -48, duration: 0.3, ease: 'power2.out', yoyo: true, repeat: 1,
+      y: -40, duration: 0.22, ease: 'power2.out', yoyo: true, repeat: 1,
       onComplete() {
         gsap.set(walker, { y: 0 });
-        setFrame('idle-front');
-        showWink(() => { busy = false; wander(); });
+        locked = false;
+        openMenu(fromKeys);
       }
     });
+  }
+  walker.addEventListener('click', e => poke(e, false));
+  walker.addEventListener('keydown', e => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    poke(e, true);
   });
+  // Esc or a click anywhere else puts the choices away.
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape' || !menuOpen) return;
+    const hadFocus = sayEl.contains(document.activeElement);
+    release();
+    if (hadFocus) walker.focus({ preventScroll: true });
+  });
+  document.addEventListener('pointerdown', e => {
+    if (menuOpen && !sayEl.contains(e.target) && !walker.contains(e.target)) release();
+  });
+  window.addEventListener('resize', () => {
+    if (phone.matches && talking) { if (walkTween) walkTween.kill(); stopWalkFrames(); release(); }
+    else placeSay();
+  });
+
+  /* ----- he follows the idea through its steps ----- */
+  if (form) {
+    let touched = false, lastStep = form.dataset.step;
+    const touch = () => { touched = true; };
+    ideaField.addEventListener('focus', touch);
+    ideaField.addEventListener('input', () => {
+      touch();
+      // typing while he stands by: he keeps quiet and waits for them to finish
+      if (talking && !menuOpen && !leading) { hush(); stay(9000); }
+    });
+    document.getElementById('ideaTry')?.addEventListener('click', touch);
+
+    new MutationObserver(() => {
+      const step = form.dataset.step, prev = lastStep;
+      if (step === prev) return;
+      lastStep = step;
+      if (phone.matches || leading) return;
+      if (step === 'email' && prev === 'idea') toForm('Nice one. Where do I reply?', { hold: 7000 });
+      if (step === 'sent') {
+        clearIdle();
+        clearTimeout(stayTimer);
+        if (walkTween) walkTween.kill();
+        stopWalkFrames();
+        talking = true; busy = true; sideBias = 0;
+        setFrame('wave-both');
+        say('Got it! Talk soon.');
+        if (!reduced) gsap.to(walker, { y: -34, duration: 0.24, ease: 'power2.out', yoyo: true, repeat: 3,
+          onComplete() { gsap.set(walker, { y: 0 }); } });
+        stay(4200);
+      }
+    }).observe(form, { attributes: true, attributeFilter: ['data-step'] });
+
+    // Once per visit, if the form has been left alone, he strolls over and points it out.
+    let seen = false;
+    try { seen = sessionStorage.getItem('samNudge') === '1'; } catch (err) {}
+    if (!seen && !reduced) setTimeout(() => {
+      if (touched || busy || talking || phone.matches || document.hidden || !heroVisible) return;
+      if (form.dataset.step !== 'idea' || ideaField.value.trim()) return;
+      try { sessionStorage.setItem('samNudge', '1'); } catch (err) {}
+      toForm('Got an idea? Pop it in here.', { hold: 6500 });
+    }, 15000);
+  }
 
   if (reduced) {
     setFrame('idle-front');
