@@ -22,12 +22,27 @@ export const hero = {
     { for: "finance", label: "Advisory firm" },
     { for: "creatives", label: "Creative studio" },
   ],
-  other: "Something else",
   ctaHref: "/contact",
+  ctaLabel: "Start your brief",
+  // Sits under the button, after the Launch price and time from `brief`
+  ctaNote: "Four taps and a name, no blank box.",
   workLink: "See the work",
-  // Real client sites shown in the hero stack, by title from `work`.
-  showcase: ["Elle Vie", "Gijs Running", "James Agro", "Routes2Change"],
-  proof: "One designer, first sketch to launch. 8+ years, 20+ projects.",
+  // The hero demo walks every audience in `audiences` and every example site
+  // in each; `phrases` finishes "I run …" for each audience id.
+  demo: {
+    eyebrow: "Your brief",
+    lead: "I run",
+    need: "and I need a new site.",
+    phrases: {
+      hair: "a salon",
+      trades: "a trades business",
+      coffee: "a café",
+      athletic: "a coaching business",
+      creatives: "a creative studio",
+      community: "a charity",
+    } as Record<string, string>,
+  },
+  proof: "8+ years, 20+ projects, one designer from first sketch to launch.",
 };
 
 export const services: {
