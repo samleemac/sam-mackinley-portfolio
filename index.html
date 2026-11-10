@@ -6,6 +6,7 @@
 <title>Sam MacKinley — Web Designer</title>
 <meta name="description" content="I think, then I build. Tech specialist with 10+ years crafting digital experiences." />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231B1B18'/%3E%3Ctext x='16' y='23' text-anchor='middle' font-family='system-ui,sans-serif' font-size='18' font-weight='700' fill='%23F1F0EB'%3ES%3C/text%3E%3C/svg%3E" />
+<link rel="preload" as="image" href="media/walker/sheet.webp" type="image/webp" media="(min-width:641px)" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
@@ -352,9 +353,15 @@ section{position:relative;z-index:5}
 @keyframes bob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(7px)}}
 
 /* wandering character */
-.walker{position:absolute;left:13%;top:62%;width:74px;height:112px;z-index:7;cursor:none}
-.walker .walker-frame{position:absolute;bottom:0;left:50%;transform:translateX(-50%);
-  height:112px;width:auto;user-select:none;-webkit-user-drag:none;pointer-events:none}
+.walker{position:absolute;left:13%;top:62%;width:77px;height:112px;z-index:7;cursor:none}
+.walker.live{left:0;top:0;will-change:transform}   /* once the script runs he is placed by transform */
+.walker .walker-hop,.walker .walker-body,.walker .walker-frame{position:absolute;inset:0;pointer-events:none}
+.walker .walker-body{transform-origin:50% 100%}
+/* one sprite sheet, 14 cells of 77x112 in a row (see tools/build-walker-sheet.py) */
+.walker .walker-frame{background:url(media/walker/sheet.webp) -770px 0/1078px 112px no-repeat}
+.walker .walker-shadow{position:absolute;left:50%;bottom:-6px;width:50px;height:11px;margin-left:-25px;
+  border-radius:50%;pointer-events:none;
+  background:radial-gradient(closest-side,rgba(40,38,30,.3),rgba(40,38,30,.12) 55%,rgba(40,38,30,0))}
 .walker .walker-wink,.walker .walker-prompt{position:absolute;left:50%;bottom:calc(100% + 4px);
   transform:translateX(-50%) scale(0);transform-origin:bottom center;opacity:0;pointer-events:none;
   filter:drop-shadow(0 6px 10px rgba(40,38,30,.25))}
@@ -1379,7 +1386,8 @@ footer .made svg{width:14px;height:14px}
     <div class="walker" id="walker" role="button" tabindex="0" aria-label="Ask Sam where to start" aria-expanded="false" aria-controls="walkerSay">
       <img class="walker-prompt" id="walkerPrompt" src="media/walker/click-me.png" alt="" draggable="false" />
       <img class="walker-wink" id="walkerWink" src="media/walker/wink-head.png" alt="" draggable="false" />
-      <img class="walker-frame" id="walkerFrame" src="media/walker/idle-front.png" alt="" draggable="false" />
+      <span class="walker-shadow"></span>
+      <span class="walker-hop" id="walkerHop"><span class="walker-body" id="walkerBody"><span class="walker-frame" id="walkerFrame"></span></span></span>
     </div>
     <!-- what he says: a line plus, when he is asked, the next steps to pick from -->
     <div class="walker-say" id="walkerSay" hidden>
@@ -2319,12 +2327,22 @@ if (ideaForm) {
    Click him and he stops, hops and asks what brings you here. Each answer is
    something he does: walk you over to the idea form, lead the way down to the
    built sites, send you to the prices, or just wink. He also strolls over to
-   the form once on his own, and reacts as an idea moves through its steps. */
+   the form once on his own, and reacts as an idea moves through its steps.
+
+   How he walks: one sprite sheet (media/walker/sheet.webp, built by
+   tools/build-walker-sheet.py), moved with a transform. He only ever travels
+   along the direction he is facing — routes are straight runs with square
+   turns, picked to go round the stickers — and his stride is driven by the
+   distance covered, not a clock, so his feet do not slide when he speeds up,
+   slows down or stops. */
 (function heroWalker() {
   const walker = document.getElementById('walker');
   if (!walker || !window.gsap) return;
   const stage = document.querySelector('.hero-stage');
   const frame = document.getElementById('walkerFrame');
+  const body = document.getElementById('walkerBody');
+  const hopEl = document.getElementById('walkerHop');
+  const shadow = walker.querySelector('.walker-shadow');
   const winkEl = document.getElementById('walkerWink');
   const promptEl = document.getElementById('walkerPrompt');
   const sayEl = document.getElementById('walkerSay');
@@ -2333,19 +2351,51 @@ if (ideaForm) {
   const form = document.getElementById('ideaForm');
   const ideaField = document.getElementById('ideaInput');
   const phone = window.matchMedia(PHONE_HERO);
-  const DIR = 'media/walker/';
-  const cycle = d => [1, 2, 3, 4].map(i => `walk-${d}-${i}`);
-  const WALK = { front: cycle('front'), back: cycle('back'), right: cycle('right'), left: cycle('left') };
-  [...Object.values(WALK).flat(), 'idle-front', 'idle-back', 'wave', 'wave-both', 'wink-head', 'click-me']
-    .forEach(n => { const i = new Image(); i.src = `${DIR}${n}.png`; });
 
-  const setFrame = n => { frame.src = `${DIR}${n}.png`; };
+  /* ----- sprite sheet: one row of 77x112 cells ----- */
+  const CELL = 77;
+  const STILL = { 'idle-front': 10, 'idle-back': 11, 'wave': 12, 'wave-both': 13 };
+  // at: first cell · n: poses per step · step: px of ground one step covers at this size
+  const GAIT = { side: { at: 0, n: 6, step: 38 }, front: { at: 6, n: 2, step: 25 }, back: { at: 8, n: 2, step: 25 } };
+  let cellNow = -1;
+  const show = i => { if (i !== cellNow) { cellNow = i; frame.style.backgroundPosition = `${-i * CELL}px 0`; } };
+  function setFrame(n) {            // a standing pose, squared up
+    show(STILL[n]);
+    body.style.transform = '';
+    shadow.style.transform = '';
+  }
+  // The walking pose for a direction after `dist` px of travel.
+  function stride(dir, dist) {
+    if (dir === 'left' || dir === 'right') {
+      // the legs are drawn into the frames; start from legs-together so he steps off from standing
+      const t = (dist / GAIT.side.step + 0.5) % 1;
+      show(GAIT.side.at + Math.floor(t * GAIT.side.n));
+      body.style.transform = dir === 'left' ? 'scaleX(-1)' : '';
+      shadow.style.transform = '';
+      return;
+    }
+    // towards or away: one drawn pose per foot, with the rise and the weight shift added here
+    const g = GAIT[dir], steps = dist / g.step, foot = Math.floor(steps) % 2;
+    const arc = Math.sin(Math.PI * (steps % 1));
+    show(g.at + foot);
+    body.style.transform = `translateY(${(-1.8 * arc).toFixed(2)}px) rotate(${((foot ? 1.5 : -1.5) * arc).toFixed(2)}deg)`;
+    shadow.style.transform = `scaleX(${(1 - 0.1 * arc).toFixed(3)})`;
+  }
 
-  const SPEED = 70;                 // px/s — one 4-frame stride ≈ 0.64s
-  const BRISK = 190;                // px/s when he is leading someone somewhere
-  const FRAME_MS = 160;
-  let walkTween = null, frameTimer = null, idleTimers = [], promptTimer = null, busy = false;
-  let walkFrames = null, walkMs = FRAME_MS, heroVisible = true;
+  /* ----- where he is: a transform, so walking never re-lays out the page ----- */
+  const pos = { x: 0, y: 0 };
+  function moveTo(x, y) {
+    pos.x = x; pos.y = y;
+    walker.style.transform = `translate3d(${x.toFixed(2)}px,${y.toFixed(2)}px,0)`;
+  }
+  moveTo(Math.round(stage.clientWidth * 0.13), Math.round(stage.clientHeight * 0.62));
+  walker.classList.add('live');
+  setFrame('idle-front');
+
+  const SPEED = 62;                 // px/s strolling
+  const BRISK = 175;                // px/s when he is leading someone somewhere
+  let walkTween = null, idleTimers = [], promptTimer = null, busy = false;
+  let heroVisible = true;
   // talking: his bubble is up or he is leading the way · menuOpen: the choices are showing
   // locked: mid-hop, mid-wink or on his way out — clicks wait until he is done
   let talking = false, menuOpen = false, leading = false, locked = false, stayTimer = null, sideBias = 0;
@@ -2353,23 +2403,13 @@ if (ideaForm) {
   const clearIdle = () => { idleTimers.forEach(clearTimeout); idleTimers = []; };
   const later = (fn, ms) => idleTimers.push(setTimeout(fn, ms));
 
-  function startWalkFrames(frames, ms = FRAME_MS) {
-    let i = 0;
-    walkFrames = frames;
-    walkMs = ms;
-    setFrame(frames[0]);
-    clearInterval(frameTimer);
-    frameTimer = setInterval(() => { i = (i + 1) % frames.length; setFrame(frames[i]); }, ms);
-  }
-  function stopWalkFrames() { clearInterval(frameTimer); frameTimer = null; }
+  function stopWalk() { if (walkTween) walkTween.kill(); walkTween = null; }
 
-  // He walks by moving left/top, which re-lays out the page every frame,
-  // so stop him mid-stride while the hero is scrolled out of view.
+  // No point walking where nobody can see: hold him mid-stride while the hero is scrolled away.
   new IntersectionObserver(([e]) => {
     heroVisible = e.isIntersecting;
-    if (!walkTween || !walkTween.isActive() && !walkTween.paused()) return;
-    if (heroVisible) { walkTween.resume(); if (walkFrames) startWalkFrames(walkFrames, walkMs); }
-    else { walkTween.pause(); stopWalkFrames(); }
+    if (!walkTween) return;
+    if (heroVisible) walkTween.resume(); else walkTween.pause();
   }).observe(stage);
 
   function hidePrompt() {
@@ -2383,10 +2423,10 @@ if (ideaForm) {
     if (sayEl.hidden) return;
     const W = stage.clientWidth;
     const bw = sayEl.offsetWidth, bh = sayEl.offsetHeight;
-    const cx = walker.offsetLeft + walker.offsetWidth / 2;
+    const cx = pos.x + walker.offsetWidth / 2;
     const left = Math.max(12, Math.min(cx - bw / 2 + sideBias, W - bw - 12));
-    const above = walker.offsetTop - bh - 14 >= 64;
-    const top = above ? walker.offsetTop - bh - 14 : walker.offsetTop + walker.offsetHeight + 14;
+    const above = pos.y - bh - 14 >= 64;
+    const top = above ? pos.y - bh - 14 : pos.y + walker.offsetHeight + 14;
     const tail = Math.max(20, Math.min(cx - left, bw - 20));
     sayEl.classList.toggle('below', !above);
     sayEl.style.left = left + 'px';
@@ -2444,21 +2484,79 @@ if (ideaForm) {
       });
   }
 
-  function pickPoint() {
+  /* ----- routes: straight runs along the way he faces, square turns between them ----- */
+  const hitsBox = (x, y, ko) => {
+    const x2 = x + walker.offsetWidth + 5, y2 = y + walker.offsetHeight + 5;
+    return ko.some(k => x - 5 < k.x2 && x2 > k.x1 && y - 5 < k.y2 && y2 > k.y1);
+  };
+  // how much of a straight run from a to b would be spent walking over things
+  function runHits(a, b, ko) {
+    const n = Math.max(1, Math.ceil(Math.hypot(b.x - a.x, b.y - a.y) / 18));
+    let hits = 0;
+    for (let i = 1; i <= n; i++) if (hitsBox(a.x + (b.x - a.x) * i / n, a.y + (b.y - a.y) * i / n, ko)) hits++;
+    return hits;
+  }
+  const dirOf = (dx, dy) => Math.abs(dx) >= Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'front' : 'back');
+  function route(to, ko) {
+    const dx = to.x - pos.x, dy = to.y - pos.y;
+    // near enough straight along one axis: a single run, the slight drift does not show
+    if (Math.abs(dy) <= Math.abs(dx) * 0.16 || Math.abs(dx) <= Math.abs(dy) * 0.08)
+      return { pts: [to], hits: runHits(pos, to, ko) };
+    // otherwise an L: across then up/down, or the other way round, whichever is clearer
+    const across = { x: to.x, y: pos.y }, along = { x: pos.x, y: to.y };
+    const h1 = runHits(pos, across, ko) + runHits(across, to, ko);
+    const h2 = runHits(pos, along, ko) + runHits(along, to, ko);
+    const first = h1 < h2 || (h1 === h2 && Math.random() < 0.6) ? across : along;
+    return { pts: [first, to], hits: Math.min(h1, h2) };
+  }
+
+  // A clear spot to stroll to, with a route that goes round the stickers when one exists.
+  function pickRoute() {
     const W = stage.clientWidth, H = stage.clientHeight;
     const bw = walker.offsetWidth, bh = walker.offsetHeight;
     const ko = keepouts();
-    const curY = walker.offsetTop;
-    const preferVert = Math.random() < 0.45;
-    for (let i = 0; i < 50; i++) {
-      const x = gsap.utils.random(24, Math.max(25, W - bw - 24));
-      const y = gsap.utils.random(H * 0.16, Math.max(H * 0.17, H - bh - 28));
-      if (preferVert && Math.abs(y - curY) < 90) continue;
-      const box = { x1: x - 6, y1: y - 6, x2: x + bw + 6, y2: y + bh + 6 };
-      if (!ko.some(k => box.x1 < k.x2 && box.x2 > k.x1 && box.y1 < k.y2 && box.y2 > k.y1))
-        return { x, y };
+    let best = null;
+    for (let i = 0; i < 60; i++) {
+      const to = { x: Math.round(gsap.utils.random(24, Math.max(25, W - bw - 24))),
+                   y: Math.round(gsap.utils.random(H * 0.16, Math.max(H * 0.17, H - bh - 28))) };
+      // no two-step shuffles: a small offset on one axis becomes a straight run on the other
+      if (Math.abs(to.x - pos.x) < 34) to.x = pos.x;
+      if (Math.abs(to.y - pos.y) < 34) to.y = pos.y;
+      if (Math.hypot(to.x - pos.x, to.y - pos.y) < 70 || hitsBox(to.x, to.y, ko)) continue;
+      const r = route(to, ko);
+      if (!r.hits) return r;
+      if (!best || r.hits < best.hits) best = r;
     }
-    return null;
+    return best;
+  }
+
+  // Walk a list of points. Each run eases off the mark and into the stop, and the stride follows
+  // the ground actually covered, so the feet stay planted through the speed changes.
+  function walkPath(pts, speed, done) {
+    let i = 0, dir = 'front';
+    const next = () => {
+      if (i >= pts.length) { walkTween = null; done(dir); return; }
+      const from = { x: pos.x, y: pos.y }, to = pts[i++];
+      const dx = to.x - from.x, dy = to.y - from.y, dist = Math.hypot(dx, dy);
+      if (dist < 1) { next(); return; }
+      dir = dirOf(dx, dy);
+      const T = dist / speed + 0.22, r = Math.min(0.5, 0.22 / T);   // 0.22s to get going, the same to stop
+      const ease = t => t < r ? t * t / (2 * r * (1 - r)) : t > 1 - r ? 1 - (1 - t) * (1 - t) / (2 * r * (1 - r)) : (t - r / 2) / (1 - r);
+      const run = { d: 0 };
+      stride(dir, 0);
+      walkTween = gsap.to(run, {
+        d: dist, duration: T, ease,
+        onUpdate() {
+          const k = run.d / dist;
+          moveTo(from.x + dx * k, from.y + dy * k);
+          stride(dir, run.d);
+          placeSay();
+        },
+        onComplete() { moveTo(Math.round(to.x), Math.round(to.y)); next(); }
+      });
+      if (!heroVisible) walkTween.pause();
+    };
+    next();
   }
 
   function arriveIdle(dir) {
@@ -2477,41 +2575,22 @@ if (ideaForm) {
     }
   }
 
-  const dirOf = (dx, dy) => Math.abs(dx) >= Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'front' : 'back');
-
   function wander() {
     clearIdle();
     hidePrompt();
     if (busy || reduced || phone.matches || document.hidden || !heroVisible) { later(wander, 2000); return; }
-    const target = pickPoint();
-    if (!target) { later(wander, 2500); return; }
-    const dx = target.x - walker.offsetLeft, dy = target.y - walker.offsetTop;
-    const dist = Math.hypot(dx, dy);
-    if (dist < 50) { later(wander, 1200); return; }
-    // pick the cycle that matches the dominant travel direction
-    const dir = dirOf(dx, dy);
-    startWalkFrames(WALK[dir]);
-    walkTween = gsap.to(walker, {
-      left: target.x, top: target.y, duration: dist / SPEED, ease: 'none',
-      onComplete() { stopWalkFrames(); arriveIdle(dir); }
-    });
+    const r = pickRoute();
+    if (!r) { later(wander, 2500); return; }
+    walkPath(r.pts, SPEED, arriveIdle);
   }
 
   /* ----- leading the way ----- */
   // A brisk, purposeful walk to a spot; his bubble travels with him.
   function walkTo(target, done) {
-    if (walkTween) walkTween.kill();
-    stopWalkFrames();
-    const dx = target.x - walker.offsetLeft, dy = target.y - walker.offsetTop;
-    const dist = Math.hypot(dx, dy);
-    if (reduced || dist < 10) { done(); return; }   // reduced motion: he stays put and just points you there
+    stopWalk();
+    if (reduced || Math.hypot(target.x - pos.x, target.y - pos.y) < 10) { done(); return; }   // reduced motion: he stays put and just points you there
     leading = true;
-    startWalkFrames(WALK[dirOf(dx, dy)], 110);
-    walkTween = gsap.to(walker, {
-      left: target.x, top: target.y, duration: Math.min(dist / BRISK, 2.6), ease: 'none',
-      onUpdate: placeSay,
-      onComplete() { stopWalkFrames(); leading = false; done(); }
-    });
+    walkPath(route(target, keepouts()).pts, BRISK, () => { leading = false; done(); });
   }
 
   // Standing spot beside the idea form: just to its left, feet level with the pill.
@@ -2530,7 +2609,7 @@ if (ideaForm) {
     hidePrompt();
     talking = true; busy = true;
     const spot = formSpot();
-    const far = Math.hypot(spot.x - walker.offsetLeft, spot.y - walker.offsetTop) > 60;
+    const far = Math.hypot(spot.x - pos.x, spot.y - pos.y) > 60;
     sideBias = 0;
     if (far && !reduced) say('Follow me.'); else hush();
     walkTo(spot, () => {
@@ -2551,7 +2630,7 @@ if (ideaForm) {
     if (!sites) { release(); return; }
     talking = true; busy = true;
     say('This way.');
-    walkTo({ x: walker.offsetLeft, y: stage.clientHeight - walker.offsetHeight - 6 }, () => {
+    walkTo({ x: pos.x, y: stage.clientHeight - walker.offsetHeight - 6 }, () => {
       sites.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
       release(1500);
     });
@@ -2594,7 +2673,7 @@ if (ideaForm) {
 
   function showClickMe() {
     if (busy || phone.matches || document.hidden) return;
-    if (!walkTween || !walkTween.isActive()) setFrame('wave-both');
+    if (!walkTween) setFrame('wave-both');
     gsap.killTweensOf(promptEl);
     gsap.timeline()
       .to(promptEl, { scale: 1, opacity: 1, duration: 0.28, ease: 'back.out(2)' })
@@ -2615,8 +2694,7 @@ if (ideaForm) {
     if (talking) { openMenu(fromKeys); return; } // standing by the form: straight to the choices
     if (busy) return;
     busy = true; talking = true;
-    if (walkTween) walkTween.kill();
-    stopWalkFrames();
+    stopWalk();
     clearIdle();
     hidePrompt();
     if (reduced) { openMenu(fromKeys); return; }
@@ -2624,10 +2702,10 @@ if (ideaForm) {
     burst(fromKeys ? r.left + r.width / 2 : e.clientX, fromKeys ? r.top + r.height / 2 : e.clientY);
     locked = true;
     setFrame('wave-both');           // arms up for the hop
-    gsap.to(walker, {
+    gsap.to(hopEl, {
       y: -40, duration: 0.22, ease: 'power2.out', yoyo: true, repeat: 1,
       onComplete() {
-        gsap.set(walker, { y: 0 });
+        gsap.set(hopEl, { y: 0 });
         locked = false;
         openMenu(fromKeys);
       }
@@ -2650,8 +2728,11 @@ if (ideaForm) {
     if (menuOpen && !sayEl.contains(e.target) && !walker.contains(e.target)) release();
   });
   window.addEventListener('resize', () => {
-    if (phone.matches && talking) { if (walkTween) walkTween.kill(); stopWalkFrames(); release(); }
-    else placeSay();
+    if (phone.matches) { if (talking) { stopWalk(); release(); } return; }
+    // keep him on the stage when it changes size under him
+    if (!walkTween) moveTo(Math.round(Math.min(pos.x, Math.max(8, stage.clientWidth - walker.offsetWidth - 8))),
+                           Math.round(Math.min(pos.y, Math.max(8, stage.clientHeight - walker.offsetHeight - 8))));
+    placeSay();
   });
 
   /* ----- he follows the idea through its steps ----- */
@@ -2675,13 +2756,12 @@ if (ideaForm) {
       if (step === 'sent') {
         clearIdle();
         clearTimeout(stayTimer);
-        if (walkTween) walkTween.kill();
-        stopWalkFrames();
+        stopWalk();
         talking = true; busy = true; sideBias = 0;
         setFrame('wave-both');
         say('Got it! Talk soon.');
-        if (!reduced) gsap.to(walker, { y: -34, duration: 0.24, ease: 'power2.out', yoyo: true, repeat: 3,
-          onComplete() { gsap.set(walker, { y: 0 }); } });
+        if (!reduced) gsap.to(hopEl, { y: -34, duration: 0.24, ease: 'power2.out', yoyo: true, repeat: 3,
+          onComplete() { gsap.set(hopEl, { y: 0 }); } });
         stay(4200);
       }
     }).observe(form, { attributes: true, attributeFilter: ['data-step'] });
