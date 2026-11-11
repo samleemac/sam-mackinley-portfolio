@@ -10,3 +10,9 @@ verify*.py
 /Templates/
 .vercel
 .env*
+
+# promo video renders
+promo/source/*.mp4
+promo/source/*.wav
+promo/source/*.jpg
+promo/source/list.txt
