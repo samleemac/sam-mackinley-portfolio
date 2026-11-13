@@ -683,36 +683,65 @@ body.pc-lock{overflow:hidden}
 .journey .row.now .tag{background:rgba(123,194,74,.16);color:#5a8c34}
 .journey .cv-link{color:#1b1b18;font:inherit;font-weight:700;background:none;border:none;padding:0;
   text-decoration:underline;text-underline-offset:2px;cursor:none}
-/* fun facts — flip cards */
+/* fun facts — a guess-then-flip deck: a question on the front, the answer on the back */
+.facts-ch{display:flex;align-items:center;justify-content:space-between;gap:10px;white-space:nowrap}
+.facts-count{display:inline-flex;align-items:center;gap:7px;text-transform:none;letter-spacing:.04em;font-weight:500;color:#8c897f}
+.facts-dots{display:inline-flex;gap:3px}
+.facts-dots i{width:7px;height:7px;border-radius:50%;background:#e3e1d9;transition:background .3s,transform .3s cubic-bezier(.3,1.6,.5,1)}
+.facts-dots i.on{background:var(--c);transform:scale(1.25)}
+.facts-reset{font:inherit;font-weight:700;color:#1b1b18;background:none;border:none;padding:0;cursor:none;
+  text-decoration:underline;text-underline-offset:2px}
+.facts-reset[hidden]{display:none}
 .facts{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.fact{background:none;border:none;padding:0;aspect-ratio:3/4;perspective:720px;cursor:none;
-  font:inherit;color:inherit;text-align:left;-webkit-appearance:none;appearance:none}
+.fact{--r:0deg;--c:#E0B978;--c2:#f6ecd9;background:none;border:none;padding:0;aspect-ratio:4/5;perspective:900px;cursor:none;
+  font:inherit;color:inherit;text-align:left;-webkit-appearance:none;appearance:none;position:relative;border-radius:14px}
+.fact:focus-visible{outline:2px solid #1b1b18;outline-offset:3px}
 .fact-inner{display:block;position:relative;width:100%;height:100%;transform-style:preserve-3d;
-  transition:transform .55s cubic-bezier(.2,.8,.2,1)}
+  transform:rotateY(var(--r));transition:transform .7s cubic-bezier(.3,1.32,.45,1)}
+.fact.flipping{animation:factLift .7s ease-out}
+@keyframes factLift{0%{transform:none}40%{transform:translateY(-6px) scale(1.05)}100%{transform:none}}
+.fact-face{position:absolute;inset:0;border-radius:14px;overflow:hidden;
+  backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;flex-direction:column;
+  padding:10px 11px 11px;transition:box-shadow .3s}
+/* front: the question, on the card's colour */
+.fact-front{background:var(--c);color:#1b1b18;
+  background-image:radial-gradient(circle at 85% 12%,rgba(255,255,255,.38),rgba(255,255,255,0) 46%);
+  box-shadow:inset 0 0 0 1px rgba(27,27,24,.08)}
+.fact-top{display:flex;justify-content:space-between;align-items:center;font-family:var(--font-mono);
+  font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:700}
+.fact-top .no{opacity:.55}
+.fact-art{flex:1;display:flex;align-items:center;justify-content:center;min-height:0}
+.fact-art .disc{width:62%;max-width:76px;aspect-ratio:1;border-radius:50%;background:#fffaf0;
+  border:2px solid #1b1b18;display:grid;place-items:center;overflow:hidden;
+  box-shadow:3px 3px 0 #1b1b18;transition:transform .35s cubic-bezier(.3,1.6,.5,1)}
+.fact-art svg{width:62%;height:62%;display:block}
+.fact-art img{width:100%;height:100%;object-fit:cover;display:block}
+.fact-q{font-family:var(--font-script);font-weight:700;font-size:19px;line-height:.98;letter-spacing:-.01em;min-height:2em;
+  display:flex;align-items:flex-end}
+.fact-tap{margin-top:6px;display:flex;align-items:center;gap:5px;font-family:var(--font-mono);font-size:8px;
+  letter-spacing:.12em;text-transform:uppercase;opacity:.6}
+.fact-tap svg{width:10px;height:10px}
 @media (hover:hover){
-  .fact:hover .fact-inner{transform:rotateY(180deg)}
+  .fact:not(.flipped):hover .fact-front{box-shadow:inset 0 0 0 1px rgba(27,27,24,.12),0 14px 22px -14px rgba(40,38,30,.55)}
+  .fact:not(.flipped):hover .disc{transform:rotate(-8deg) scale(1.06)}
 }
-.fact.flipped .fact-inner{transform:rotateY(180deg)}
-.fact.hint .fact-inner{animation:factHint 5.4s cubic-bezier(.45,.05,.2,1) infinite}
-@keyframes factHint{
-  0%,20%{transform:rotateY(0deg)}
-  36%,64%{transform:rotateY(180deg)}
-  80%,100%{transform:rotateY(0deg)}
-}
-.fact.hint:hover .fact-inner,.fact.hint.flipped .fact-inner{animation:none}
-.facts-ch .ch-hint{text-transform:none;letter-spacing:.04em;opacity:.75;font-weight:500}
-.fact-face{position:absolute;inset:0;border-radius:12px;border:1px solid #ecebe4;background:#fff;
-  backface-visibility:hidden;-webkit-backface-visibility:hidden;
-  display:flex;align-items:center;justify-content:center;overflow:hidden;
-  transform:rotateY(0)}
-.fact-front img{width:86%;height:86%;object-fit:contain}
-.fact-front svg{width:42px;height:42px;display:block}
-.fact-back{transform:rotateY(180deg);padding:7px 8px;align-items:center;
-  font-size:10px;line-height:1.32;color:#3c3a34;text-align:center;
-  overflow:hidden;hyphens:auto}
+/* back: the answer, big, then one line of detail */
+.fact-back{transform:rotateY(180deg);background:#fffdf8;color:#3c3a34;font-size:10px;
+  box-shadow:inset 0 0 0 1px #ecebe4,inset 0 4px 0 var(--c)}
+.fact-back .fact-top .tag{background:var(--c2);color:#1b1b18;padding:3px 7px;border-radius:20px;letter-spacing:.1em}
+.fact-a{margin-top:auto;font-size:2.15em;font-weight:800;letter-spacing:-.035em;line-height:.98;color:#1b1b18;
+  overflow-wrap:anywhere}
+.fact-d{margin-top:.75em;font-size:1.12em;line-height:1.36;color:#5a574e}
+/* first card nudges until someone flips one */
+.facts.fresh .fact:first-child .fact-inner{animation:factNudge 4.8s ease-in-out 1.6s infinite}
+@keyframes factNudge{0%,78%,100%{transform:rotateY(0)}84%{transform:rotateY(-16deg)}90%{transform:rotateY(10deg)}95%{transform:rotateY(-4deg)}}
 @media (prefers-reduced-motion:reduce){
-  .fact-inner{transition:none}
-  .fact.hint .fact-inner{animation:none}
+  /* no turning: the answer fades in over the question */
+  .fact-inner{transform:none!important;transition:none}
+  .fact.flipping,.facts.fresh .fact:first-child .fact-inner{animation:none}
+  .fact-back{transform:none;opacity:0;transition:opacity .25s}
+  .fact.flipped .fact-back{opacity:1}
+  .fact.flipped .fact-front{visibility:hidden}
 }
 
 /* ----- Achievements view ----- */
@@ -1106,8 +1135,7 @@ footer .made svg{width:14px;height:14px}
   .finder.open .detail,.detail .inner{min-height:0}
   .view-snapshot,.view-ach,.view-cv{padding:14px 12px 18px;overflow-y:auto}
   .facts{grid-template-columns:repeat(2,1fr)}
-  .fact.hint .fact-inner{animation:none}
-  .facts-ch .ch-hint{display:block;margin-top:4px}
+  .fact-q{font-size:20px}
   .fold .lbl{font-size:11px}
 }
 /* ---------- live sketch of the visitor's idea ---------- */
@@ -3091,20 +3119,24 @@ const RADAR = [
   { l: 'Random\nideas', v: 0.8 },
   { l: 'Greek\nyoghurt', v: 1 },
 ];
+// One drawing style for every emblem: ink line, round ends, a single flat fill.
 const FACT_ICONS = {
-  coffee: '<svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M10 18h22v12a9 9 0 0 1-9 9h-4a9 9 0 0 1-9-9V18z" fill="#EFE8DC" stroke="#3c3a34" stroke-width="1.8"/><path d="M32 20h5a5 5 0 0 1 0 10h-5" stroke="#3c3a34" stroke-width="1.8"/><path d="M12 40h18" stroke="#3c3a34" stroke-width="1.8" stroke-linecap="round"/><path d="M18 8c0 3 2 3 2 6M24 7c0 3 2 3 2 7M30 8c0 3 2 3 2 6" stroke="#8c897f" stroke-width="1.6" stroke-linecap="round"/><rect x="12" y="22" width="18" height="10" rx="2" fill="#6B4423" opacity=".9"/></svg>',
-  run: '<svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><circle cx="29" cy="9" r="4" fill="#3c3a34"/><path d="M28 14l-6 7-8-2M22 21l4 7 8-3" stroke="#3c3a34" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 19l-6 5M26 28l-3 10M34 25l6 8" stroke="#3c3a34" stroke-width="2.2" stroke-linecap="round"/><path d="M20 39h8M38 34h6" stroke="#c79a4e" stroke-width="2.2" stroke-linecap="round"/></svg>',
-  city: '<svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M6 40V22h8v18H6zm10 0V12h10v28H16zm12 0V18h8v22h-8zm10 0V26h6v14h-6z" fill="#EFE8DC" stroke="#3c3a34" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 26h2M9 31h2M19 18h2M19 24h2M19 30h2M30 24h2M30 30h2" stroke="#3c3a34" stroke-width="1.5" stroke-linecap="round"/><circle cx="38" cy="12" r="4" fill="#F3D45E" stroke="#3c3a34" stroke-width="1.3"/></svg>',
-  football: '<svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><circle cx="24" cy="24" r="14.5" fill="#f7f6f1" stroke="#3c3a34" stroke-width="1.8"/><path d="M24 16.2l5 3.6-1.9 5.9h-6.2L19 19.8 24 16.2z" fill="#3c3a34"/><path d="M29 19.8l6.2-1.2M17 19.8l-6.2-1.2M20.9 25.7l-3.4 6.4M27.1 25.7l3.4 6.4M24 16.2V10.5" stroke="#3c3a34" stroke-width="1.5" stroke-linejoin="round"/></svg>',
+  coffee: '<svg viewBox="0 0 48 48" fill="none" stroke="#1b1b18" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 19h24v10a10 10 0 0 1-10 10h-4a10 10 0 0 1-10-10z" fill="#E0B978"/><path d="M34 22h3a5 5 0 0 1 0 10h-4"/><path d="M17 7c-2 3 2 5 0 8M23 6c-2 3 2 5 0 9M29 7c-2 3 2 5 0 8"/></svg>',
+  run: '<svg viewBox="0 0 48 48" fill="none" stroke="#1b1b18" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 33V25c0-2 2-3 4-2l6 3 6-9c1-2 4-2 5 0l2 3c2 4 6 6 11 6h1a4 4 0 0 1 4 4v3z" fill="#86C896"/><path d="M6 33h36v3a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2z" fill="#fffaf0"/><path d="M19 21l3 2M22 18l3 2"/></svg>',
+  travel: '<svg viewBox="0 0 48 48" fill="none" stroke="#1b1b18" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 22L42 7 33 41l-9-12z" fill="#7BA7D9"/><path d="M24 29l18-22M24 29l-2 10 5-7"/></svg>',
+  football: '<svg viewBox="0 0 48 48" fill="none" stroke="#1b1b18" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="24" cy="24" r="16" fill="#fffaf0"/><path d="M24 16l6 4.4-2.3 7h-7.4L18 20.4z" fill="#E29A9A"/><path d="M24 16V8.5M30 20.4l7-2.4M27.7 27.4l4.3 6.2M20.3 27.4L16 33.6M18 20.4l-7-2.4"/></svg>',
 };
+// q is the question on the front, a the answer on the back, d one line of detail.
+// art: an icon key, or an illustration with the crop that centres it in the round frame.
 const FACTS = [
-  { icon: 'coffee', label: 'Coffee', back: 'I love going to new cities and finding speciality coffee places. My favourite place for speciality coffee so far has been Barcelona.' },
-  { icon: 'run', label: 'Running', back: 'I like to run and do events. My longest race was the Lisboa Marathon 2025!' },
-  { icon: 'city', label: 'Travel', back: 'I love to travel, some key highlights from places has been Boston, Copenhagen, Zurich, Rome & More. Wishlist = Sydney, Tokyo, Arizona' },
-  { icon: 'football', label: 'Football', back: 'I like to watch and play football too. My team has always been Liverpool FC and I\u2019ll catch them in the evenings and on the weekend cheering them on.' },
-  { img: 'media/facts/dogs.png', label: 'Dogs', back: 'I have 2 wonderful little dogs who keep me on my toes all day... well the Cavapoo does, the daschund just likes to sleep' },
-  { img: 'media/facts/partner.png', label: 'Partner', back: 'I\u2019m married to an amazing, inspiring woman who has travelled all over the world, building and teaching in various different continents. Her website is coming soon where she will tell her story, it\u2019s worth a read!' },
+  { label: 'Coffee', c: '#E0B978', c2: '#f6ead6', art: { icon: 'coffee' }, q: 'Best coffee city so far?', a: 'Barcelona.', d: 'I hunt down speciality coffee in every new city. Barcelona is still top.' },
+  { label: 'Running', c: '#86C896', c2: '#e2f2e5', art: { icon: 'run' }, q: 'Longest race I’ve run?', a: '42.2 km.', d: 'The Lisboa Marathon, 2025. I like to run and do events.' },
+  { label: 'Travel', c: '#7BA7D9', c2: '#e3edf8', art: { icon: 'travel' }, q: 'Where to next?', a: 'Sydney, Tokyo, Arizona.', d: 'On the wishlist. Highlights so far: Boston, Copenhagen, Zurich and Rome.' },
+  { label: 'Football', c: '#E29A9A', c2: '#f8e3e3', art: { icon: 'football' }, q: 'Who do I cheer for?', a: 'Liverpool FC.', d: 'Always have. I watch and play, evenings and weekends.' },
+  { label: 'Dogs', c: '#F3D45E', c2: '#fbf0c4', art: { img: 'media/facts/dogs.png', pos: '50% 74%', zoom: 1.9 }, q: 'How many dogs?', a: 'Two.', d: 'The Cavapoo keeps me on my toes. The dachshund just likes to sleep.' },
+  { label: 'Partner', c: '#B9A0DD', c2: '#eee6f7', art: { img: 'media/facts/partner.png', pos: '50% 13%', zoom: 1.75 }, q: 'Who inspires me most?', a: 'My wife.', d: 'She has built and taught across continents. Her site, with her story, is coming soon.' },
 ];
+const FLIP_ICON = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 5A4 4 0 0 0 2.6 3.4M2 7a4 4 0 0 0 7.4 1.6"/><path d="M2.4 1.4v2.2h2.2M9.6 10.6V8.4H7.4"/></svg>';
 
 function radarSVG(data) {
   const cx = 120, cy = 112, R = 64, n = data.length;
@@ -3191,28 +3223,69 @@ function renderSnapshot() {
         </div>
       </div>
       <div class="card-s">
-        <div class="ch facts-ch">Fun facts <span class="ch-hint">- flip to see more</span></div>
-        <div class="facts">
+        <div class="ch facts-ch"><span>Fun facts</span>
+          <span class="facts-count"><span class="facts-dots" aria-hidden="true">${FACTS.map(f => `<i style="--c:${f.c}"></i>`).join('')}</span>
+            <span id="factsCount" aria-live="polite">Guess, then flip</span>
+            <button type="button" class="facts-reset" id="factsReset" hidden>Again</button></span>
+        </div>
+        <div class="facts fresh">
           ${FACTS.map((f, i) => {
-            const front = f.img
-              ? `<img src="${f.img}" alt="">`
-              : FACT_ICONS[f.icon];
-            const hint = i === 0 && !reduced && !window.matchMedia('(max-width:640px)').matches;
-            return `<button type="button" class="fact${hint ? ' hint' : ''}" aria-label="${f.label} fun fact. Click to flip.">
+            const art = f.art.img
+              ? `<img src="${f.art.img}" alt="" style="object-position:${f.art.pos};transform:scale(${f.art.zoom});transform-origin:${f.art.pos}">`
+              : FACT_ICONS[f.art.icon];
+            const no = String(i + 1).padStart(2, '0');
+            return `<button type="button" class="fact" style="--c:${f.c};--c2:${f.c2}" aria-pressed="false">
               <span class="fact-inner">
-                <span class="fact-face fact-front">${front}</span>
-                <span class="fact-face fact-back">${f.back}</span>
+                <span class="fact-face fact-front">
+                  <span class="fact-top"><span>${f.label}</span><span class="no">${no}</span></span>
+                  <span class="fact-art"><span class="disc">${art}</span></span>
+                  <span class="fact-q">${f.q}</span>
+                  <span class="fact-tap">${FLIP_ICON}Flip</span>
+                </span>
+                <span class="fact-face fact-back" aria-hidden="true">
+                  <span class="fact-top"><span class="tag">${f.label}</span><span class="no">${no}</span></span>
+                  <span class="fact-a">${f.a}</span>
+                  <span class="fact-d">${f.d}</span>
+                </span>
               </span>
             </button>`;
           }).join('')}
         </div>
       </div>
     </div>`;
-  v.querySelectorAll('.fact').forEach(el => {
-    el.addEventListener('click', () => {
-      el.classList.remove('hint');
-      el.classList.toggle('flipped');
+  // Each card turns over towards the side you clicked, and the header keeps count.
+  const deck = v.querySelector('.facts'), cards = [...deck.querySelectorAll('.fact')];
+  const dots = [...v.querySelectorAll('.facts-dots i')], countEl = v.querySelector('#factsCount'), again = v.querySelector('#factsReset');
+  const tally = () => {
+    const n = cards.filter(c => c.classList.contains('flipped')).length;
+    cards.forEach((c, i) => dots[i].classList.toggle('on', c.classList.contains('flipped')));
+    countEl.textContent = n === cards.length ? 'All six!' : n ? `${n} of ${cards.length} flipped` : 'Guess, then flip';
+    again.hidden = n !== cards.length;
+  };
+  const turn = (el, open, dir) => {
+    const now = parseFloat(el.style.getPropertyValue('--r')) || 0;
+    // every turn is another half-spin from where it is, so it never snaps back the way it came
+    el.style.setProperty('--r', now + 180 * dir + 'deg');
+    el.classList.toggle('flipped', open);
+    el.setAttribute('aria-pressed', String(open));
+    el.querySelector('.fact-front').setAttribute('aria-hidden', String(open));
+    el.querySelector('.fact-back').setAttribute('aria-hidden', String(!open));
+    if (!reduced) { el.classList.remove('flipping'); void el.offsetWidth; el.classList.add('flipping'); }
+  };
+  cards.forEach(el => {
+    el.addEventListener('animationend', e => { if (e.animationName === 'factLift') el.classList.remove('flipping'); });
+    el.addEventListener('click', e => {
+      deck.classList.remove('fresh');
+      const r = el.getBoundingClientRect();
+      const fromKeys = e.detail === 0;   // keyboard clicks carry no pointer position
+      const dir = fromKeys || e.clientX >= r.left + r.width / 2 ? 1 : -1;
+      turn(el, !el.classList.contains('flipped'), dir);
+      tally();
     });
+  });
+  again.addEventListener('click', () => {
+    cards.forEach((el, i) => setTimeout(() => turn(el, false, 1), reduced ? 0 : i * 70));
+    setTimeout(tally, reduced ? 0 : cards.length * 70);
   });
   v.querySelector('[data-open-cv]')?.addEventListener('click', () => switchView('cv'));
   liveSnapshot(v, y0, y100);
@@ -3365,7 +3438,7 @@ function fitFactBacks(root) {
     el.style.overflow = 'visible';
     let size = parseFloat(getComputedStyle(el).fontSize) || 10;
     let guard = 50;
-    while (el.scrollHeight > el.clientHeight && size > 6.5 && guard--) {
+    while (el.scrollHeight > el.clientHeight && size > 7.2 && guard--) {
       size -= 0.2;
       el.style.fontSize = size + 'px';
     }

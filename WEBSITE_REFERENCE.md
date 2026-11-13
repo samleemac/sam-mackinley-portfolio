@@ -107,6 +107,7 @@ A fake macOS Finder window (`#finder`) with a left sidebar of "Favorites" and sw
 ### Editable data arrays (JS)
 - **Projects/folders:** `FOLDERS` (~line 1120) — drives the Projects grid + detail panel. `openFolder()` / `closeFolder()` handle the open/close behavior.
 - **Snapshot:** `NOTE_PILLS`, `JOURNEY`, `RADAR`, `FACTS` (~lines 1226-1247) + `renderSnapshot()`.
+- **Fun facts deck (Snapshot):** six guess-then-flip cards. Each entry in `FACTS` has `label`, its colour `c` (front) and tint `c2` (back tag), `art` (an icon key from `FACT_ICONS`, or an `img` with `pos`/`zoom` to crop it into the round frame), `q` (the question on the front, set in Caveat), `a` (the big answer) and `d` (one line of detail). Clicking turns a card towards the side you clicked; the header dots and count track how many are flipped, and "Again" turns them all back once all six are open. Icons share one style: 48px viewBox, 2.4px ink stroke, round ends, one flat fill in the card's colour. `fitFactBacks()` shrinks a back's base font (its text is sized in em) if a long answer would overflow.
 - **Achievements:** `STATS` and `ACHV` (~lines 1303-1317) + `renderAch()`. Badge types: `award` (gold) / `ship` (grey).
 - **Testimonials:** `TESTIMONIALS` (~line 1336) + `renderTest()`. Each entry: `{ quote, nm, role, initials, color, stars }`. `color` uses an `--f-*` token; `stars` is a count (1-5) rendered as filled gold stars. To add a client, append an object to the array — the grid lays out automatically.
 
