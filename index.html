@@ -693,8 +693,18 @@ body.pc-lock{overflow:hidden}
   text-decoration:underline;text-underline-offset:2px}
 .facts-reset[hidden]{display:none}
 .facts{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.fact{--r:0deg;--c:#E0B978;--c2:#f6ecd9;background:none;border:none;padding:0;aspect-ratio:4/5;perspective:900px;cursor:none;
+.fact-cell{position:relative;--c:#E0B978;--c2:#f6ecd9}
+.fact{--r:0deg;display:block;width:100%;background:none;border:none;padding:0;aspect-ratio:4/5;perspective:900px;cursor:none;
   font:inherit;color:inherit;text-align:left;-webkit-appearance:none;appearance:none;position:relative;border-radius:14px}
+/* a card with a link leaves room at the foot of its back, and the link fades in there after the turn */
+.fact-cell.has-link .fact-back{padding-bottom:40px}
+.fact-link{position:absolute;left:11px;right:11px;bottom:10px;z-index:2;display:flex;align-items:center;justify-content:space-between;
+  gap:6px;padding:6px 10px;border-radius:20px;background:#1b1b18;color:#fff;text-decoration:none;cursor:none;white-space:nowrap;
+  font-family:var(--font-mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;
+  opacity:0;visibility:hidden;transform:translateY(4px);transition:opacity .25s,transform .25s,visibility 0s .25s}
+.fact-cell.open .fact-link{opacity:1;visibility:visible;transform:none;transition:opacity .3s .45s,transform .3s .45s,visibility 0s .45s}
+.fact-link:hover,.fact-link:focus-visible{background:var(--c);color:#1b1b18;outline:none}
+body.touch .fact-link{cursor:pointer}
 .fact:focus-visible{outline:2px solid #1b1b18;outline-offset:3px}
 .fact-inner{display:block;position:relative;width:100%;height:100%;transform-style:preserve-3d;
   transform:rotateY(var(--r));transition:transform .7s cubic-bezier(.3,1.32,.45,1)}
@@ -733,12 +743,13 @@ body.pc-lock{overflow:hidden}
   overflow-wrap:anywhere}
 .fact-d{margin-top:.75em;font-size:1.12em;line-height:1.36;color:#5a574e}
 /* first card nudges until someone flips one */
-.facts.fresh .fact:first-child .fact-inner{animation:factNudge 4.8s ease-in-out 1.6s infinite}
+.facts.fresh .fact-cell:first-child .fact-inner{animation:factNudge 4.8s ease-in-out 1.6s infinite}
 @keyframes factNudge{0%,78%,100%{transform:rotateY(0)}84%{transform:rotateY(-16deg)}90%{transform:rotateY(10deg)}95%{transform:rotateY(-4deg)}}
 @media (prefers-reduced-motion:reduce){
   /* no turning: the answer fades in over the question */
   .fact-inner{transform:none!important;transition:none}
-  .fact.flipping,.facts.fresh .fact:first-child .fact-inner{animation:none}
+  .fact.flipping,.facts.fresh .fact-cell:first-child .fact-inner{animation:none}
+  .fact-cell.open .fact-link{transition:none}
   .fact-back{transform:none;opacity:0;transition:opacity .25s}
   .fact.flipped .fact-back{opacity:1}
   .fact.flipped .fact-front{visibility:hidden}
@@ -3125,14 +3136,19 @@ const FACT_ICONS = {
   run: '<svg viewBox="0 0 48 48" fill="none" stroke="#1b1b18" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 33V25c0-2 2-3 4-2l6 3 6-9c1-2 4-2 5 0l2 3c2 4 6 6 11 6h1a4 4 0 0 1 4 4v3z" fill="#86C896"/><path d="M6 33h36v3a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2z" fill="#fffaf0"/><path d="M19 21l3 2M22 18l3 2"/></svg>',
   travel: '<svg viewBox="0 0 48 48" fill="none" stroke="#1b1b18" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 22L42 7 33 41l-9-12z" fill="#7BA7D9"/><path d="M24 29l18-22M24 29l-2 10 5-7"/></svg>',
   football: '<svg viewBox="0 0 48 48" fill="none" stroke="#1b1b18" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="24" cy="24" r="16" fill="#fffaf0"/><path d="M24 16l6 4.4-2.3 7h-7.4L18 20.4z" fill="#E29A9A"/><path d="M24 16V8.5M30 20.4l7-2.4M27.7 27.4l4.3 6.2M20.3 27.4L16 33.6M18 20.4l-7-2.4"/></svg>',
+  music: '<svg viewBox="0 0 48 48" fill="none" stroke="#1b1b18" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="22" cy="26" r="15" fill="#fffaf0"/><path d="M13.5 20.5a10 10 0 0 1 6-5.5M30.5 31.5a10 10 0 0 1-6 5.5"/><circle cx="22" cy="26" r="5" fill="#F0A271"/><path d="M36 6v14l-5 3"/><circle cx="36" cy="6" r="1" fill="#1b1b18"/></svg>',
+  snack: '<svg viewBox="0 0 48 48" fill="none" stroke="#1b1b18" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 24h36a18 15 0 0 1-36 0z" fill="#fffaf0"/><path d="M8 24c2-4 6-6 16-6s14 2 16 6" fill="#fffaf0"/><circle cx="17" cy="17" r="4" fill="#9ED7D0"/><circle cx="25" cy="14" r="4.2" fill="#E29A9A"/><circle cx="32" cy="18" r="3.6" fill="#9ED7D0"/><path d="M16 39h16"/></svg>',
 };
 // q is the question on the front, a the answer on the back, d one line of detail.
 // art: an icon key, or an illustration with the crop that centres it in the round frame.
+// link (optional): shown at the foot of the back once the card is flipped.
 const FACTS = [
   { label: 'Coffee', c: '#E0B978', c2: '#f6ead6', art: { icon: 'coffee' }, q: 'Best coffee city so far?', a: 'Barcelona.', d: 'I hunt down speciality coffee in every new city. Barcelona is still top.' },
   { label: 'Running', c: '#86C896', c2: '#e2f2e5', art: { icon: 'run' }, q: 'Longest race I’ve run?', a: '42.2 km.', d: 'The Lisboa Marathon, 2025. I like to run and do events.' },
   { label: 'Travel', c: '#7BA7D9', c2: '#e3edf8', art: { icon: 'travel' }, q: 'Where to next?', a: 'Sydney, Tokyo, Arizona.', d: 'On the wishlist. Highlights so far: Boston, Copenhagen, Zurich and Rome.' },
   { label: 'Football', c: '#E29A9A', c2: '#f8e3e3', art: { icon: 'football' }, q: 'Who do I cheer for?', a: 'Liverpool FC.', d: 'Always have. I watch and play, evenings and weekends.' },
+  { label: 'Music', c: '#F0A271', c2: '#fbe6d8', art: { icon: 'music' }, q: 'What’s on while I build?', a: 'Oasis to Olivia Dean.', d: 'Plus Avril Lavigne, The Chainsmokers and more.', link: { href: 'https://open.spotify.com/playlist/6WTT2unDySBchtLpJJStud', text: 'My playlist' } },
+  { label: 'Snack', c: '#9ED7D0', c2: '#e2f3f0', art: { icon: 'snack' }, q: 'Snack that fuels every build?', a: 'Greek yoghurt.', d: 'With some fruit on top. Pancakes are a close second.' },
   { label: 'Dogs', c: '#F3D45E', c2: '#fbf0c4', art: { img: 'media/facts/dogs.png', pos: '50% 74%', zoom: 1.9 }, q: 'How many dogs?', a: 'Two.', d: 'The Cavapoo keeps me on my toes. The dachshund just likes to sleep.' },
   { label: 'Partner', c: '#B9A0DD', c2: '#eee6f7', art: { img: 'media/facts/partner.png', pos: '50% 13%', zoom: 1.75 }, q: 'Who inspires me most?', a: 'My wife.', d: 'She has built and taught across continents. Her site, with her story, is coming soon.' },
 ];
@@ -3234,7 +3250,8 @@ function renderSnapshot() {
               ? `<img src="${f.art.img}" alt="" style="object-position:${f.art.pos};transform:scale(${f.art.zoom});transform-origin:${f.art.pos}">`
               : FACT_ICONS[f.art.icon];
             const no = String(i + 1).padStart(2, '0');
-            return `<button type="button" class="fact" style="--c:${f.c};--c2:${f.c2}" aria-pressed="false">
+            const link = f.link ? `<a class="fact-link" href="${f.link.href}" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true">${f.link.text}<span aria-hidden="true">↗</span></a>` : '';
+            return `<div class="fact-cell${f.link ? ' has-link' : ''}" style="--c:${f.c};--c2:${f.c2}"><button type="button" class="fact" aria-pressed="false">
               <span class="fact-inner">
                 <span class="fact-face fact-front">
                   <span class="fact-top"><span>${f.label}</span><span class="no">${no}</span></span>
@@ -3248,7 +3265,7 @@ function renderSnapshot() {
                   <span class="fact-d">${f.d}</span>
                 </span>
               </span>
-            </button>`;
+            </button>${link}</div>`;
           }).join('')}
         </div>
       </div>
@@ -3257,10 +3274,10 @@ function renderSnapshot() {
   const deck = v.querySelector('.facts'), cards = [...deck.querySelectorAll('.fact')];
   const dots = [...v.querySelectorAll('.facts-dots i')], countEl = v.querySelector('#factsCount'), again = v.querySelector('#factsReset');
   const tally = () => {
-    const n = cards.filter(c => c.classList.contains('flipped')).length;
+    const n = cards.filter(c => c.classList.contains('flipped')).length, all = cards.length;
     cards.forEach((c, i) => dots[i].classList.toggle('on', c.classList.contains('flipped')));
-    countEl.textContent = n === cards.length ? 'All six!' : n ? `${n} of ${cards.length} flipped` : 'Guess, then flip';
-    again.hidden = n !== cards.length;
+    countEl.textContent = n === all ? `All ${all}!` : n ? `${n} of ${all} flipped` : 'Guess, then flip';
+    again.hidden = n !== all;
   };
   const turn = (el, open, dir) => {
     const now = parseFloat(el.style.getPropertyValue('--r')) || 0;
@@ -3270,6 +3287,12 @@ function renderSnapshot() {
     el.setAttribute('aria-pressed', String(open));
     el.querySelector('.fact-front').setAttribute('aria-hidden', String(open));
     el.querySelector('.fact-back').setAttribute('aria-hidden', String(!open));
+    const link = el.parentElement.querySelector('.fact-link');
+    if (link) {
+      el.parentElement.classList.toggle('open', open);
+      link.tabIndex = open ? 0 : -1;
+      link.setAttribute('aria-hidden', String(!open));
+    }
     if (!reduced) { el.classList.remove('flipping'); void el.offsetWidth; el.classList.add('flipping'); }
   };
   cards.forEach(el => {
