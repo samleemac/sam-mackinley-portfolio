@@ -694,6 +694,9 @@ body.pc-lock{overflow:hidden}
 .facts-reset[hidden]{display:none}
 .facts{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
 .fact-cell{position:relative;--c:#E0B978;--c2:#f6ecd9}
+/* an odd card out at the end spans the row instead of sitting alone */
+.fact-cell:last-child:nth-child(odd){grid-column:1/-1}
+.fact-cell:last-child:nth-child(odd) .fact{aspect-ratio:8/5}
 .fact{--r:0deg;display:block;width:100%;background:none;border:none;padding:0;aspect-ratio:4/5;perspective:900px;cursor:none;
   font:inherit;color:inherit;text-align:left;-webkit-appearance:none;appearance:none;position:relative;border-radius:14px}
 /* a card with a link leaves room at the foot of its back, and the link fades in there after the turn */
@@ -3136,6 +3139,7 @@ const FACT_ICONS = {
   run: '<svg viewBox="0 0 48 48" fill="none" stroke="#1b1b18" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 33V25c0-2 2-3 4-2l6 3 6-9c1-2 4-2 5 0l2 3c2 4 6 6 11 6h1a4 4 0 0 1 4 4v3z" fill="#86C896"/><path d="M6 33h36v3a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2z" fill="#fffaf0"/><path d="M19 21l3 2M22 18l3 2"/></svg>',
   travel: '<svg viewBox="0 0 48 48" fill="none" stroke="#1b1b18" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 22L42 7 33 41l-9-12z" fill="#7BA7D9"/><path d="M24 29l18-22M24 29l-2 10 5-7"/></svg>',
   football: '<svg viewBox="0 0 48 48" fill="none" stroke="#1b1b18" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="24" cy="24" r="16" fill="#fffaf0"/><path d="M24 16l6 4.4-2.3 7h-7.4L18 20.4z" fill="#E29A9A"/><path d="M24 16V8.5M30 20.4l7-2.4M27.7 27.4l4.3 6.2M20.3 27.4L16 33.6M18 20.4l-7-2.4"/></svg>',
+  order: '<svg viewBox="0 0 48 48" fill="none" stroke="#1b1b18" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15h22l-3 27H15z" fill="#fffaf0"/><path d="M10 10h26v5H10z" fill="#fffaf0"/><path d="M13.3 25h19.4l-1 10H14.3z" fill="#C8EB8E"/><circle cx="38" cy="33" r="6" fill="#fffaf0"/><path d="M36.5 31.2h.1M39.5 31.2h.1M38 34.4h.1"/></svg>',
   music: '<svg viewBox="0 0 48 48" fill="none" stroke="#1b1b18" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="22" cy="26" r="15" fill="#fffaf0"/><path d="M13.5 20.5a10 10 0 0 1 6-5.5M30.5 31.5a10 10 0 0 1-6 5.5"/><circle cx="22" cy="26" r="5" fill="#F0A271"/><path d="M36 6v14l-5 3"/><circle cx="36" cy="6" r="1" fill="#1b1b18"/></svg>',
   snack: '<svg viewBox="0 0 48 48" fill="none" stroke="#1b1b18" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 24h36a18 15 0 0 1-36 0z" fill="#fffaf0"/><path d="M8 24c2-4 6-6 16-6s14 2 16 6" fill="#fffaf0"/><circle cx="17" cy="17" r="4" fill="#9ED7D0"/><circle cx="25" cy="14" r="4.2" fill="#E29A9A"/><circle cx="32" cy="18" r="3.6" fill="#9ED7D0"/><path d="M16 39h16"/></svg>',
 };
@@ -3144,6 +3148,7 @@ const FACT_ICONS = {
 // link (optional): shown at the foot of the back once the card is flipped.
 const FACTS = [
   { label: 'Coffee', c: '#E0B978', c2: '#f6ead6', art: { icon: 'coffee' }, q: 'Best coffee city so far?', a: 'Barcelona.', d: 'I hunt down speciality coffee in every new city. Barcelona is still top.' },
+  { label: 'Order', c: '#C8EB8E', c2: '#edf7dc', art: { icon: 'order' }, q: 'Go-to coffee order?', a: 'Flat white.', d: 'Made with coconut milk.' },
   { label: 'Running', c: '#86C896', c2: '#e2f2e5', art: { icon: 'run' }, q: 'Longest race I’ve run?', a: '42.2 km.', d: 'The Lisboa Marathon, 2025. I like to run and do events.' },
   { label: 'Travel', c: '#7BA7D9', c2: '#e3edf8', art: { icon: 'travel' }, q: 'Where to next?', a: 'Sydney, Tokyo, Arizona.', d: 'On the wishlist. Highlights so far: Boston, Copenhagen, Zurich and Rome.' },
   { label: 'Football', c: '#E29A9A', c2: '#f8e3e3', art: { icon: 'football' }, q: 'Who do I cheer for?', a: 'Liverpool FC.', d: 'Always have. I watch and play, evenings and weekends.' },
